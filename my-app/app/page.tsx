@@ -1,39 +1,64 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
+  const [isRotating, setIsRotating] = useState(false);
+  const [autoRotate, setAutoRotate] = useState(true);
 
   useEffect(() => {
     const container = containerRef.current;
     const overlay = overlayRef.current;
     let angle = 0;
     let animationFrameId: number;
+    let rotationTimeout: NodeJS.Timeout;
 
     const animate = () => {
       if (container && overlay) {
-        // sine와 cosine을 이용해 원형 경로를 따라 회전 (여기서는 ±20도 범위로 설정)
-        const rotateY = Math.sin(angle) * 7;
-        const rotateX = Math.cos(angle) * 7;
-        container.style.transform = `perspective(350px) rotateY(${rotateY}deg) rotateX(${rotateX}deg)`;
+        if (autoRotate || isRotating) {
+          // sine와 cosine을 이용해 원형 경로를 따라 회전 (여기서는 ±20도 범위로 설정)
+          const rotateY = Math.sin(angle) * 20;
+          const rotateX = Math.cos(angle) * 20;
+          container.style.transform = `perspective(350px) rotateY(${rotateY}deg) rotateX(${rotateX}deg)`;
 
-        // overlay의 배경 위치도 angle을 기반으로 천천히 변하게 함
-        const bgPos = Number(((Math.sin(angle) + 1) * 50).toFixed(2))/2; // 0% ~ 100% 사이
-        overlay.style.backgroundPosition = `${bgPos}%`;
+          // overlay의 배경 위치도 angle을 기반으로 천천히 변하게 함
+          const bgPos = Number(((Math.sin(angle) + 1) * 50).toFixed(2))/2; // 0% ~ 100% 사이
+          overlay.style.backgroundPosition = `${bgPos}%`;
 
-        // angle을 천천히 증가 (속도 조절은 이 값으로)
-        angle += 0.01;
+          // angle을 천천히 증가 (속도 조절은 이 값으로)
+          angle += isRotating ? 0.5 : 0.00; // 클릭 시 더 빠르게 회전
+        } else {
+          // 정면을 바라보도록 부드럽게 리셋
+          container.style.transform = `perspective(350px) rotateY(0deg) rotateX(0deg)`;
+          overlay.style.backgroundPosition = `50%`;
+        }
       }
       animationFrameId = requestAnimationFrame(animate);
     };
 
     animationFrameId = requestAnimationFrame(animate);
 
-    return () => cancelAnimationFrame(animationFrameId);
-  }, []);
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      if (rotationTimeout) clearTimeout(rotationTimeout);
+    };
+  }, [isRotating, autoRotate]);
+
+  const handleCardClick = () => {
+    // 자동 회전 중지
+    setAutoRotate(false);
+    
+    // 클릭 시 1초간 빠르게 회전
+    setIsRotating(true);
+    
+    // 1초 후 회전 중지
+    setTimeout(() => {
+      setIsRotating(false);
+    }, 1000);
+  };
 
   return (
     <div className="h-screen relative">
@@ -53,8 +78,9 @@ export default function Home() {
         <div className="border-amber-700 border-2 w-full h-78 flex justify-center">
           <div 
             ref={containerRef}
-            className="w-55 h-78 relative"
-            style={{ transition: "transform 0.1s ease" }}
+            className="w-55 h-78 relative cursor-pointer"
+            style={{ transition: "transform 0.5s ease" }}
+            onClick={handleCardClick}
           >
             <div 
               ref={overlayRef}
