@@ -21,7 +21,7 @@ export default function Home() {
         container.style.transform = `perspective(350px) rotateY(${rotateY}deg) rotateX(${rotateX}deg)`;
 
         // overlay의 배경 위치도 angle을 기반으로 천천히 변하게 함
-        const bgPos = ((Math.sin(angle) + 1) * 50).toFixed(2); // 0% ~ 100% 사이
+        const bgPos = Number(((Math.sin(angle) + 1) * 50).toFixed(2))/2; // 0% ~ 100% 사이
         overlay.style.backgroundPosition = `${bgPos}%`;
 
         // angle을 천천히 증가 (속도 조절은 이 값으로)
@@ -62,11 +62,12 @@ export default function Home() {
                 absolute
                 w-[220px]
                 h-[310px]
-                bg-[linear-gradient(105deg,_transparent_40%,_rgba(255,219,112,0.8)_45%,_rgba(132,50,255,0.6)_50%,_transparent_54%)]
-                bg-[length:150%_150%]
-                bg-[position:100%]
-                mix-blend-color-dodge
-                brightness-125 
+                bg-[linear-gradient(45deg,_rgba(255,255,255,0.2)_0%,_rgba(255,219,112,0.6)_10%,_rgba(132,50,255,0.8)_60%,_transparent_100%)]
+                bg-[length:200%_200%]
+                mix-blend-screen
+                filter
+                blur-[30px]
+                animate-[shine_4s_linear_infinite]
                 opacity-60
               "
               style={{ transition: "opacity 0.1s ease" }}
