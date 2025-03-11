@@ -20,7 +20,7 @@ export default function App({
 
   // 비디오 재생 시작을 제어하는 상태 추가
   const [startVideo, setStartVideo] = useState(false);
-  const [thirdGroundScale, setThirdGroundScale] = useState(1)
+  const [coinTextOpacity, setCoinTextOpacity] = useState(0)
 
   const [finalGroundRotate, setFinalGroundRotate] = useState(0)
 
@@ -37,7 +37,7 @@ export default function App({
     const timer2 = setTimeout(() => {
       setSecondaryMyCardRotate(20)
       setSecondaryMyCardPosition(60)
-      setOpeningScale(1.4)
+      setOpeningScale(1.6)
     }, 3200);
 
     const timer3 = setTimeout(() => {
@@ -46,8 +46,18 @@ export default function App({
     }, 3600);
 
     const timer4 = setTimeout(() => {
+      setOpeningScale(2.4)
+      setCoinTextOpacity(100)
+    }, 5000);
+
+    const timer5 = setTimeout(() => {
       setOpeningScale(1)
-    }, 4800);
+      setCoinTextOpacity(0)
+    }, 7000);
+
+    const timer6 = setTimeout(() => {
+      setStartVideo(false)
+    }, 7500);
 
     // const timer6 = setTimeout(() => {
     //   setFinalGroundRotate(12)
@@ -58,6 +68,8 @@ export default function App({
       clearTimeout(timer2);
       clearTimeout(timer3);
       clearTimeout(timer4);
+      clearTimeout(timer5);
+      clearTimeout(timer6);
       // clearTimeout(timer6);
     };
   }, []);
@@ -134,9 +146,36 @@ export default function App({
         {startVideo && (
           <AutoplayVideo 
             src="FlipBack.webm" 
-            className="w-full max-w-lg absolute top-0 left-0 z-99999" 
+            className="w-full max-w-lg absolute top-[52%] left-[50%]  z-99999 transform scale-50 translate-x-[-50%] translate-y-[-50%]" 
           />
         )}
+        <div
+           className="
+            w-[35%] max-w-lg absolute z-100000 top-[42%] left-[50%] 
+            translate-x-[-50%] translate-y-[-50%]
+            text-center
+            rounded-4xl
+            bg-gradient-to-r from-[#09B9FE] to-[#3A8AFE]
+            font-extrabold
+            transform transition-all duration-1500
+            text-[.8rem]
+            " 
+            style={{
+              opacity: `${ coinTextOpacity }`
+            }}
+          >
+            후공
+        </div>
+        <div className="
+          w-full h-full bg-white z-1999 absolute translate transition-all duration-1000
+          bg-[linear-gradient(to_bottom,#FE8E68,#FF9C6A,#FFB679,#FF9C6A,#FE8E68)]
+          "
+          style={{
+            opacity: `${ coinTextOpacity }`
+          }}
+        >
+
+        </div>
         <div className="z-100 flex  flex-row gap-3">
           <div className="w-18 h-25 border-3 rounded-lg "></div>
           <div className="w-18 h-25 border-3 rounded-lg "></div>

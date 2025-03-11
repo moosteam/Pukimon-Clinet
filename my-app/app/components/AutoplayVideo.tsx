@@ -1,4 +1,3 @@
-// components/AutoplayVideo.tsx
 import React, { useRef, useEffect } from 'react';
 
 interface AutoplayVideoProps {
@@ -7,14 +6,15 @@ interface AutoplayVideoProps {
   width?: number | string;
   height?: number | string;
   type?: string; // 비디오 타입을 위한 prop 추가
+  style?: string
 }
 
 const AutoplayVideo: React.FC<AutoplayVideoProps> = ({
   src,
   className,
-  width = "8rem",
-  height = "8rem",
-  type = 'video/webm' // 기본값은 mp4로 설정
+  width = "4rem", // 크기 줄이기
+  height = "4rem", // 크기 줄이기
+  type = 'video/webm', // 기본값은 mp4로 설정
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
 
