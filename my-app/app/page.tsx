@@ -257,7 +257,7 @@ export default function App({
               // Only show cards that haven't been played yet
               if (!playedCards[cardId]) {
                 return (
-                  <Draggable isReversed={true} key={`enemy-draggable-${index}`} id={`enemy-${cardId}`}>
+                  <Draggable isReversed={true} key={`enemy-draggable-${index}`} id={`${cardId}`}>
                     <div className="relative">
                       <img
                         src="Charizard.jpg"
