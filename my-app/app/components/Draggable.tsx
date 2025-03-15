@@ -1,17 +1,24 @@
 import React from 'react';
-import {useDraggable} from '@dnd-kit/core';
+import { useDraggable } from '@dnd-kit/core';
 
 export function Draggable(props: {
   children: React.ReactNode;
   id: string;
+  isReversed?: boolean;
 }) {
-  const {attributes, listeners, setNodeRef, transform} = useDraggable({
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: props.id,
   });
   
-  const style = transform ? {
-    transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-  } : undefined;
+  // isReversed가 true면 x, y 좌표를 반전시킵니다.
+  const adjustedX = transform ? (props.isReversed ? -transform.x : transform.x) : 0;
+  const adjustedY = transform ? (props.isReversed ? -transform.y : transform.y) : 0;
+
+  const style = transform
+    ? {
+        transform: `translate3d(${adjustedX}px, ${adjustedY}px, 0)`,
+      }
+    : undefined;
 
   return (
     <div 
