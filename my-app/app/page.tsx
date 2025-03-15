@@ -261,7 +261,7 @@ export default function App({
                     <div className="relative"> 
                       <img
                         src="Charizard.jpg"
-                        alt="" 
+                        alt=""  
                         className="w-18 transition-all duration-500 cursor-grab hover:scale-110"
                       />
                     </div>
