@@ -258,7 +258,7 @@ export default function App({
               if (!playedCards[cardId]) {
                 return (
                   <Draggable isReversed={true} key={`enemy-draggable-${index}`} id={`${cardId}`}>
-                    <div className="relative">
+                    <div className="relative"> 
                       <img
                         src="Charizard.jpg"
                         alt="" 
