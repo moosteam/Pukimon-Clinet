@@ -12,8 +12,10 @@ import { PlayerCards } from "./components/PlayerCards";
 import { GameBoard } from "./components/GameBoard";
 import { EnemyHand } from "./components/EnemyHand";
 import { EnemyWating } from "./components/EnemyWating";
-
-
+import { FieldCards } from "./components/FieldCards";
+import { CoinAnimation } from "./components/CoinAnimation";
+import { MyWating } from "./components/MyWating"
+import { MyHand } from "./components/MyHand";
 
 interface EndTurnButtonProps {
   onEndTurn: () => void;
@@ -234,157 +236,32 @@ export default function App({
             enemyHandList={enemyHandList}
             playedCards={PlayerCards}
           />
-
           {/* 필드 카드 영역 */}
-          <EnemyWating 
+          <EnemyWating
+            droppedCards={droppedCards}
+          />
+          {/* 중앙 카드 영역 */}
+          <FieldCards
+            onEndTurn={onEndTurn}
+            myTurn={myTurn}
+            droppedCards={droppedCards}
+          />
+          {/* 비디오 영역 */}
+          <CoinAnimation
+            startVideo={startVideo}
+            coinTextOpacity={coinTextOpacity}
+          />
+
+          {/* 하단 필드 카드 영역 */}
+          <MyWating
             droppedCards={droppedCards}
           />
 
-          {/* 중앙 카드 영역 */}
-          <div className="z-50 flex flex-row w-full justify-between items-center">
-            {/* 적의 효과칸과 덱 */}
-            <div>
-              <img src="pukimon_card_back.png" alt="" className="w-18" />
-
-              <div>
-                <button
-                  onClick={onEndTurn}
-                  className="bg-white text-black hover:bg-blue-100 text-sm mt-4 mb-4 font-bold py-2 px-2 rounded-full shadow-lg transition-all duration-300"
-                  style={{ visibility: !myTurn ? "visible" : "hidden", transform: 'scale(-1, -1)' }}
-                >
-                  턴 종료하기
-                </button>
-                <div className="w-18 h-25 rounded-sm bg-black/10 shadow-[inset_0_0_4px_rgba(0,0,0,0.3)]"></div>
-
-              </div>
-            </div>
-            {/* 배틀 필드 */}
-            <div>
-              <Droppable id="my_battle">
-                <div className="w-18 h-25 border-3 rounded-lg mt-8 mb-4 bg-yellow-50 flex items-center justify-center">
-                  {droppedCards['my_battle'] && (
-                    <img
-                      src="Charizard.jpg"
-                      alt=""
-                      className="w-full h-full object-cover"
-                    />
-                  )}
-                </div>
-              </Droppable>
-              <div className="h-6"></div>
-              <Droppable id="y_battle">
-                <div className="w-18 h-25 border-3 rounded-lg mb-8 mt-4 bg-yellow-50 flex items-center justify-center">
-                  {droppedCards['y_battle'] && (
-                    <img
-                      src="Charizard.jpg"
-                      alt=""
-                      className="w-full h-full object-cover"
-                    />
-                  )}
-                </div>
-              </Droppable>
-            </div>
-            {/* 나의 효과칸과 덱 */}
-            <div className="flex items-center flex-col">
-              <div className="w-18 h-25 rounded-sm bg-black/10 shadow-[inset_0_0_4px_rgba(0,0,0,0.3)]"></div>
-              <div>
-                <button
-                  onClick={onEndTurn}
-                  className="bg-white text-black hover:bg-blue-100 text-sm mt-4 mb-4 font-bold py-2 px-2 rounded-full shadow-lg transition-all duration-300"
-                  style={{ visibility: myTurn ? "visible" : "hidden" }}
-                >
-                  턴 종료하기
-                </button>
-              </div>
-              <img src="pukimon_card_back.png" alt="" className="w-18" />
-            </div>
-          </div>
-
-          {/* 비디오 영역 */}
-          {startVideo && (
-            <AutoplayVideo
-              src="FlipBack.webm"
-              className="w-full max-w-lg absolute top-[52%] left-[50%] z-60 transform scale-50 translate-x-[-50%] translate-y-[-50%] pointer-events-none"
-            />
-          )}
-
-          {/* 코인 텍스트 */}
-          <div
-            className="w-[35%] max-w-lg absolute z-70 top-[42%] left-[50%] translate-x-[-50%] translate-y-[-50%] text-center rounded-4xl bg-gradient-to-r from-[#09B9FE] to-[#3A8AFE] font-extrabold transform transition-all duration-1500 text-[.8rem]"
-            style={{ opacity: `${coinTextOpacity}` }}>
-            후공
-          </div>
-
-          {/* 코인 배경 효과 */}
-          <div className="w-full h-full absolute z-65 transition-all duration-1000 bg-[linear-gradient(to_bottom,#FE8E68,#FF9C6A,#FFB679,#FF9C6A,#FE8E68)]"
-            style={{ opacity: `${coinTextOpacity}`, pointerEvents: "none" }}>
-          </div>
-
-          {/* 하단 필드 카드 영역 */}
-          <div className="z-50 flex flex-row gap-3">
-            <Droppable id="waiting_1">
-              <div className="w-18 h-25 border-3 rounded-lg bg-yellow-50 flex items-center justify-center">
-                {droppedCards['waiting_1'] && (
-                  <img
-                    src="Charizard.jpg"
-                    alt=""
-                    className="w-full h-full object-cover"
-                  />
-                )}
-              </div>
-            </Droppable>
-            <Droppable id="waiting_2">
-              <div className="w-18 h-25 border-3 rounded-lg bg-yellow-50 flex items-center justify-center">
-                {droppedCards['waiting_2'] && (
-                  <img
-                    src="Charizard.jpg"
-                    alt=""
-                    className="w-full h-full object-cover"
-                  />
-                )}
-              </div>
-            </Droppable>
-            <Droppable id="waiting_3">
-              <div className="w-18 h-25 border-3 rounded-lg bg-yellow-50 flex items-center justify-center">
-                {droppedCards['waiting_3'] && (
-                  <img
-                    src="Charizard.jpg"
-                    alt=""
-                    className="w-full h-full object-cover"
-                  />
-                )}
-              </div>
-            </Droppable>
-          </div>
-
           {/* 내 핸드 영역 - 드래그 가능한 카드들 */}
-          <div className="z-50 flex flex-row mt-4 gap-2">
-            {myHandList && myHandList.map((card, index) => {
-              const cardId = `card-${index}`;
-              // Only show cards that haven't been played yet
-              if (!playedCards[cardId]) {
-                return (
-                  <Draggable isReversed={false} key={`draggable-${index}`} id={cardId}>
-                    <div className="relative">
-                      <img
-                        src="Charizard.jpg"
-                        alt=""
-                        className="w-18 transition-all duration-500 cursor-grab hover:scale-110"
-                      />
-                    </div>
-                  </Draggable>
-                );
-              }
-              return null;
-            })}
-            {!myHandList &&
-              <img
-                src="Charizard.jpg"
-                alt=""
-                className="w-18 transition-all duration-1500 invisible"
-              />
-            }
-          </div>
+          <MyHand
+            myHandList={myHandList}
+            playedCards={PlayerCards}
+          />
         </GameBoard>
       </div >
     </DndContext >
