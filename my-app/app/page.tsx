@@ -4,14 +4,18 @@ import { useEffect, useState } from "react";
 import { useAtom, useAtomValue } from "jotai";
 import { DndContext, DragEndEvent } from '@dnd-kit/core';
 import { OpeningOverlay } from "./components/AnimationManager/OpeningOverlay";
+import { CoinAnimation } from "./components/AnimationManager/CoinAnimation";
 import { PlayerCards } from "./components/Card/PlayerCards";
 import { GameBoard } from "./components/BattleField/GameBoard";
+import { FieldCards } from "./components/BattleField/FieldCards";
 import { EnemyHand } from "./components/EnemyArea/EnemyHand";
 import { EnemyWating } from "./components/EnemyArea/EnemyWating";
-import { FieldCards } from "./components/BattleField/FieldCards";
-import { CoinAnimation } from "./components/AnimationManager/CoinAnimation";
 import { MyWating } from "./components/MyArea/MyWating"
 import { MyHand } from "./components/MyArea/MyHand";
+
+import { useLongPress } from 'use-long-press';
+
+import { myCardListAtom, enemyCardListAtom, myHandListAtom, enemyHandListAtom, myUsedListAtom, enemyUsedListAtom } from './atom'
 
 interface EndTurnButtonProps {
   onEndTurn: () => void;
@@ -32,6 +36,13 @@ export default function App({
   const [startVideo, setStartVideo] = useState(false);
   const [coinTextOpacity, setCoinTextOpacity] = useState(0);
   const [finalGroundRotate, setFinalGroundRotate] = useState(0);
+
+  const [myCardList, setMyCardList] = useAtom(myCardListAtom)
+  const [enemyCardList, setEnemyCardList] = useAtom(enemyCardListAtom)
+  const [myHandList, setMyHandList] = useAtom(myHandListAtom)
+  const [enemyHandList, setEnemyHandList] = useAtom(enemyHandListAtom)
+  const [myUsedList, setMyUsedList] = useAtom(myUsedListAtom)
+  const [enemyUsedList, setEnemyUsedList] = useAtom(enemyUsedListAtom)
 
   useEffect(() => {
     // 클라이언트 사이드 렌더링 확인
@@ -149,16 +160,7 @@ export default function App({
       addCardToEnemyHand(4);
     }
   }
-
-  // 게임플레이를 위한 변수들
-  const [myCardList] = useState<string[]>(["리자몽", "리자몽", "리자몽", "리자몽", "리자몽", "리자몽", "리자몽"]);
-  const [enemyCardList] = useState<string[]>(["리자몽", "리자몽", "리자몽", "리자몽", "리자몽", "리자몽", "리자몽"]);
-  const [myHandList, setMyHandList] = useState<string[]>([]);
-  const [enemyHandList, setEnemyHandList] = useState<string[]>([]);
-  const [myUsedList] = useState<string[]>([]);
-  const [enemyUsedList] = useState<string[]>([]);
   const [playedCards, setPlayedCards] = useState<{ [key: string]: boolean }>({});
-
   // Add state to track cards in droppable areas
   const [droppedCards, setDroppedCards] = useState<{ [key: string]: string }>({});
 
