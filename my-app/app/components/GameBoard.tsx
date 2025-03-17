@@ -1,0 +1,34 @@
+interface GameBoardProps {
+  openingRotate: number;
+  openingScale: number;
+  finalGroundRotate: number;
+  children?: React.ReactNode; // children prop 추가
+}
+
+export const GameBoard: React.FC<GameBoardProps> = ({
+  openingRotate, 
+  openingScale, 
+  finalGroundRotate,
+  children // children prop 추가
+}) => {
+  return (
+    <div 
+      className="absolute w-full h-full z-40 bg-none flex justify-between flex-col items-center p-2 transition-all duration-1500"
+      style={{
+        transform: `perspective(800px) rotateZ(${openingRotate}deg) scale(${openingScale}) rotateX(${finalGroundRotate}deg) translateY(${finalGroundRotate * -1 / 3.5}rem)`,
+        // 오프닝 부분 클릭 금지를 위해 rotate가 0일때 클릭할 수 없게 함
+        pointerEvents: finalGroundRotate != 0 ? "auto" : "none"
+      }}
+    >
+      <div className="w-full h-full absolute">
+        <img
+          src="pukimon_battle_field.png"
+          alt="Battle Field"
+          className="absolute object-cover top-0 left-0 scale-170 translate-y-[50%] w-full h-full z-10 pointer-events-none"
+          style={{ minWidth: '100%', height: 'auto' }}
+        />
+      </div>
+      {children} {/* children 렌더링 */}
+    </div>
+  )
+}

@@ -7,6 +7,13 @@ import { DndContext, DragEndEvent } from '@dnd-kit/core';
 import { Draggable } from './components/Draggable';
 import { Droppable } from './components/Droppable';
 import { PlayerCard } from './components/PlayerCard'
+import { OpeningOverlay } from "./components/OpeningOverlay";
+import { PlayerCards } from "./components/PlayerCards";
+import { GameBoard } from "./components/GameBoard";
+import { EnemyHand } from "./components/EnemyHand";
+import { EnemyWating } from "./components/EnemyWating";
+
+
 
 interface EndTurnButtonProps {
   onEndTurn: () => void;
@@ -28,12 +35,8 @@ export default function App({
   const [coinTextOpacity, setCoinTextOpacity] = useState(0);
   const [finalGroundRotate, setFinalGroundRotate] = useState(0);
 
-  // clientSide 렌더링만 하도록 설정
-  const [isClient, setIsClient] = useState(false);
-
   useEffect(() => {
     // 클라이언트 사이드 렌더링 확인
-    setIsClient(true);
 
     // 초기 상태 설정
     setOpeningRotate(120);
@@ -90,15 +93,8 @@ export default function App({
         action: () => {
           setFinalGroundRotate(12);
         }
-      },
-      {
-        time: 9500,
-        action: () => {
-          addCardToMyHand(4);
-        }
       }
     ];
-
     // 타이머 설정 및 실행
     const timers = animationSequence.map(({ time, action }) => {
       return setTimeout(action, time);
@@ -109,6 +105,17 @@ export default function App({
       timers.forEach(timer => clearTimeout(timer));
     };
   }, []);
+
+  useEffect(() => {
+    // 10초 후에 실행될 타이머 설정
+    const timer = setTimeout(() => {
+      addCardToMyHand(4);
+    }, 10000); // 10000ms = 10초
+
+    // 컴포넌트가 언마운트될 때 타이머 정리
+    return () => clearTimeout(timer);
+  }, []); // 빈 배열은 컴포넌트가 마운트될 때 한 번만 실행됨을 의미
+
 
   const [myTurn, setMyTurn] = useState(true);
 
@@ -207,115 +214,31 @@ export default function App({
   }
 
   // 클라이언트 사이드 렌더링 될 때까지 아무것도 렌더링하지 않음
-  if (!isClient) {
-    return null;
-  }
-
   return (
     <DndContext onDragEnd={handleDragEnd}>
       <div className="w-full h-full bg-[#C2DAF6] relative">
 
         {/* 플레이어 카드 1 */}
-        <PlayerCard
-          imageSrc="/player1.png"
-          rotate={secondaryMyCardRotate}
-          position={secondaryMyCardPosition}
-          translateY={4}
+        <PlayerCards
+          secondaryMyCardRotate={secondaryMyCardRotate}
+          secondaryMyCardPosition={secondaryMyCardPosition}
+          myImageSrc={"/player1.png"}
+          emenyImageSrc={"/player2.png"}
         />
-        {/* 플레이어 카드 2 */}
-        <PlayerCard
-          imageSrc="/player2.png"
-          rotate={-secondaryMyCardRotate}
-          position={-secondaryMyCardPosition}
-          translateY={26}
-        />
-
         {/* 오프닝 애니메이션 오버레이 */}
-        <div className="absolute w-full h-full bg-white z-30 transition-all duration-1000 pointer-events-none"
-          style={{ opacity: `${openingOpacity}` }}></div>
-
+        <OpeningOverlay openingOpacity={openingOpacity} />
         {/* 게임 필드 */}
-        <div className="absolute w-full h-full z-40 bg-none flex justify-between flex-col items-center p-2 transition-all duration-1500"
-          style={{
-            transform: `perspective(800px) rotateZ(${openingRotate}deg) scale(${openingScale}) rotateX(${finalGroundRotate}deg) translateY(${finalGroundRotate * -1 / 3.5}rem)`,
-            // 오프닝 부분 클릭 금지를 위해 rotate가 0일때 클릭할 수 없게 함
-            pointerEvents: finalGroundRotate != 0 ? "auto" : "none" 
-          }}>
-          {/* 배경 필드 */}
-          <div className="w-full h-full absolute">
-            <img
-              src="pukimon_battle_field.png"
-              alt="Battle Field"
-              className="absolute object-cover top-0 left-0 scale-170 translate-y-[50%] w-full h-full z-10 pointer-events-none"
-              style={{ minWidth: '100%', height: 'auto' }}
-            />
-          </div>
-
+        <GameBoard openingRotate={openingRotate} openingScale={openingScale} finalGroundRotate={finalGroundRotate}>
           {/* 적 카드 영역 */}
-          <div className="z-50 flex flex-row">
-          {enemyHandList && enemyHandList.map((card, index) => {
-              const cardId = `enemy-card-${index}`;
-              // Only show cards that haven't been played yet
-              if (!playedCards[cardId]) {
-                return (
-                  <Draggable isReversed={true} key={`enemy-draggable-${index}`} id={`${cardId}`}>
-                    <div className="relative"> 
-                      <img
-                        src="Charizard.jpg"
-                        alt=""  
-                        className="w-18 transition-all duration-500 cursor-grab hover:scale-110"
-                      />
-                    </div>
-                  </Draggable>
-                );
-              }
-              return null;
-            })}
-            {myHandList.length === 0 &&
-              <img
-                src="Charizard.jpg"
-                alt=""
-                className="w-18 transition-all duration-1500 invisible"
-              />
-            }
-          </div>
+          <EnemyHand
+            enemyHandList={enemyHandList}
+            playedCards={PlayerCards}
+          />
 
           {/* 필드 카드 영역 */}
-          <div className="z-50 flex flex-row gap-3">
-          <Droppable id="enemy_waiting_1">
-              <div className="w-18 h-25 border-3 rounded-lg bg-yellow-50 flex items-center justify-center">
-                {droppedCards['enemy_waiting_1'] && (
-                  <img
-                    src="Charizard.jpg"
-                    alt=""
-                    className="w-full h-full object-cover"
-                  />
-                )}
-              </div>
-            </Droppable>
-            <Droppable id="enemy_waiting_2">
-              <div className="w-18 h-25 border-3 rounded-lg bg-yellow-50 flex items-center justify-center">
-                {droppedCards['enemy_waiting_2'] && (
-                  <img
-                    src="Charizard.jpg"
-                    alt=""
-                    className="w-full h-full object-cover"
-                  />
-                )}
-              </div>
-            </Droppable>
-            <Droppable id="enemy_waiting_3">
-              <div className="w-18 h-25 border-3 rounded-lg bg-yellow-50 flex items-center justify-center">
-                {droppedCards['enemy_waiting_3'] && (
-                  <img
-                    src="Charizard.jpg"
-                    alt=""
-                    className="w-full h-full object-cover"
-                  />
-                )}
-              </div>
-            </Droppable>
-          </div>
+          <EnemyWating 
+            droppedCards={droppedCards}
+          />
 
           {/* 중앙 카드 영역 */}
           <div className="z-50 flex flex-row w-full justify-between items-center">
@@ -327,7 +250,7 @@ export default function App({
                 <button
                   onClick={onEndTurn}
                   className="bg-white text-black hover:bg-blue-100 text-sm mt-4 mb-4 font-bold py-2 px-2 rounded-full shadow-lg transition-all duration-300"
-                  style={{visibility : !myTurn ? "visible" : "hidden", transform: 'scale(-1, -1)'}}
+                  style={{ visibility: !myTurn ? "visible" : "hidden", transform: 'scale(-1, -1)' }}
                 >
                   턴 종료하기
                 </button>
@@ -368,7 +291,7 @@ export default function App({
                 <button
                   onClick={onEndTurn}
                   className="bg-white text-black hover:bg-blue-100 text-sm mt-4 mb-4 font-bold py-2 px-2 rounded-full shadow-lg transition-all duration-300"
-                  style={{visibility : myTurn ? "visible" : "hidden"}}
+                  style={{ visibility: myTurn ? "visible" : "hidden" }}
                 >
                   턴 종료하기
                 </button>
@@ -462,8 +385,8 @@ export default function App({
               />
             }
           </div>
-        </div>
-      </div>
-    </DndContext>
+        </GameBoard>
+      </div >
+    </DndContext >
   );
 }
