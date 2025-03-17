@@ -1,20 +1,20 @@
 import React from 'react';
-import { Draggable } from './Draggable';
+import { Draggable } from '../Draggable';
 
-interface MyHandProps {
-    myHandList: any;
+interface EnemyHandProps {
+    enemyHandList: any;
     playedCards: any;
 }
 
-export const MyHand: React.FC<MyHandProps> = ({ myHandList, playedCards }) => {
+export const EnemyHand: React.FC<EnemyHandProps> = ({ enemyHandList, playedCards }) => {
     return (
         <div className="z-50 flex flex-row">
-            {myHandList && myHandList.map((card: any, index: any) => {
-                const cardId = `card-${index}`;
+            {enemyHandList && enemyHandList.map((card: any, index: any) => {
+                const cardId = `enemy-card-${index}`;
                 // Only show cards that haven't been played yet
                 if (!playedCards[cardId]) {
                     return (
-                        <Draggable isReversed={false} key={`draggable-${index}`} id={`${cardId}`}>
+                        <Draggable isReversed={true} key={`enemy-draggable-${index}`} id={`${cardId}`}>
                             <div className="relative">
                                 <img
                                     src="Charizard.jpg"
@@ -27,7 +27,7 @@ export const MyHand: React.FC<MyHandProps> = ({ myHandList, playedCards }) => {
                 }
                 return null;
             })}
-            {myHandList.length === 0 &&
+            {enemyHandList.length === 0 &&
                 <img
                     src="Charizard.jpg"
                     alt=""

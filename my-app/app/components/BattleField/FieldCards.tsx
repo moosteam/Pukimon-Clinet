@@ -1,4 +1,4 @@
-import { Droppable } from "./Droppable";
+import { Droppable } from "../Droppable";
 
 interface FieldCardsProps {
     onEndTurn: any;

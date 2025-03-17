@@ -1,16 +1,16 @@
 import React from 'react';
-import { Droppable } from './Droppable';
+import { Droppable } from '../Droppable';
 
-interface EnemyWatingProps {
+interface MyWatingProps {
     droppedCards: any;
 }
 
-export const EnemyWating: React.FC<EnemyWatingProps> = ({ droppedCards }) => {
+export const MyWating: React.FC<MyWatingProps> = ({ droppedCards }) => {
     return (
         <div className="z-50 flex flex-row gap-3">
-            <Droppable id="enemy_waiting_1">
+            <Droppable id="waiting_1">
                 <div className="w-18 h-25 border-3 rounded-lg bg-yellow-50 flex items-center justify-center">
-                    {droppedCards['enemy_waiting_1'] && (
+                    {droppedCards['waiting_1'] && (
                         <img
                             src="Charizard.jpg"
                             alt=""
@@ -19,9 +19,9 @@ export const EnemyWating: React.FC<EnemyWatingProps> = ({ droppedCards }) => {
                     )}
                 </div>
             </Droppable>
-            <Droppable id="enemy_waiting_2">
+            <Droppable id="waiting_2">
                 <div className="w-18 h-25 border-3 rounded-lg bg-yellow-50 flex items-center justify-center">
-                    {droppedCards['enemy_waiting_2'] && (
+                    {droppedCards['waiting_2'] && (
                         <img
                             src="Charizard.jpg"
                             alt=""
@@ -30,9 +30,9 @@ export const EnemyWating: React.FC<EnemyWatingProps> = ({ droppedCards }) => {
                     )}
                 </div>
             </Droppable>
-            <Droppable id="enemy_waiting_3">
+            <Droppable id="waiting_3">
                 <div className="w-18 h-25 border-3 rounded-lg bg-yellow-50 flex items-center justify-center">
-                    {droppedCards['enemy_waiting_3'] && (
+                    {droppedCards['waiting_3'] && (
                         <img
                             src="Charizard.jpg"
                             alt=""
@@ -42,5 +42,6 @@ export const EnemyWating: React.FC<EnemyWatingProps> = ({ droppedCards }) => {
                 </div>
             </Droppable>
         </div>
+
     )
 }

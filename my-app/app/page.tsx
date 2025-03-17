@@ -2,20 +2,16 @@
 
 import { useEffect, useState } from "react";
 import { useAtom, useAtomValue } from "jotai";
-import AutoplayVideo from './components/AutoplayVideo';
 import { DndContext, DragEndEvent } from '@dnd-kit/core';
-import { Draggable } from './components/Draggable';
-import { Droppable } from './components/Droppable';
-import { PlayerCard } from './components/PlayerCard'
-import { OpeningOverlay } from "./components/OpeningOverlay";
-import { PlayerCards } from "./components/PlayerCards";
-import { GameBoard } from "./components/GameBoard";
-import { EnemyHand } from "./components/EnemyHand";
-import { EnemyWating } from "./components/EnemyWating";
-import { FieldCards } from "./components/FieldCards";
-import { CoinAnimation } from "./components/CoinAnimation";
-import { MyWating } from "./components/MyWating"
-import { MyHand } from "./components/MyHand";
+import { OpeningOverlay } from "./components/AnimationManager/OpeningOverlay";
+import { PlayerCards } from "./components/Card/PlayerCards";
+import { GameBoard } from "./components/BattleField/GameBoard";
+import { EnemyHand } from "./components/EnemyArea/EnemyHand";
+import { EnemyWating } from "./components/EnemyArea/EnemyWating";
+import { FieldCards } from "./components/BattleField/FieldCards";
+import { CoinAnimation } from "./components/AnimationManager/CoinAnimation";
+import { MyWating } from "./components/MyArea/MyWating"
+import { MyHand } from "./components/MyArea/MyHand";
 
 interface EndTurnButtonProps {
   onEndTurn: () => void;
@@ -116,7 +112,7 @@ export default function App({
 
     // 컴포넌트가 언마운트될 때 타이머 정리
     return () => clearTimeout(timer);
-  }, []); // 빈 배열은 컴포넌트가 마운트될 때 한 번만 실행됨을 의미
+  }, []);
 
 
   const [myTurn, setMyTurn] = useState(true);
@@ -220,7 +216,7 @@ export default function App({
     <DndContext onDragEnd={handleDragEnd}>
       <div className="w-full h-full bg-[#C2DAF6] relative">
 
-        {/* 플레이어 카드 1 */}
+        {/* 플레이어 카드 */}
         <PlayerCards
           secondaryMyCardRotate={secondaryMyCardRotate}
           secondaryMyCardPosition={secondaryMyCardPosition}
@@ -231,37 +227,20 @@ export default function App({
         <OpeningOverlay openingOpacity={openingOpacity} />
         {/* 게임 필드 */}
         <GameBoard openingRotate={openingRotate} openingScale={openingScale} finalGroundRotate={finalGroundRotate}>
+
           {/* 적 카드 영역 */}
-          <EnemyHand
-            enemyHandList={enemyHandList}
-            playedCards={PlayerCards}
-          />
+          <EnemyHand enemyHandList={enemyHandList} playedCards={PlayerCards} />
           {/* 필드 카드 영역 */}
-          <EnemyWating
-            droppedCards={droppedCards}
-          />
+          <EnemyWating droppedCards={droppedCards} />
           {/* 중앙 카드 영역 */}
-          <FieldCards
-            onEndTurn={onEndTurn}
-            myTurn={myTurn}
-            droppedCards={droppedCards}
-          />
-          {/* 비디오 영역 */}
-          <CoinAnimation
-            startVideo={startVideo}
-            coinTextOpacity={coinTextOpacity}
-          />
-
+          <FieldCards onEndTurn={onEndTurn} myTurn={myTurn} droppedCards={droppedCards} />
           {/* 하단 필드 카드 영역 */}
-          <MyWating
-            droppedCards={droppedCards}
-          />
-
+          <MyWating droppedCards={droppedCards} />
           {/* 내 핸드 영역 - 드래그 가능한 카드들 */}
-          <MyHand
-            myHandList={myHandList}
-            playedCards={PlayerCards}
-          />
+          <MyHand myHandList={myHandList} playedCards={PlayerCards} />
+
+          {/* 비디오 영역 */}
+          <CoinAnimation startVideo={startVideo} coinTextOpacity={coinTextOpacity} />
         </GameBoard>
       </div >
     </DndContext >
