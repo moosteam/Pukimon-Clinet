@@ -1,0 +1,60 @@
+[
+  {
+    "name": "리자몽",
+    "cardImage": "./리자몽ex.jpg",
+    "isEx": true,
+    "type": "불",
+    "hp": 180,
+    "skill": [
+      {
+        "name": "베어가르기",
+        "damage": 60,
+        "energy": 3
+      },
+      {
+        "name": "홍련의바람",
+        "damage": 200,
+        "energy": 4
+      }
+    ],
+    "weakness": "물",
+    "beforeEvo": "리자드",
+    "afterEvo": ""
+  },
+
+  {
+    "name": "리자드",
+    "cardImage": "./리자드.jpg",
+    "isEx": false,
+    "type": "불",
+    "hp": 90,
+    "skill": [
+      {
+        "name": "불꽃의발톱",
+        "damage": 60,
+        "energy": 3
+      }
+    ],
+    "weakness": "물",
+    "beforeEvo": "파이리",
+    "afterEvo": "리자몽ex"
+  },
+
+  {
+    "name": "파이리",
+    "cardImage": "./파이리.jpg",
+    "isEx": false,
+    "type": "불",
+    "hp": 60,
+    "skill": [
+      {
+        "name": "불꽃세례",
+        "damage": 30,
+        "energy": 1
+      }
+    ],
+    "weakness": "물",
+    "beforeEvo": "",
+    "afterEvo": "리자드"
+  }
+]

@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { Draggable } from '../Draggable';
 import { useLongPress } from 'use-long-press';
-
+import { useMouseIdle } from '../../hooks/useMouseIdle';
 
 interface MyHandProps {
     myHandList: any;
@@ -12,9 +12,12 @@ export const MyHand: React.FC<MyHandProps> = ({ myHandList, playedCards }) => {
 
     const [isCardZoomed, setIsCardZoomed] = useState(false);
     const [zoomedCardSrc, setZoomedCardSrc] = useState("Charizard.jpg");
+    const isIdle = useMouseIdle()
 
     const longPressHandler = useLongPress(() => {
-        setIsCardZoomed(true);
+        if (isIdle) {
+            setIsCardZoomed(true);
+        }
     });
 
     const closeZoom = useCallback(() => {

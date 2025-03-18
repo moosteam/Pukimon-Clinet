@@ -32,7 +32,7 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
             {/* 배틀 필드 */}
             <div>
                 <Droppable id="my_battle">
-                    <div className="w-18 h-25 border-3 rounded-lg mt-8 mb-4 bg-yellow-50 flex items-center justify-center">
+                    <div className="w-32 h-44 border-3 rounded-lg mt-4 bg-yellow-50 flex items-center justify-center">
                         {droppedCards['my_battle'] && (
                             <img
                                 src="Charizard.jpg"
@@ -42,9 +42,8 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
                         )}
                     </div>
                 </Droppable>
-                <div className="h-6"></div>
                 <Droppable id="y_battle">
-                    <div className="w-18 h-25 border-3 rounded-lg mb-8 mt-4 bg-yellow-50 flex items-center justify-center">
+                    <div className="w-32 h-44 border-3 rounded-lg mb-4 bg-yellow-50 flex items-center justify-center">
                         {droppedCards['y_battle'] && (
                             <img
                                 src="Charizard.jpg"

@@ -216,7 +216,7 @@ export default function App({
   // 클라이언트 사이드 렌더링 될 때까지 아무것도 렌더링하지 않음
   return (
     <DndContext onDragEnd={handleDragEnd}>
-      <div className="w-full h-full bg-[#C2DAF6] relative">
+      <div className="w-full h-full bg-[#C2DAF6] relative overflow-hidden">
 
         {/* 플레이어 카드 */}
         <PlayerCards
