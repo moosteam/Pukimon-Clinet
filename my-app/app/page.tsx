@@ -187,18 +187,18 @@ export default function App({
     // Battle area handling
     if (dropzoneId === 'my_battle' || dropzoneId === 'y_battle') {
         setDroppedCards(prev => ({ ...prev, [dropzoneId]: cardName }));
-        // Move hand list update inside validation block
         if (myTurn) {
             setMyHandList(prev => prev.filter((_, i) => i !== index));
         } else {
             setEnemyHandList(prev => prev.filter((_, i) => i !== index));
         }
     }
-    // Waiting area handling
+    // Waiting area handling - Requires battle area card
     else if (dropzoneId.includes('waiting_')) {
-        if (droppedCards['my_battle'] || droppedCards['y_battle']) {
+        // Check if corresponding battle area has a card
+        const battleArea = dropzoneId.startsWith('my_') ? 'y_battle' : 'my_battle';
+        if (droppedCards[battleArea]) {
             setDroppedCards(prev => ({ ...prev, [dropzoneId]: cardName }));
-            // Move hand list update inside validation block
             if (myTurn) {
                 setMyHandList(prev => prev.filter((_, i) => i !== index));
             } else {
