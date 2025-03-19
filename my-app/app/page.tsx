@@ -8,14 +8,10 @@ import { CoinAnimation } from "./components/AnimationManager/CoinAnimation";
 import { PlayerCards } from "./components/Card/PlayerCards";
 import { GameBoard } from "./components/BattleField/GameBoard";
 import { FieldCards } from "./components/BattleField/FieldCards";
-import { EnemyHand } from "./components/EnemyArea/EnemyHand";
-import { EnemyWating } from "./components/EnemyArea/EnemyWating";
-import { MyWating } from "./components/MyArea/MyWating"
-import { MyHand } from "./components/MyArea/MyHand";
+import { Hand } from "./components/Area/Hand";
+import { Wating } from "./components/Area/Wating";
 
-import { useLongPress } from 'use-long-press';
-
-import { myCardListAtom, enemyCardListAtom, myHandListAtom, enemyHandListAtom, myUsedListAtom, enemyUsedListAtom } from './atom'
+import { myCardListAtom, enemyCardListAtom, myHandListAtom, enemyHandListAtom, myUsedListAtom, enemyUsedListAtom, myCardRearAtom } from './atom'
 
 interface EndTurnButtonProps {
   onEndTurn: () => void;
@@ -43,6 +39,7 @@ export default function App({
   const [enemyHandList, setEnemyHandList] = useAtom(enemyHandListAtom)
   const [myUsedList, setMyUsedList] = useAtom(myUsedListAtom)
   const [enemyUsedList, setEnemyUsedList] = useAtom(enemyUsedListAtom)
+  const [myCardRear, setMyCardRear] = useAtom(myCardRearAtom)
 
   useEffect(() => {
     // 클라이언트 사이드 렌더링 확인
@@ -64,7 +61,7 @@ export default function App({
         }
       },
       {
-        time: 3200,
+        time: 3200/4,
         action: () => {
           setSecondaryMyCardRotate(20);
           setSecondaryMyCardPosition(60);
@@ -72,33 +69,33 @@ export default function App({
         }
       },
       {
-        time: 3600,
+        time: 3600/4,
         action: () => {
           setStartVideo(true);
         }
       },
       {
-        time: 5000,
+        time: 5000/4,
         action: () => {
           setOpeningScale(2.4);
           setCoinTextOpacity(100);
         }
       },
       {
-        time: 7000,
+        time: 7000/4,
         action: () => {
           setOpeningScale(1);
           setCoinTextOpacity(0);
         }
       },
       {
-        time: 7500,
+        time: 7500/4,
         action: () => {
           setStartVideo(false);
         }
       },
       {
-        time: 8500,
+        time: 8500/4,
         action: () => {
           setFinalGroundRotate(12);
         }
@@ -119,7 +116,7 @@ export default function App({
     // 10초 후에 실행될 타이머 설정
     const timer = setTimeout(() => {
       addCardToMyHand(4);
-    }, 10000); // 10000ms = 10초
+    }, 10000/4); // 10000ms = 10초
 
     // 컴포넌트가 언마운트될 때 타이머 정리
     return () => clearTimeout(timer);
@@ -129,36 +126,43 @@ export default function App({
   const [myTurn, setMyTurn] = useState(true);
 
   const addCardToMyHand = (cycle: number) => {
-    const addSingleCard = (index: number) => {
-      if (index >= cycle) return;
+    const initialCards = myCardList.slice(0, cycle);
+    setMyCardList(prev => prev.slice(cycle));
 
+    initialCards.forEach((card, index) => {
       setTimeout(() => {
-        setMyHandList(prevHandList => [...prevHandList, "리자몽"])
-        addSingleCard(index + 1);
-      }, 300);
-    };
-    addSingleCard(0);
+        setMyHandList(prev => [...prev, card]);
+      }, 300 * index);
+    });
   };
 
   const addCardToEnemyHand = (cycle: number) => {
-    const addSingleCard = (index: number) => {
-      if (index >= cycle) return;
+    const initialCards = enemyCardList.slice(0, cycle);
+    setEnemyCardList(prev => prev.slice(cycle));
 
+    initialCards.forEach((card, index) => {
       setTimeout(() => {
-        setEnemyHandList(prevHandList => [...prevHandList, "리자몽"])
-        addSingleCard(index + 1);
-      }, 300);
-    };
-    addSingleCard(0);
+        setEnemyHandList(prev => [...prev, card]);
+      }, 300 * index);
+    });
   };
 
   const onEndTurn = () => {
     setOpeningRotate(openingRotate + 180);
     setFinalGroundRotate(finalGroundRotate * -1);
-    setMyTurn(!myTurn);
+
     if (enemyHandList.length == 0) {
       addCardToEnemyHand(4);
     }
+    else if (myTurn) {
+      addCardToEnemyHand(1);
+    }
+    else if (!myTurn) {
+      addCardToMyHand(1);
+    }
+
+    setMyTurn(!myTurn);
+
   }
   const [playedCards, setPlayedCards] = useState<{ [key: string]: boolean }>({});
   // Add state to track cards in droppable areas
@@ -166,52 +170,43 @@ export default function App({
 
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
+    if (!over) return;
 
-    if (over) {
-      // Get the card ID and the droppable area ID
-      const cardId = active.id as string;
-      const dropzoneId = over.id as string;
+    const cardId = active.id as string;
+    const cardName = active.data.current?.imgLink;
+    const dropzoneId = over.id as string;
+    const isMyCard = cardId.startsWith('card-');
+    const isEnemyCard = cardId.startsWith('enemycard-');
 
-      // Check if it's a waiting area
-      if (dropzoneId.includes('waiting_')) {
-        // Only allow dropping in waiting areas if there's a card in battle area
-        if (droppedCards['my_battle'] || droppedCards['y_battle']) {
-          console.log(`Card ${cardId} dropped on ${dropzoneId}`);
+    // Validate turn and ownership
+    if ((myTurn && !isMyCard) || (!myTurn && !isEnemyCard)) return;
 
-          // Mark the card as played
-          setPlayedCards(prev => ({
-            ...prev,
-            [cardId]: true
-          }));
+    // Get card index from ID
+    const index = parseInt(cardId.split('-')[1]);
 
-          // Store which card is in which droppable area
-          setDroppedCards(prev => ({
-            ...prev,
-            [dropzoneId]: cardId
-          }));
+    // Battle area handling
+    if (dropzoneId === 'my_battle' || dropzoneId === 'y_battle') {
+        setDroppedCards(prev => ({ ...prev, [dropzoneId]: cardName }));
+        // Move hand list update inside validation block
+        if (myTurn) {
+            setMyHandList(prev => prev.filter((_, i) => i !== index));
         } else {
-          console.log("Cannot place card in waiting area - no card in battle area yet");
-          // You could add a visual feedback or notification here
+            setEnemyHandList(prev => prev.filter((_, i) => i !== index));
         }
-      }
-      // If it's a battle area, always allow dropping
-      else if (dropzoneId === 'my_battle' || dropzoneId === 'y_battle') {
-        console.log(`Card ${cardId} dropped on ${dropzoneId}`);
-
-        // Mark the card as played
-        setPlayedCards(prev => ({
-          ...prev,
-          [cardId]: true
-        }));
-
-        // Store which card is in which droppable area
-        setDroppedCards(prev => ({
-          ...prev,
-          [dropzoneId]: cardId
-        }));
-      }
     }
-  }
+    // Waiting area handling
+    else if (dropzoneId.includes('waiting_')) {
+        if (droppedCards['my_battle'] || droppedCards['y_battle']) {
+            setDroppedCards(prev => ({ ...prev, [dropzoneId]: cardName }));
+            // Move hand list update inside validation block
+            if (myTurn) {
+                setMyHandList(prev => prev.filter((_, i) => i !== index));
+            } else {
+                setEnemyHandList(prev => prev.filter((_, i) => i !== index));
+            }
+        }
+    }
+}
 
   // 클라이언트 사이드 렌더링 될 때까지 아무것도 렌더링하지 않음
   return (
@@ -222,8 +217,8 @@ export default function App({
         <PlayerCards
           secondaryMyCardRotate={secondaryMyCardRotate}
           secondaryMyCardPosition={secondaryMyCardPosition}
-          myImageSrc={"/player1.png"}
-          emenyImageSrc={"/player2.png"}
+          myImageSrc={"/ui/player1.png"}
+          emenyImageSrc={"/ui/player2.png"}
         />
         {/* 오프닝 애니메이션 오버레이 */}
         <OpeningOverlay openingOpacity={openingOpacity} />
@@ -231,15 +226,15 @@ export default function App({
         <GameBoard openingRotate={openingRotate} openingScale={openingScale} finalGroundRotate={finalGroundRotate}>
 
           {/* 적 카드 영역 */}
-          <EnemyHand enemyHandList={enemyHandList} playedCards={PlayerCards} />
+          <Hand handList={enemyHandList} playedCards={PlayerCards} isMy={false} />
           {/* 필드 카드 영역 */}
-          <EnemyWating droppedCards={droppedCards} />
+          <Wating droppedCards={droppedCards} isMy={false} />
           {/* 중앙 카드 영역 */}
           <FieldCards onEndTurn={onEndTurn} myTurn={myTurn} droppedCards={droppedCards} />
           {/* 하단 필드 카드 영역 */}
-          <MyWating droppedCards={droppedCards} />
+          <Wating droppedCards={droppedCards} isMy={true} />
           {/* 내 핸드 영역 - 드래그 가능한 카드들 */}
-          <MyHand myHandList={myHandList} playedCards={PlayerCards} />
+          <Hand handList={myHandList} playedCards={PlayerCards} isMy={true} />
 
           {/* 비디오 영역 */}
           <CoinAnimation startVideo={startVideo} coinTextOpacity={coinTextOpacity} />

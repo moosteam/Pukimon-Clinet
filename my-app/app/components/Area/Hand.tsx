@@ -1,23 +1,21 @@
 import React, { useState, useCallback } from 'react';
 import { Draggable } from '../Draggable';
 import { useLongPress } from 'use-long-press';
-import { useMouseIdle } from '../../hooks/useMouseIdle';
 
-interface MyHandProps {
-    myHandList: any;
+
+interface HandProps {
+    handList: any;
     playedCards: any;
+    isMy: any;
 }
 
-export const MyHand: React.FC<MyHandProps> = ({ myHandList, playedCards }) => {
+export const Hand: React.FC<HandProps> = ({ handList, playedCards, isMy }) => {
 
     const [isCardZoomed, setIsCardZoomed] = useState(false);
     const [zoomedCardSrc, setZoomedCardSrc] = useState("Charizard.jpg");
-    const isIdle = useMouseIdle()
 
     const longPressHandler = useLongPress(() => {
-        if (isIdle) {
-            setIsCardZoomed(true);
-        }
+        setIsCardZoomed(true);
     });
 
     const closeZoom = useCallback(() => {
@@ -25,11 +23,11 @@ export const MyHand: React.FC<MyHandProps> = ({ myHandList, playedCards }) => {
     }, []);
 
     return (
-        <div className="z-50 flex flex-row">
+        <div className="z-9999999999 flex flex-row">
             {/* Card zoom overlay */}
             {isCardZoomed && (
                 <div
-                    className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 transform scale-120"
+                    className="fixed inset-0 z-9999999999 flex items-center justify-center bg-black/50 transform scale-120"
                     onClick={closeZoom}
                 >
                     <div className="relative w-[50%] max-w-[200px]">
@@ -42,16 +40,21 @@ export const MyHand: React.FC<MyHandProps> = ({ myHandList, playedCards }) => {
                 </div>
             )}
 
-            {myHandList && myHandList.map((card: any, index: any) => {
+            {handList && handList.map((card: any, index: any) => {
                 const cardId = `card-${index}`;
                 // Only show cards that haven't been played yet
                 if (!playedCards[cardId]) {
                     return (
-                        <Draggable isReversed={false} key={`draggable-${index}`} id={`${cardId}`}>
+                        <Draggable 
+                            isReversed={!isMy} 
+                            key={isMy ? `draggable-${index}` : `enemydraggable-${index}`} 
+                            id={isMy ? `${cardId}` : `enemy${cardId}`}
+                            imgLink={`card/${card}.png`}
+                        >
                             <div className="relative">
                                 <img
-                                    {...longPressHandler()}
-                                    src="Charizard.jpg"
+                                    // {...longPressHandler()}
+                                    src={`card/${card}.png`}
                                     alt=""
                                     className="w-18 transition-all duration-500 cursor-grab hover:scale-110"
                                 />
@@ -61,9 +64,9 @@ export const MyHand: React.FC<MyHandProps> = ({ myHandList, playedCards }) => {
                 }
                 return null;
             })}
-            {myHandList.length === 0 &&
+            {handList.length === 0 &&
                 <img
-                    src="Charizard.jpg"
+                    src="card/리자몽ex.png"
                     alt=""
                     className="w-18 transition-all duration-1500 invisible"
                 />

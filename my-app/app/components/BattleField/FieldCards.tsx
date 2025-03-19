@@ -3,7 +3,7 @@ import { Droppable } from "../Droppable";
 interface FieldCardsProps {
     onEndTurn: any;
     myTurn: any;
-    droppedCards: any;
+    droppedCards: Record<string, string>; // Update type
 }
 
 export const FieldCards: React.FC<FieldCardsProps> = ({
@@ -35,8 +35,8 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
                     <div className="w-32 h-44 border-3 rounded-lg mt-4 bg-yellow-50 flex items-center justify-center">
                         {droppedCards['my_battle'] && (
                             <img
-                                src="Charizard.jpg"
-                                alt=""
+                                src={droppedCards['my_battle']}
+                                alt={droppedCards['my_battle']}
                                 className="w-full h-full object-cover"
                             />
                         )}
@@ -46,8 +46,8 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
                     <div className="w-32 h-44 border-3 rounded-lg mb-4 bg-yellow-50 flex items-center justify-center">
                         {droppedCards['y_battle'] && (
                             <img
-                                src="Charizard.jpg"
-                                alt=""
+                                src={droppedCards['y_battle']}
+                                alt={droppedCards['y_battle']}
                                 className="w-full h-full object-cover"
                             />
                         )}

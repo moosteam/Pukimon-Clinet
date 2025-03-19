@@ -4,10 +4,14 @@ import { useDraggable } from '@dnd-kit/core';
 export function Draggable(props: {
   children: React.ReactNode;
   id: string;
+  imgLink: string;
   isReversed?: boolean;
 }) {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: props.id,
+    data: {
+      imgLink: props.imgLink
+    },
   });
 
   // isReversed가 true면 x, y 좌표를 반전시킵니다.

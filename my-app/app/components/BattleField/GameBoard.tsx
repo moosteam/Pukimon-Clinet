@@ -22,7 +22,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     >
       <div className="w-full h-full absolute">
         <img
-          src="pukimon_battle_field.png"
+          src="ui/pukimon_battle_field.png"
           alt="Battle Field"
           className="absolute object-cover top-0 left-0 scale-170 translate-y-[50%] w-full h-full z-10 pointer-events-none"
           style={{ minWidth: '100%', height: 'auto' }}
