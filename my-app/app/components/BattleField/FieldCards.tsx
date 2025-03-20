@@ -1,7 +1,9 @@
 import { Droppable } from "../Droppable";
 import { useState } from "react";
+import { useAtom, useAtomValue } from "jotai";
 
 import { data } from "../../data/cards";
+import { myBattlePokemonEnergyAtom, myBattlePokemonHPAtom, enemyBattlePokemonEnergyAtom, enemyBattlePokemonHPAtom } from "../../atom";
 
 interface FieldCardsProps {
     onEndTurn: any;
@@ -14,7 +16,14 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
     myTurn,
     droppedCards,
 }) => {
+    
+    const [myBattlePokemonEnergy, setMyBattlePokemonEnergy] = useAtom(myBattlePokemonEnergyAtom);
+    const [myBattlePokemonHP, setMyBattlePokemonHP] = useAtom(myBattlePokemonHPAtom);
+    const [enemyBattlePokemonEnergy, setEnemyBattlePokemonEnergy] = useAtom(enemyBattlePokemonEnergyAtom);
+    const [enemyBattlePokemonHP, setEnemyBattlePokemonHP] = useAtom(enemyBattlePokemonHPAtom);
+    
     const [isReadyToAttack, setIsReadyToAttack] = useState(false);
+    
     return (
         <div className="z-50 flex flex-row w-full justify-between items-center">
             {isReadyToAttack && (
@@ -105,7 +114,7 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
                     >
                         {droppedCards['my_battle'] && (
                             <div>
-                                <div className="bg-green-700 absolute p-1 border-4">60</div>
+                                <div className="bg-green-700 absolute p-1 border-4">{myBattlePokemonHP}</div>
                                 <img
                                     src={droppedCards['my_battle']}
                                     alt={droppedCards['my_battle']}

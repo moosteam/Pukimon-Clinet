@@ -30,6 +30,12 @@ export const enemyUsedListAtom = atom<string[]>([]);
 export const myBattlePokemonEnergyAtom = atom<number>(0);
 export const myWatingPokemonEnergyAtom = atom<number[]>([0, 0, 0]);
 
+export const myBattlePokemonHPAtom = atom<number>(0);
+export const myWatingPokemonHPAtom = atom<number[]>([0, 0, 0]);
+
 export const enemyBattlePokemonEnergyAtom = atom<number>(0);
 export const enemyWatingPokemonEnergyAtom = atom<number[]>([0, 0, 0]);
+
+export const enemyBattlePokemonHPAtom = atom<number>(0);
+export const enemyWatingPokemonHPAtom = atom<number[]>([0, 0, 0]);
 

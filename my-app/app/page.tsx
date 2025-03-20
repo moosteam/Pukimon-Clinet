@@ -12,7 +12,19 @@ import { Hand } from "./components/Area/Hand";
 import { Wating } from "./components/Area/Wating";
 import { data } from "./data/cards";
 
-import { myCardListAtom, enemyCardListAtom, myHandListAtom, enemyHandListAtom, myUsedListAtom, enemyUsedListAtom, myCardRearAtom } from './atom'
+import { 
+  myCardListAtom, 
+  enemyCardListAtom,
+  myHandListAtom,
+  enemyHandListAtom,
+  myUsedListAtom,
+  enemyUsedListAtom,
+  myCardRearAtom,
+  myBattlePokemonEnergyAtom,
+  myBattlePokemonHPAtom,
+  enemyBattlePokemonEnergyAtom,
+  enemyBattlePokemonHPAtom
+} from './atom'
 
 interface EndTurnButtonProps {
   onEndTurn: () => void;
@@ -41,6 +53,11 @@ export default function App({
   const [myUsedList, setMyUsedList] = useAtom(myUsedListAtom)
   const [enemyUsedList, setEnemyUsedList] = useAtom(enemyUsedListAtom)
   const [myCardRear, setMyCardRear] = useAtom(myCardRearAtom)
+  const [myBattlePokemonEnergy, setMyBattlePokemonEnergy] = useAtom(myBattlePokemonEnergyAtom);
+  const [myBattlePokemonHP, setMyBattlePokemonHP] = useAtom(myBattlePokemonHPAtom);
+  const [enemyBattlePokemonEnergy, setEnemyBattlePokemonEnergy] = useAtom(enemyBattlePokemonEnergyAtom);
+  const [enemyBattlePokemonHP, setEnemyBattlePokemonHP] = useAtom(enemyBattlePokemonHPAtom);
+  
 
   useEffect(() => {
     // 클라이언트 사이드 렌더링 확인
@@ -216,6 +233,7 @@ export default function App({
     if (dropzoneId === 'my_battle' || dropzoneId === 'y_battle') {
         setDroppedCards(prev => ({ ...prev, [dropzoneId]: cardName }));
         if (myTurn) {
+            setMyBattlePokemonHP(data[cardName].hp)
             setMyHandList(prev => prev.filter((_, i) => i !== index));
         } else {
             setEnemyHandList(prev => prev.filter((_, i) => i !== index));
