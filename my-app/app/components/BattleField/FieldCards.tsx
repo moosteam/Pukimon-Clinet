@@ -4,7 +4,7 @@ import { useAtom, useAtomValue } from "jotai";
 
 import { data } from "../../data/cards";
 import { myBattlePokemonEnergyAtom, myBattlePokemonHPAtom, enemyBattlePokemonEnergyAtom, enemyBattlePokemonHPAtom } from "../../atom";
-
+import { Draggable } from "../Draggable";
 interface FieldCardsProps {
     onEndTurn: any;
     myTurn: any;
@@ -57,7 +57,24 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
             )}
             {/* 적의 효과칸과 덱 */}
             <div>
-                <img src="pukimon_card_back.png" alt="" className="w-18" />
+            {!myTurn && 
+                    <Draggable 
+                    isReversed={true} 
+                    key={'energy'} 
+                    id={'energy'}
+                    imgLink={``}
+                >
+                    <div className="relative">
+                        <img
+                            // {...longPressHandler()}
+                            src={`ui/energy.png`}
+                            alt=""
+                            className="w-18 transition-all duration-500 cursor-grab hover:scale-110"
+                        />
+                    </div>
+                </Draggable>
+                }
+                <img src="ui/pukimon_card_back.png" alt="" className="w-18" />
 
                 <div>
                     <button
@@ -67,10 +84,13 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
                     >
                         턴 종료하기
                     </button>
+                    
                     <div className="w-18 h-25 rounded-sm bg-black/10 shadow-[inset_0_0_4px_rgba(0,0,0,0.3)]"></div>
 
                 </div>
+                
             </div>
+            
             {/* 배틀 필드 */}
             <div>
                 <Droppable id="y_battle">
@@ -114,7 +134,11 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
                     >
                         {droppedCards['my_battle'] && (
                             <div>
-                                <div className="bg-green-700 absolute p-1 border-4">{myBattlePokemonHP}</div>
+                                {Array(myBattlePokemonEnergy).fill(0).map(() => (
+                                    <div className="bg-green-700 absolute p-1 border-4">에너지</div>
+                                )) }
+                                
+                                <div className="bg-green-700 absolute mt-34 p-1 border-4">{myBattlePokemonHP}</div>
                                 <img
                                     src={droppedCards['my_battle']}
                                     alt={droppedCards['my_battle']}
@@ -122,6 +146,7 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
                                 />
                             </div>
                         )}
+                        
                     </div>
                 </Droppable>
             </div>
@@ -137,7 +162,25 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
                         턴 종료하기
                     </button>
                 </div>
-                <img src="pukimon_card_back.png" alt="" className="w-18" />
+                <img src="ui/pukimon_card_back.png" alt="" className="w-18" />
+                {myTurn && 
+                    <Draggable 
+                    isReversed={false} 
+                    key={'energy'} 
+                    id={'energy'}
+                    imgLink={``}
+                >
+                    <div className="relative">
+                        <img
+                            // {...longPressHandler()}
+                            src={`ui/energy.png`}
+                            alt=""
+                            className="w-18 transition-all duration-500 cursor-grab hover:scale-110"
+                        />
+                    </div>
+                </Draggable>
+                }
+                
             </div>
         </div>
     )
