@@ -1,4 +1,5 @@
 import { Droppable } from "../Droppable";
+import { useState } from "react";
 
 interface FieldCardsProps {
     onEndTurn: any;
@@ -11,6 +12,7 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
     myTurn,
     droppedCards,
 }) => {
+
     return (
         <div className="z-50 flex flex-row w-full justify-between items-center">
             {/* 적의 효과칸과 덱 */}
@@ -31,23 +33,43 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
             </div>
             {/* 배틀 필드 */}
             <div>
-                <Droppable id="my_battle">
-                    <div className="w-32 h-44 border-3 rounded-lg mt-4 bg-yellow-50 flex items-center justify-center">
-                        {droppedCards['my_battle'] && (
+                <Droppable id="y_battle">
+                    <div className="w-32 h-44 border-3 rounded-lg mt-4 bg-yellow-50 flex items-center justify-center"
+                          style={{
+                            borderWidth: 2,
+                            borderColor: !droppedCards["y_battle"] && (!myTurn) ? "blue" : "transparent",
+                            boxShadow: !droppedCards["y_battle"] && (!myTurn)
+                              ? "0 0 15px 5px rgba(0, 0, 255, 0.6)"
+                              : "none",
+                            borderRadius: "8px",
+                            transition: "box-shadow 0.3s ease, border-color 0.3s ease",
+                          }}
+                    >
+                        {droppedCards['y_battle'] && (
                             <img
-                                src={droppedCards['my_battle']}
-                                alt={droppedCards['my_battle']}
+                                src={droppedCards['y_battle']}
+                                alt={droppedCards['y_battle']}
                                 className="w-full h-full object-cover"
                             />
                         )}
                     </div>
                 </Droppable>
-                <Droppable id="y_battle">
-                    <div className="w-32 h-44 border-3 rounded-lg mb-4 bg-yellow-50 flex items-center justify-center">
-                        {droppedCards['y_battle'] && (
+                <Droppable id="my_battle">
+                    <div className="w-32 h-44 border-3 rounded-lg mb-4 bg-yellow-50 flex items-center justify-center"
+                        style={{
+                            borderWidth: 2,
+                            borderColor: !droppedCards["my_battle"] && myTurn ? "blue" : "transparent",
+                            boxShadow: !droppedCards["my_battle"] && myTurn
+                              ? "0 0 15px 5px rgba(0, 0, 255, 0.6)"
+                              : "none",
+                            borderRadius: "8px",
+                            transition: "box-shadow 0.3s ease, border-color 0.3s ease",
+                          }}
+                    >
+                        {droppedCards['my_battle'] && (
                             <img
-                                src={droppedCards['y_battle']}
-                                alt={droppedCards['y_battle']}
+                                src={droppedCards['my_battle']}
+                                alt={droppedCards['my_battle']}
                                 className="w-full h-full object-cover"
                             />
                         )}

@@ -1,7 +1,21 @@
-export const data = [
-  {
-    name: "리자몽",
-    cardImage: "./card/리자몽ex.jpg",
+interface Card {
+  name: string;
+  isEx: boolean;
+  type: string;
+  hp: number;
+  skill: { name: string; damage: number; energy: number; }[];
+  weakness: string;
+  beforeEvo: string;
+  afterEvo: string;
+}
+
+interface CardData {
+  [key: string]: Card;
+}
+
+export const data: CardData = {
+  "card/리자몽ex.png": {
+    name: "리자몽ex",
     isEx: true,
     type: "불",
     hp: 180,
@@ -18,13 +32,11 @@ export const data = [
       },
     ],
     weakness: "물",
-    beforeEvo: "리자드",
+    beforeEvo: "card/리자드.png",
     afterEvo: "",
   },
-
-  {
+  "card/리자드.png": {
     name: "리자드",
-    cardImage: "./card/리자드.jpg",
     isEx: false,
     type: "불",
     hp: 90,
@@ -36,13 +48,11 @@ export const data = [
       },
     ],
     weakness: "물",
-    beforeEvo: "파이리",
-    afterEvo: "리자몽ex",
+    beforeEvo: "card/파이리.png",
+    afterEvo: "card/리자몽ex.png",
   },
-
-  {
+  "card/파이리.png": {
     name: "파이리",
-    cardImage: "./card/파이리.jpg",
     isEx: false,
     type: "불",
     hp: 60,
@@ -55,6 +65,6 @@ export const data = [
     ],
     weakness: "물",
     beforeEvo: "",
-    afterEvo: "리자드",
+    afterEvo: "card/리자드.png",
   },
-];
+};

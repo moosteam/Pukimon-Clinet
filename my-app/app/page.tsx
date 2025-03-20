@@ -10,6 +10,7 @@ import { GameBoard } from "./components/BattleField/GameBoard";
 import { FieldCards } from "./components/BattleField/FieldCards";
 import { Hand } from "./components/Area/Hand";
 import { Wating } from "./components/Area/Wating";
+import { data } from "./data/cards";
 
 import { myCardListAtom, enemyCardListAtom, myHandListAtom, enemyHandListAtom, myUsedListAtom, enemyUsedListAtom, myCardRearAtom } from './atom'
 
@@ -61,7 +62,7 @@ export default function App({
         }
       },
       {
-        time: 3200/4,
+        time: 3200/100,
         action: () => {
           setSecondaryMyCardRotate(20);
           setSecondaryMyCardPosition(60);
@@ -69,33 +70,33 @@ export default function App({
         }
       },
       {
-        time: 3600/4,
+        time: 3600/100,
         action: () => {
           setStartVideo(true);
         }
       },
       {
-        time: 5000/4,
+        time: 5000/100,
         action: () => {
           setOpeningScale(2.4);
           setCoinTextOpacity(100);
         }
       },
       {
-        time: 7000/4,
+        time: 7000/100,
         action: () => {
           setOpeningScale(1);
           setCoinTextOpacity(0);
         }
       },
       {
-        time: 7500/4,
+        time: 7500/100,
         action: () => {
           setStartVideo(false);
         }
       },
       {
-        time: 8500/4,
+        time: 8500/100,
         action: () => {
           setFinalGroundRotate(12);
         }
@@ -116,7 +117,7 @@ export default function App({
     // 10초 후에 실행될 타이머 설정
     const timer = setTimeout(() => {
       addCardToMyHand(4);
-    }, 10000/4); // 10000ms = 10초
+    }, 10000/100); // 10000ms = 10초
 
     // 컴포넌트가 언마운트될 때 타이머 정리
     return () => clearTimeout(timer);
@@ -150,21 +151,24 @@ export default function App({
   const onEndTurn = () => {
     setOpeningRotate(openingRotate + 180);
     setFinalGroundRotate(finalGroundRotate * -1);
-
-    if (enemyHandList.length == 0) {
-      addCardToEnemyHand(4);
+    if (!myTurn) {
+      if (myHandList.length == 0) {
+        addCardToMyHand(4);
+      }
+      else {
+        addCardToMyHand(1);
+      }
     }
-    else if (myTurn) {
-      addCardToEnemyHand(1);
+    else {
+      if (enemyHandList.length == 0) {
+        addCardToEnemyHand(4);
+      }
+      else {
+        addCardToEnemyHand(1);
+      }
     }
-    else if (!myTurn) {
-      addCardToMyHand(1);
-    }
-
     setMyTurn(!myTurn);
-
   }
-  const [playedCards, setPlayedCards] = useState<{ [key: string]: boolean }>({});
   // Add state to track cards in droppable areas
   const [droppedCards, setDroppedCards] = useState<{ [key: string]: string }>({});
 
@@ -173,7 +177,7 @@ export default function App({
     if (!over) return;
 
     const cardId = active.id as string;
-    const cardName = active.data.current?.imgLink;
+    const cardName = active.data.current?.imgLink as string;
     const dropzoneId = over.id as string;
     const isMyCard = cardId.startsWith('card-');
     const isEnemyCard = cardId.startsWith('enemycard-');
@@ -183,6 +187,30 @@ export default function App({
 
     // Get card index from ID
     const index = parseInt(cardId.split('-')[1]);
+
+    // 전 진화체가 없을때만 진화가능
+    // if (data[cardName]?.beforeEvo !== "") {
+    //   return
+    // }
+
+    // 이미 카드가 드롭되있으면 
+    if (droppedCards[dropzoneId]){
+      console.log("이미 카드가 드롭됨 : " + droppedCards[dropzoneId])
+      // 진화체여야 낼 수 있음
+      if (droppedCards[dropzoneId] != data[cardName]?.beforeEvo) {
+        console.log("진화체가 아님")
+        return
+      }
+    }
+    // 카드가 없다면
+    else {
+      // 진화체가 없는 카드만 낼 수 있음
+      if (data[cardName]?.beforeEvo != "") {
+        return
+      }
+    }
+
+
 
     // Battle area handling
     if (dropzoneId === 'my_battle' || dropzoneId === 'y_battle') {
@@ -196,7 +224,7 @@ export default function App({
     // Waiting area handling - Requires battle area card
     else if (dropzoneId.includes('waiting_')) {
         // Check if corresponding battle area has a card
-        const battleArea = dropzoneId.startsWith('my_') ? 'y_battle' : 'my_battle';
+        const battleArea = dropzoneId.startsWith('my_') ? 'my_battle' : 'y_battle';
         if (droppedCards[battleArea]) {
             setDroppedCards(prev => ({ ...prev, [dropzoneId]: cardName }));
             if (myTurn) {
