@@ -14,7 +14,7 @@ export const Wating: React.FC<WatingProps> = ({ droppedCards, isMy }) => {
         <div className="z-50 flex flex-row gap-3">
             {waitingZones.map((zoneId) => (
                 <Droppable key={zoneId} id={zoneId}>
-                    <div className="w-18 h-25 border-3 rounded-lg bg-yellow-50 flex items-center justify-center">
+                    <div className="w-18 h-25 border-3 rounded-lg flex items-center justify-center">
                         {droppedCards[zoneId] && (
                             <img
                                 src={droppedCards[zoneId]} // Use full path

@@ -1,6 +1,8 @@
 import { Droppable } from "../Droppable";
 import { useState } from "react";
 
+import { data } from "../../data/cards";
+
 interface FieldCardsProps {
     onEndTurn: any;
     myTurn: any;
@@ -12,9 +14,31 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
     myTurn,
     droppedCards,
 }) => {
-
+    const [isReadyToAttack, setIsReadyToAttack] = useState(false);
     return (
         <div className="z-50 flex flex-row w-full justify-between items-center">
+            {isReadyToAttack && (
+                <div className="absolute w-full h-full flex items-center"
+                    onClick={() => {
+                        setIsReadyToAttack(false);
+                    }}
+                >
+                    <img src={droppedCards['my_battle']} alt="" />
+                    <div className="flex flex-col w-36 m-4" 
+                    >
+                        {data[droppedCards['my_battle']].skill.map((skill, index) => (
+                            <div key={index} className=" bg-gray-300 text-gray-900 p-3 rounded-lg shadow-lg border-2 border-gray-400">
+                                <div className="flex flex-row justify-between ">
+                                    <div>{skill.name}</div>
+                                    <div>{skill.damage}</div>
+                                </div>
+                                <div>필요에너지 : {skill.energy}</div>
+                            </div>
+                        ))}
+                    </div> 
+
+                </div>
+            )}
             {/* 적의 효과칸과 덱 */}
             <div>
                 <img src="pukimon_card_back.png" alt="" className="w-18" />
@@ -64,6 +88,9 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
                               : "none",
                             borderRadius: "8px",
                             transition: "box-shadow 0.3s ease, border-color 0.3s ease",
+                          }}
+                          onClick={() => {
+                            setIsReadyToAttack(true);
                           }}
                     >
                         {droppedCards['my_battle'] && (
