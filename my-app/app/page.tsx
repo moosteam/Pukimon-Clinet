@@ -23,13 +23,16 @@ import {
   myBattlePokemonEnergyAtom,
   myBattlePokemonHPAtom,
   enemyBattlePokemonEnergyAtom,
-  enemyBattlePokemonHPAtom
+  enemyBattlePokemonHPAtom,
+  myWatingPokemonHPAtom,
+  myWatingPokemonEnergyAtom,
+  enemyWatingPokemonHPAtom,
+  enemyWatingPokemonEnergyAtom
 } from './atom'
 
 interface EndTurnButtonProps {
   onEndTurn: () => void;
 }
-
 
 export default function App({
   children
@@ -57,7 +60,10 @@ export default function App({
   const [myBattlePokemonHP, setMyBattlePokemonHP] = useAtom(myBattlePokemonHPAtom);
   const [enemyBattlePokemonEnergy, setEnemyBattlePokemonEnergy] = useAtom(enemyBattlePokemonEnergyAtom);
   const [enemyBattlePokemonHP, setEnemyBattlePokemonHP] = useAtom(enemyBattlePokemonHPAtom);
-  
+  const [myWaitingHP, setMyWaitingHP] = useAtom(myWatingPokemonHPAtom);
+  const [myWaitingEnergy, setMyWaitingEnergy] = useAtom(myWatingPokemonEnergyAtom);
+  const [enemyWaitingHP, setEnemyWaitingHP] = useAtom(enemyWatingPokemonHPAtom);
+  const [enemyWaitingEnergy, setEnemyWaitingEnergy] = useAtom(enemyWatingPokemonEnergyAtom);
 
   useEffect(() => {
     // 클라이언트 사이드 렌더링 확인
@@ -215,12 +221,6 @@ export default function App({
     // Get card index from ID
     const index = parseInt(cardId.split('-')[1]);
 
-    // 전 진화체가 없을때만 진화가능
-    // if (data[cardName]?.beforeEvo !== "") {
-    //   return
-    // }
-
-
     // 이미 카드가 드롭되있으면 
     if (droppedCards[dropzoneId]){
       console.log("이미 카드가 드롭됨 : " + droppedCards[dropzoneId])
@@ -237,7 +237,6 @@ export default function App({
         return
       }
     }
-
 
     // Battle area handling
     if (dropzoneId === 'my_battle' || dropzoneId === 'y_battle') {
@@ -256,9 +255,33 @@ export default function App({
         const battleArea = dropzoneId.startsWith('my_') ? 'my_battle' : 'y_battle';
         if (droppedCards[battleArea]) {
             setDroppedCards(prev => ({ ...prev, [dropzoneId]: cardName }));
+            
+            // Extract the waiting position number (1, 2, or 3)
+            const waitingPosition = parseInt(dropzoneId.split('_').pop() || '1') - 1;
+            
             if (myTurn) {
+                // Update my waiting Pokémon HP atom
+                const newHP = [...myWaitingHP];
+                newHP[waitingPosition] = data[cardName].hp;
+                setMyWaitingHP(newHP);
+                
+                // Update my waiting Pokémon energy atom
+                const newEnergy = [...myWaitingEnergy];
+                newEnergy[waitingPosition] = 0; // Start with 0 energy
+                setMyWaitingEnergy(newEnergy);
+                
                 setMyHandList(prev => prev.filter((_, i) => i !== index));
             } else {
+                // Update enemy waiting Pokémon HP atom
+                const newHP = [...enemyWaitingHP];
+                newHP[waitingPosition] = data[cardName].hp;
+                setEnemyWaitingHP(newHP);
+                
+                // Update enemy waiting Pokémon energy atom
+                const newEnergy = [...enemyWaitingEnergy];
+                newEnergy[waitingPosition] = 0; // Start with 0 energy
+                setEnemyWaitingEnergy(newEnergy);
+                
                 setEnemyHandList(prev => prev.filter((_, i) => i !== index));
             }
         }
@@ -269,7 +292,6 @@ export default function App({
   return (
     <DndContext onDragEnd={handleDragEnd}>
       <div className="w-full h-full bg-[#C2DAF6] relative overflow-hidden">
-
         {/* 플레이어 카드 */}
         <PlayerCards
           secondaryMyCardRotate={secondaryMyCardRotate}
