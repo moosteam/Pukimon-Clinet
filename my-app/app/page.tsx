@@ -27,7 +27,8 @@ import {
   myWatingPokemonHPAtom,
   myWatingPokemonEnergyAtom,
   enemyWatingPokemonHPAtom,
-  enemyWatingPokemonEnergyAtom
+  enemyWatingPokemonEnergyAtom,
+  isNowTurnGiveEnergyAtom
 } from './atom'
 
 interface EndTurnButtonProps {
@@ -64,6 +65,7 @@ export default function App({
   const [myWaitingEnergy, setMyWaitingEnergy] = useAtom(myWatingPokemonEnergyAtom);
   const [enemyWaitingHP, setEnemyWaitingHP] = useAtom(enemyWatingPokemonHPAtom);
   const [enemyWaitingEnergy, setEnemyWaitingEnergy] = useAtom(enemyWatingPokemonEnergyAtom);
+  const [isNowTurnGiveEnergy, setIsNowTurnGiveEnergy] = useAtom(isNowTurnGiveEnergyAtom);
 
   useEffect(() => {
     // 클라이언트 사이드 렌더링 확인
@@ -173,6 +175,7 @@ export default function App({
 
   const onEndTurn = () => {
     setOpeningRotate(openingRotate + 180);
+    setIsNowTurnGiveEnergy(false)
     setFinalGroundRotate(finalGroundRotate * -1);
     if (!myTurn) {
       if (myHandList.length == 0) {
@@ -207,6 +210,7 @@ export default function App({
 
     alert(cardId)
     if (cardId == "energy") {
+      setIsNowTurnGiveEnergy(true)
       if (dropzoneId=='my_battle') {
         setMyBattlePokemonEnergy(prev => prev + 1)
       }

@@ -1,6 +1,7 @@
 import React from "react";
 import { EnergyCard } from "../Card/EnergyCard";
-
+import { useAtomValue } from "jotai";
+import { isNowTurnGiveEnergyAtom } from "../../atom"
 interface DeckAreaProps {
     isMyDeck: boolean;
     myTurn: boolean;
@@ -10,16 +11,16 @@ interface DeckAreaProps {
 export const DeckArea: React.FC<DeckAreaProps> = ({
     isMyDeck,
     myTurn,
-    onEndTurn
+    onEndTurn,
 }) => {
-    const showButton = isMyDeck ? myTurn : !myTurn;
+    const isNowTurnGiveEnergy = useAtomValue(isNowTurnGiveEnergyAtom);
     const buttonStyle = isMyDeck
         ? { visibility: myTurn ? "visible" : "hidden" }
         : { visibility: !myTurn ? "visible" : "hidden", transform: 'scale(-1, -1)' } ;
     
     return (
         <div className={`${isMyDeck ? "flex items-center flex-col" : ""}`}>
-            {!isMyDeck && <EnergyCard isReversed={true} isVisible={!myTurn} />}
+            {!isMyDeck && <EnergyCard isReversed={true} isVisible={!myTurn && !isNowTurnGiveEnergy} />}
             
             <img src="ui/pukimon_card_back.png" alt="Card Back" className="w-18" />
 
@@ -40,7 +41,7 @@ export const DeckArea: React.FC<DeckAreaProps> = ({
             {isMyDeck && (
                 <>
                     <div className="w-18 h-25 rounded-sm bg-black/10 shadow-[inset_0_0_4px_rgba(0,0,0,0.3)]"></div>
-                    <EnergyCard isReversed={false} isVisible={myTurn} />
+                    <EnergyCard isReversed={false} isVisible={myTurn && !isNowTurnGiveEnergy} />
                 </>
             )}
         </div>

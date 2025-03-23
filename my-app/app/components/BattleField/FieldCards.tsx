@@ -32,8 +32,8 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
     
     // Helper function to find the first available bench Pokémon
     const findFirstBenchPokemon = (prefix: string): number | null => {
-        for (let i = 1; i <= 5; i++) {
-            if (droppedCards[`${prefix}_bench_${i}`]) {
+        for (let i = 1; i <= 3; i++) {
+            if (droppedCards[`${prefix}_wating_${i}`]) {
                 return i;
             }
         }
@@ -43,11 +43,11 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
     // Helper function to shift bench Pokémon after one is moved to battle
     const shiftBenchPokemon = (updatedCards: Record<string, string>, prefix: string, startIndex: number) => {
         for (let i = startIndex; i < 5; i++) {
-            if (updatedCards[`${prefix}_bench_${i+1}`]) {
-                updatedCards[`${prefix}_bench_${i}`] = updatedCards[`${prefix}_bench_${i+1}`];
-                delete updatedCards[`${prefix}_bench_${i+1}`];
+            if (updatedCards[`${prefix}_wating_${i+1}`]) {
+                updatedCards[`${prefix}_wating_${i}`] = updatedCards[`${prefix}_wating_${i+1}`];
+                delete updatedCards[`${prefix}_wating_${i+1}`];
             } else {
-                delete updatedCards[`${prefix}_bench_${i}`];
+                delete updatedCards[`${prefix}_wating_${i}`];
                 break;
             }
         }
@@ -69,8 +69,18 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
                         {data[droppedCards[attackingCard || 'my_battle']].skill.map((skill, index) => (
                             <div key={index} className="bg-gray-300 text-gray-900 p-3 rounded-lg shadow-lg border-2 border-gray-400 z-10"
                                 onClick={() => {
-                                    setIsReadyToAttack(false);
+                                    // Check if there's enough energy to use this skill
+                                    const currentEnergy = attackingCard === 'my_battle' 
+                                        ? myBattlePokemonEnergy 
+                                        : enemyBattlePokemonEnergy;
                                     
+                                    if (currentEnergy < skill.energy) {
+                                        alert("Not enough energy to use this skill!");
+                                        setIsReadyToAttack(false);
+                                        return;
+                                    }
+                                    
+                                    setIsReadyToAttack(false);
                                     // Handle attack based on whose turn it is
                                     if (attackingCard === 'my_battle') {
                                         // Calculate new HP after damage
@@ -80,15 +90,15 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
                                         // Check if enemy Pokémon fainted
                                         if (newEnemyHP <= 0) {
                                             // Find first available bench Pokémon
-                                            const benchIndex = findFirstBenchPokemon('y');
+                                            const benchIndex = findFirstBenchPokemon('enemy');
                                             
                                             if (benchIndex !== null) {
                                                 // Move bench Pokémon to battle position
                                                 const updatedDroppedCards = {...droppedCards};
-                                                updatedDroppedCards['y_battle'] = updatedDroppedCards[`y_bench_${benchIndex}`];
+                                                updatedDroppedCards['y_battle'] = updatedDroppedCards[`enemy_wating_${benchIndex}`];
                                                 
                                                 // Shift remaining bench Pokémon
-                                                const finalCards = shiftBenchPokemon(updatedDroppedCards, 'y', benchIndex);
+                                                const finalCards = shiftBenchPokemon(updatedDroppedCards, 'enemy', benchIndex);
                                                 
                                                 // Update the dropped cards state
                                                 setDroppedCards(finalCards);
@@ -115,7 +125,7 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
                                             if (benchIndex !== null) {
                                                 // Move bench Pokémon to battle position
                                                 const updatedDroppedCards = {...droppedCards};
-                                                updatedDroppedCards['my_battle'] = updatedDroppedCards[`my_bench_${benchIndex}`];
+                                                updatedDroppedCards['my_battle'] = updatedDroppedCards[`my_wating_${benchIndex}`];
                                                 
                                                 // Shift remaining bench Pokémon
                                                 const finalCards = shiftBenchPokemon(updatedDroppedCards, 'my', benchIndex);

@@ -3,6 +3,8 @@ import { atom } from "jotai";
 export const myBattleAtom = atom<string>("myBattle");
 export const enemyBattleAtom = atom<string>("enemyBattle");
 
+export const isNowTurnGiveEnergyAtom = atom<boolean>(true);
+
 export const myCardListAtom = atom<string[]>([
   "리자몽ex",
   "리자드",
