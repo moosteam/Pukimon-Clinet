@@ -3,7 +3,16 @@ import { useState } from "react";
 import { useAtom } from "jotai";
 
 import { data } from "../../data/cards";
-import { myBattlePokemonEnergyAtom, myBattlePokemonHPAtom, enemyBattlePokemonEnergyAtom, enemyBattlePokemonHPAtom } from "../../atom";
+import { 
+    myBattlePokemonEnergyAtom, 
+    myBattlePokemonHPAtom, 
+    enemyBattlePokemonEnergyAtom, 
+    enemyBattlePokemonHPAtom,
+    myWaitingPokemonEnergyAtom,
+    myWaitingPokemonHPAtom,
+    enemyWaitingPokemonEnergyAtom,
+    enemyWaitingPokemonHPAtom
+} from "../../atom";
 import { Draggable } from "../Draggable";
 import { BattleCard } from "./BattleCard";
 import { DeckArea } from "../Area/DeckArea";
@@ -27,13 +36,20 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
     const [enemyBattlePokemonEnergy, setEnemyBattlePokemonEnergy] = useAtom(enemyBattlePokemonEnergyAtom);
     const [enemyBattlePokemonHP, setEnemyBattlePokemonHP] = useAtom(enemyBattlePokemonHPAtom);
     
+    // Add the waiting Pokémon atoms
+    const [myWaitingEnergy, setMyWaitingEnergy] = useAtom(myWaitingPokemonEnergyAtom);
+    const [myWaitingHP, setMyWaitingHP] = useAtom(myWaitingPokemonHPAtom);
+    const [enemyWaitingEnergy, setEnemyWaitingEnergy] = useAtom(enemyWaitingPokemonEnergyAtom);
+    const [enemyWaitingHP, setEnemyWaitingHP] = useAtom(enemyWaitingPokemonHPAtom);
+    
     const [isReadyToAttack, setIsReadyToAttack] = useState(false);
     const [attackingCard, setAttackingCard] = useState<string | null>(null);
     
     // Helper function to find the first available bench Pokémon
     const findFirstBenchPokemon = (prefix: string): number | null => {
         for (let i = 1; i <= 3; i++) {
-            if (droppedCards[`${prefix}_wating_${i}`]) {
+            // Fix: Use the correct waiting zone ID format
+            if (droppedCards[`${prefix}_waiting_${i}`]) {
                 return i;
             }
         }
@@ -43,11 +59,12 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
     // Helper function to shift bench Pokémon after one is moved to battle
     const shiftBenchPokemon = (updatedCards: Record<string, string>, prefix: string, startIndex: number) => {
         for (let i = startIndex; i < 5; i++) {
-            if (updatedCards[`${prefix}_wating_${i+1}`]) {
-                updatedCards[`${prefix}_wating_${i}`] = updatedCards[`${prefix}_wating_${i+1}`];
-                delete updatedCards[`${prefix}_wating_${i+1}`];
+            // Fix: Use the correct waiting zone ID format
+            if (updatedCards[`${prefix}_waiting_${i+1}`]) {
+                updatedCards[`${prefix}_waiting_${i}`] = updatedCards[`${prefix}_waiting_${i+1}`];
+                delete updatedCards[`${prefix}_waiting_${i+1}`];
             } else {
-                delete updatedCards[`${prefix}_wating_${i}`];
+                delete updatedCards[`${prefix}_waiting_${i}`];
                 break;
             }
         }
@@ -95,7 +112,17 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
                                             if (benchIndex !== null) {
                                                 // Move bench Pokémon to battle position
                                                 const updatedDroppedCards = {...droppedCards};
-                                                updatedDroppedCards['y_battle'] = updatedDroppedCards[`enemy_wating_${benchIndex}`];
+                                                
+                                                // Store bench Pokémon info before moving
+                                                const benchPokemon = updatedDroppedCards[`enemy_waiting_${benchIndex}`];
+                                                const benchHP = enemyWaitingHP[benchIndex - 1];
+                                                const benchEnergy = enemyWaitingEnergy[benchIndex - 1];
+                                                
+                                                // Update battle position with bench Pokémon
+                                                updatedDroppedCards['y_battle'] = benchPokemon;
+                                                
+                                                // Remove the Pokémon from bench
+                                                delete updatedDroppedCards[`enemy_waiting_${benchIndex}`];
                                                 
                                                 // Shift remaining bench Pokémon
                                                 const finalCards = shiftBenchPokemon(updatedDroppedCards, 'enemy', benchIndex);
@@ -103,9 +130,27 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
                                                 // Update the dropped cards state
                                                 setDroppedCards(finalCards);
                                                 
-                                                // Reset HP and energy for the new battle Pokémon
-                                                setEnemyBattlePokemonHP(100); // Default HP value
-                                                setEnemyBattlePokemonEnergy(0); // Reset energy
+                                                // Update HP and energy for the new battle Pokémon
+                                                setEnemyBattlePokemonHP(benchHP);
+                                                setEnemyBattlePokemonEnergy(benchEnergy);
+                                                
+                                                // Update bench HP and energy arrays
+                                                const newWaitingHP = [...enemyWaitingHP];
+                                                const newWaitingEnergy = [...enemyWaitingEnergy];
+                                                
+                                                // Shift HP and energy values
+                                                for (let i = benchIndex - 1; i < 2; i++) {
+                                                    if (i + 1 < 3) {
+                                                        newWaitingHP[i] = newWaitingHP[i + 1];
+                                                        newWaitingEnergy[i] = newWaitingEnergy[i + 1];
+                                                    } else {
+                                                        newWaitingHP[i] = 0;
+                                                        newWaitingEnergy[i] = 0;
+                                                    }
+                                                }
+                                                
+                                                setEnemyWaitingHP(newWaitingHP);
+                                                setEnemyWaitingEnergy(newWaitingEnergy);
                                             } else {
                                                 // No bench Pokémon available - game over
                                                 alert("You win! Enemy has no more Pokémon!");
@@ -125,7 +170,17 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
                                             if (benchIndex !== null) {
                                                 // Move bench Pokémon to battle position
                                                 const updatedDroppedCards = {...droppedCards};
-                                                updatedDroppedCards['my_battle'] = updatedDroppedCards[`my_wating_${benchIndex}`];
+                                                
+                                                // Store bench Pokémon info before moving
+                                                const benchPokemon = updatedDroppedCards[`my_waiting_${benchIndex}`];
+                                                const benchHP = myWaitingHP[benchIndex - 1];
+                                                const benchEnergy = myWaitingEnergy[benchIndex - 1];
+                                                
+                                                // Update battle position with bench Pokémon
+                                                updatedDroppedCards['my_battle'] = benchPokemon;
+                                                
+                                                // Remove the Pokémon from bench
+                                                delete updatedDroppedCards[`my_waiting_${benchIndex}`];
                                                 
                                                 // Shift remaining bench Pokémon
                                                 const finalCards = shiftBenchPokemon(updatedDroppedCards, 'my', benchIndex);
@@ -133,9 +188,27 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
                                                 // Update the dropped cards state
                                                 setDroppedCards(finalCards);
                                                 
-                                                // Reset HP and energy for the new battle Pokémon
-                                                setMyBattlePokemonHP(100); // Default HP value
-                                                setMyBattlePokemonEnergy(0); // Reset energy
+                                                // Update HP and energy for the new battle Pokémon
+                                                setMyBattlePokemonHP(benchHP);
+                                                setMyBattlePokemonEnergy(benchEnergy);
+                                                
+                                                // Update bench HP and energy arrays
+                                                const newWaitingHP = [...myWaitingHP];
+                                                const newWaitingEnergy = [...myWaitingEnergy];
+                                                
+                                                // Shift HP and energy values
+                                                for (let i = benchIndex - 1; i < 2; i++) {
+                                                    if (i + 1 < 3) {
+                                                        newWaitingHP[i] = newWaitingHP[i + 1];
+                                                        newWaitingEnergy[i] = newWaitingEnergy[i + 1];
+                                                    } else {
+                                                        newWaitingHP[i] = 0;
+                                                        newWaitingEnergy[i] = 0;
+                                                    }
+                                                }
+                                                
+                                                setMyWaitingHP(newWaitingHP);
+                                                setMyWaitingEnergy(newWaitingEnergy);
                                             } else {
                                                 // No bench Pokémon available - game over
                                                 alert("You lose! You have no more Pokémon!");
@@ -155,6 +228,94 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
                                 <div>필요에너지 : {skill.energy}</div>
                             </div>
                         ))}
+                        <div
+                          className="bg-gray-300 text-gray-900 p-3 rounded-lg shadow-lg border-2 border-gray-400 z-10"
+                          onClick={() => {
+                              // Check if there's enough energy to retreat (need 1 energy)
+                              const currentEnergy = attackingCard === 'my_battle' 
+                                  ? myBattlePokemonEnergy 
+                                  : enemyBattlePokemonEnergy;
+                              
+                              if (currentEnergy < 1) {
+                                  alert("Not enough energy to retreat! You need at least 1 energy.");
+                                  setIsReadyToAttack(false);
+                                  return;
+                              }
+                              
+                              // Find first available bench Pokémon
+                              const prefix = attackingCard === 'my_battle' ? 'my' : 'enemy';
+                              const benchIndex = findFirstBenchPokemon(prefix);
+                              
+                              if (benchIndex === null) {
+                                  alert("No Pokémon on bench to swap with!");
+                                  setIsReadyToAttack(false);
+                                  return;
+                              }
+                              
+                              // Create updated cards object
+                              const updatedDroppedCards = {...droppedCards};
+                              
+                              if (attackingCard === 'my_battle') {
+                                  // Store current battle and bench Pokémon info
+                                  const battlePokemon = updatedDroppedCards['my_battle'];
+                                  const battleHP = myBattlePokemonHP;
+                                  const battleEnergy = myBattlePokemonEnergy - 1; // Reduce energy by 1 for retreat
+                                  
+                                  const benchPokemon = updatedDroppedCards[`my_waiting_${benchIndex}`];
+                                  const benchHP = myWaitingHP[benchIndex - 1];
+                                  const benchEnergy = myWaitingEnergy[benchIndex - 1];
+                                  
+                                  // Swap Pokémon
+                                  updatedDroppedCards['my_battle'] = benchPokemon;
+                                  updatedDroppedCards[`my_waiting_${benchIndex}`] = battlePokemon;
+                                  
+                                  // Update HP and energy states
+                                  setMyBattlePokemonHP(benchHP);
+                                  setMyBattlePokemonEnergy(benchEnergy);
+                                  
+                                  // Update bench HP and energy
+                                  const newWaitingHP = [...myWaitingHP];
+                                  newWaitingHP[benchIndex - 1] = battleHP;
+                                  setMyWaitingHP(newWaitingHP);
+                                  
+                                  const newWaitingEnergy = [...myWaitingEnergy];
+                                  newWaitingEnergy[benchIndex - 1] = battleEnergy;
+                                  setMyWaitingEnergy(newWaitingEnergy);
+                              } else {
+                                  // Store current battle and bench Pokémon info
+                                  const battlePokemon = updatedDroppedCards['y_battle'];
+                                  const battleHP = enemyBattlePokemonHP;
+                                  const battleEnergy = enemyBattlePokemonEnergy - 1; // Reduce energy by 1 for retreat
+                                  
+                                  const benchPokemon = updatedDroppedCards[`enemy_waiting_${benchIndex}`];
+                                  const benchHP = enemyWaitingHP[benchIndex - 1];
+                                  const benchEnergy = enemyWaitingEnergy[benchIndex - 1];
+                                  
+                                  // Swap Pokémon
+                                  updatedDroppedCards['y_battle'] = benchPokemon;
+                                  updatedDroppedCards[`enemy_waiting_${benchIndex}`] = battlePokemon;
+                                  
+                                  // Update HP and energy states
+                                  setEnemyBattlePokemonHP(benchHP);
+                                  setEnemyBattlePokemonEnergy(benchEnergy);
+                                  
+                                  // Update bench HP and energy
+                                  const newWaitingHP = [...enemyWaitingHP];
+                                  newWaitingHP[benchIndex - 1] = battleHP;
+                                  setEnemyWaitingHP(newWaitingHP);
+                                  
+                                  const newWaitingEnergy = [...enemyWaitingEnergy];
+                                  newWaitingEnergy[benchIndex - 1] = battleEnergy;
+                                  setEnemyWaitingEnergy(newWaitingEnergy);
+                              }
+                              
+                              // Update the dropped cards state
+                              setDroppedCards(updatedDroppedCards);
+                              
+                              setIsReadyToAttack(false);
+                              onEndTurn();
+                          }}
+                        >후퇴</div>
                     </div>
                 </div>
             )}
