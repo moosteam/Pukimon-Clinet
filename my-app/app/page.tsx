@@ -204,6 +204,9 @@ export default function App({
       if (dropzoneId=='my_battle') {
         setMyBattlePokemonEnergy(prev => prev + 1)
       }
+      else if (dropzoneId=='y_battle') {
+        setEnemyBattlePokemonEnergy(prev => prev + 1)
+      }
     }
 
     // Validate turn and ownership
@@ -283,7 +286,7 @@ export default function App({
           {/* 필드 카드 영역 */}
           <Wating droppedCards={droppedCards} isMy={false} />
           {/* 중앙 카드 영역 */}
-          <FieldCards onEndTurn={onEndTurn} myTurn={myTurn} droppedCards={droppedCards} />
+          <FieldCards onEndTurn={onEndTurn} myTurn={myTurn} droppedCards={droppedCards} setDroppedCards={setDroppedCards}/>
           {/* 하단 필드 카드 영역 */}
           <Wating droppedCards={droppedCards} isMy={true} />
           {/* 내 핸드 영역 - 드래그 가능한 카드들 */}
