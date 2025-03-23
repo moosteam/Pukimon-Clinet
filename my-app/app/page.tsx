@@ -9,7 +9,7 @@ import { PlayerCards } from "./components/Card/PlayerCards";
 import { GameBoard } from "./components/BattleField/GameBoard";
 import { FieldCards } from "./components/BattleField/FieldCards";
 import { Hand } from "./components/Area/Hand";
-import { Wating } from "./components/Area/Wating";
+import { Waiting } from "./components/Area/Waiting";
 import { data } from "./data/cards";
 
 import { 
@@ -24,10 +24,10 @@ import {
   myBattlePokemonHPAtom,
   enemyBattlePokemonEnergyAtom,
   enemyBattlePokemonHPAtom,
-  myWatingPokemonHPAtom,
-  myWatingPokemonEnergyAtom,
-  enemyWatingPokemonHPAtom,
-  enemyWatingPokemonEnergyAtom,
+  myWaitingPokemonHPAtom,
+  myWaitingPokemonEnergyAtom,
+  enemyWaitingPokemonHPAtom,
+  enemyWaitingPokemonEnergyAtom,
   isNowTurnGiveEnergyAtom
 } from './atom'
 
@@ -61,10 +61,10 @@ export default function App({
   const [myBattlePokemonHP, setMyBattlePokemonHP] = useAtom(myBattlePokemonHPAtom);
   const [enemyBattlePokemonEnergy, setEnemyBattlePokemonEnergy] = useAtom(enemyBattlePokemonEnergyAtom);
   const [enemyBattlePokemonHP, setEnemyBattlePokemonHP] = useAtom(enemyBattlePokemonHPAtom);
-  const [myWaitingHP, setMyWaitingHP] = useAtom(myWatingPokemonHPAtom);
-  const [myWaitingEnergy, setMyWaitingEnergy] = useAtom(myWatingPokemonEnergyAtom);
-  const [enemyWaitingHP, setEnemyWaitingHP] = useAtom(enemyWatingPokemonHPAtom);
-  const [enemyWaitingEnergy, setEnemyWaitingEnergy] = useAtom(enemyWatingPokemonEnergyAtom);
+  const [myWaitingHP, setMyWaitingHP] = useAtom(myWaitingPokemonHPAtom);
+  const [myWaitingEnergy, setMyWaitingEnergy] = useAtom(myWaitingPokemonEnergyAtom);
+  const [enemyWaitingHP, setEnemyWaitingHP] = useAtom(enemyWaitingPokemonHPAtom);
+  const [enemyWaitingEnergy, setEnemyWaitingEnergy] = useAtom(enemyWaitingPokemonEnergyAtom);
   const [isNowTurnGiveEnergy, setIsNowTurnGiveEnergy] = useAtom(isNowTurnGiveEnergyAtom);
 
   useEffect(() => {
@@ -208,7 +208,6 @@ export default function App({
     const isMyCard = cardId.startsWith('card-');
     const isEnemyCard = cardId.startsWith('enemycard-');
 
-    alert(cardId)
     if (cardId == "energy") {
       setIsNowTurnGiveEnergy(true)
       if (dropzoneId=='my_battle') {
@@ -216,6 +215,32 @@ export default function App({
       }
       else if (dropzoneId=='y_battle') {
         setEnemyBattlePokemonEnergy(prev => prev + 1)
+      }
+      // Handle energy for waiting/bench Pokémon
+      // Check enemy first to avoid matching "my" in "enemy"
+      else if (dropzoneId.includes('enemy_waiting_')) {
+        // Extract the waiting position number (1, 2, or 3)
+        const waitingPosition = parseInt(dropzoneId.split('_').pop() || '1') - 1;
+        
+        // Make sure there's a Pokémon in this position
+        if (droppedCards[dropzoneId]) {
+          // Update energy for the specific waiting position
+          const newEnergy = [...enemyWaitingEnergy];
+          newEnergy[waitingPosition] = newEnergy[waitingPosition] + 1;
+          setEnemyWaitingEnergy(newEnergy);
+        }
+      }
+      else if (dropzoneId.includes('my_waiting_')) {
+        // Extract the waiting position number (1, 2, or 3)
+        const waitingPosition = parseInt(dropzoneId.split('_').pop() || '1') - 1;
+        
+        // Make sure there's a Pokémon in this position
+        if (droppedCards[dropzoneId]) {
+          // Update energy for the specific waiting position
+          const newEnergy = [...myWaitingEnergy];
+          newEnergy[waitingPosition] = newEnergy[waitingPosition] + 1;
+          setMyWaitingEnergy(newEnergy);
+        }
       }
     }
 
@@ -256,26 +281,15 @@ export default function App({
     // Waiting area handling - Requires battle area card
     else if (dropzoneId.includes('waiting_')) {
         // Check if corresponding battle area has a card
-        const battleArea = dropzoneId.startsWith('my_') ? 'my_battle' : 'y_battle';
+        const battleArea = dropzoneId.startsWith('enemy_') ? 'y_battle' : 'my_battle';
         if (droppedCards[battleArea]) {
             setDroppedCards(prev => ({ ...prev, [dropzoneId]: cardName }));
             
             // Extract the waiting position number (1, 2, or 3)
             const waitingPosition = parseInt(dropzoneId.split('_').pop() || '1') - 1;
             
-            if (myTurn) {
-                // Update my waiting Pokémon HP atom
-                const newHP = [...myWaitingHP];
-                newHP[waitingPosition] = data[cardName].hp;
-                setMyWaitingHP(newHP);
-                
-                // Update my waiting Pokémon energy atom
-                const newEnergy = [...myWaitingEnergy];
-                newEnergy[waitingPosition] = 0; // Start with 0 energy
-                setMyWaitingEnergy(newEnergy);
-                
-                setMyHandList(prev => prev.filter((_, i) => i !== index));
-            } else {
+            // Check enemy first to avoid matching "my" in "enemy"
+            if (dropzoneId.startsWith('enemy_')) {
                 // Update enemy waiting Pokémon HP atom
                 const newHP = [...enemyWaitingHP];
                 newHP[waitingPosition] = data[cardName].hp;
@@ -287,6 +301,18 @@ export default function App({
                 setEnemyWaitingEnergy(newEnergy);
                 
                 setEnemyHandList(prev => prev.filter((_, i) => i !== index));
+            } else {
+                // Update my waiting Pokémon HP atom
+                const newHP = [...myWaitingHP];
+                newHP[waitingPosition] = data[cardName].hp;
+                setMyWaitingHP(newHP);
+                
+                // Update my waiting Pokémon energy atom
+                const newEnergy = [...myWaitingEnergy];
+                newEnergy[waitingPosition] = 0; // Start with 0 energy
+                setMyWaitingEnergy(newEnergy);
+                
+                setMyHandList(prev => prev.filter((_, i) => i !== index));
             }
         }
     }
@@ -310,11 +336,11 @@ export default function App({
           {/* 적 카드 영역 */}
           <Hand handList={enemyHandList} playedCards={PlayerCards} isMy={false} />
           {/* 필드 카드 영역 */}
-          <Wating droppedCards={droppedCards} isMy={false} />
+          <Waiting droppedCards={droppedCards} isMy={false} />
           {/* 중앙 카드 영역 */}
           <FieldCards onEndTurn={onEndTurn} myTurn={myTurn} droppedCards={droppedCards} setDroppedCards={setDroppedCards}/>
           {/* 하단 필드 카드 영역 */}
-          <Wating droppedCards={droppedCards} isMy={true} />
+          <Waiting droppedCards={droppedCards} isMy={true} />
           {/* 내 핸드 영역 - 드래그 가능한 카드들 */}
           <Hand handList={myHandList} playedCards={PlayerCards} isMy={true} />
           {/* 비디오 영역 */}
