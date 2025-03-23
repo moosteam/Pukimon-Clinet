@@ -42,3 +42,7 @@ export const enemyWaitingPokemonEnergyAtom = atom<number[]>([0, 0, 0]);
 export const enemyBattlePokemonHPAtom = atom<number>(0);
 export const enemyWaitingPokemonHPAtom = atom<number[]>([0, 0, 0]);
 
+// Add score atoms for tracking defeated Pokémon
+export const myGameScoreAtom = atom<number>(0);
+export const enemyGameScoreAtom = atom<number>(0);
+

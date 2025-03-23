@@ -1,5 +1,5 @@
 import { Droppable } from "../Droppable";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAtom } from "jotai";
 
 import { data } from "../../data/cards";
@@ -11,7 +11,9 @@ import {
     myWaitingPokemonEnergyAtom,
     myWaitingPokemonHPAtom,
     enemyWaitingPokemonEnergyAtom,
-    enemyWaitingPokemonHPAtom
+    enemyWaitingPokemonHPAtom,
+    myGameScoreAtom,
+    enemyGameScoreAtom
 } from "../../atom";
 import { Draggable } from "../Draggable";
 import { BattleCard } from "./BattleCard";
@@ -42,13 +44,30 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
     const [enemyWaitingEnergy, setEnemyWaitingEnergy] = useAtom(enemyWaitingPokemonEnergyAtom);
     const [enemyWaitingHP, setEnemyWaitingHP] = useAtom(enemyWaitingPokemonHPAtom);
     
+    // Add game score atoms
+    const [myGameScore, setMyGameScore] = useAtom(myGameScoreAtom);
+    const [enemyGameScore, setEnemyGameScore] = useAtom(enemyGameScoreAtom);
+    
     const [isReadyToAttack, setIsReadyToAttack] = useState(false);
     const [attackingCard, setAttackingCard] = useState<string | null>(null);
+    const [gameOver, setGameOver] = useState(false);
+    
+    // Check for game over condition
+    useEffect(() => {
+        if (myGameScore >= 3) {
+            setGameOver(true);
+            alert("You win! You've defeated 3 Pokémon!");
+            // Here you could reset the game or navigate to a victory screen
+        } else if (enemyGameScore >= 3) {
+            setGameOver(true);
+            alert("You lose! Your opponent has defeated 3 of your Pokémon!");
+            // Here you could reset the game or navigate to a defeat screen
+        }
+    }, [myGameScore, enemyGameScore]);
     
     // Helper function to find the first available bench Pokémon
     const findFirstBenchPokemon = (prefix: string): number | null => {
         for (let i = 1; i <= 3; i++) {
-            // Fix: Use the correct waiting zone ID format
             if (droppedCards[`${prefix}_waiting_${i}`]) {
                 return i;
             }
@@ -58,8 +77,7 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
     
     // Helper function to shift bench Pokémon after one is moved to battle
     const shiftBenchPokemon = (updatedCards: Record<string, string>, prefix: string, startIndex: number) => {
-        for (let i = startIndex; i < 5; i++) {
-            // Fix: Use the correct waiting zone ID format
+        for (let i = startIndex; i < 3; i++) {
             if (updatedCards[`${prefix}_waiting_${i+1}`]) {
                 updatedCards[`${prefix}_waiting_${i}`] = updatedCards[`${prefix}_waiting_${i+1}`];
                 delete updatedCards[`${prefix}_waiting_${i+1}`];
@@ -73,8 +91,33 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
         
     return (
         <div className="z-50 flex flex-row w-full justify-between items-center">
-            {isReadyToAttack && (
-                <div className="absolute w-full h-full flex items-center z-1">
+            {/* Display scores */}
+            <div className="absolute top-4 left-4 bg-blue-500 text-white p-2 rounded-lg z-50">
+                Your Score: {myGameScore}
+            </div>
+            <div className="absolute top-4 right-4 bg-red-500 text-white p-2 rounded-lg z-50">
+                Enemy Score: {enemyGameScore}
+            </div>
+            
+            {gameOver && (
+                <div className="absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
+                    <div className="bg-white p-8 rounded-lg text-center">
+                        <h2 className="text-2xl font-bold mb-4">
+                            {myGameScore >= 3 ? "You Win!" : "You Lose!"}
+                        </h2>
+                        <p className="mb-4">Final Score: {myGameScore} - {enemyGameScore}</p>
+                        <button 
+                            className="bg-blue-500 text-white px-4 py-2 rounded"
+                            onClick={() => window.location.reload()}
+                        >
+                            Play Again
+                        </button>
+                    </div>
+                </div>
+            )}
+            
+            {isReadyToAttack && !gameOver && (
+                <div className="absolute w-full h-full flex items-center z-10">
                     <img 
                         src={droppedCards[attackingCard || 'my_battle']} 
                         alt=""
@@ -106,6 +149,9 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
                                         
                                         // Check if enemy Pokémon fainted
                                         if (newEnemyHP <= 0) {
+                                            // Increment player's score
+                                            setMyGameScore(prev => prev + 1);
+                                            
                                             // Find first available bench Pokémon
                                             const benchIndex = findFirstBenchPokemon('enemy');
                                             
@@ -152,9 +198,20 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
                                                 setEnemyWaitingHP(newWaitingHP);
                                                 setEnemyWaitingEnergy(newWaitingEnergy);
                                             } else {
-                                                // No bench Pokémon available - game over
-                                                alert("You win! Enemy has no more Pokémon!");
-                                                // Reset game state or redirect to victory screen
+                                                // No bench Pokémon available
+                                                delete droppedCards['y_battle'];
+                                                setDroppedCards({...droppedCards});
+                                                
+                                                // Check if this win gives the player 3 points total
+                                                const newScore = myGameScore + 1;
+                                                setMyGameScore(newScore);
+                                                
+                                                if (newScore >= 3) {
+                                                    setGameOver(true);
+                                                    alert("You win! You've defeated 3 Pokémon!");
+                                                } else {
+                                                    alert("Enemy has no more Pokémon in this position!");
+                                                }
                                             }
                                         }
                                     } else {
@@ -164,6 +221,9 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
                                         
                                         // Check if my Pokémon fainted
                                         if (newMyHP <= 0) {
+                                            // Increment enemy's score
+                                            setEnemyGameScore(prev => prev + 1);
+                                            
                                             // Find first available bench Pokémon
                                             const benchIndex = findFirstBenchPokemon('my');
                                             
@@ -210,9 +270,20 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
                                                 setMyWaitingHP(newWaitingHP);
                                                 setMyWaitingEnergy(newWaitingEnergy);
                                             } else {
-                                                // No bench Pokémon available - game over
-                                                alert("You lose! You have no more Pokémon!");
-                                                // Reset game state or redirect to defeat screen
+                                                // No bench Pokémon available
+                                                delete droppedCards['my_battle'];
+                                                setDroppedCards({...droppedCards});
+                                                
+                                                // Check if this win gives the enemy 3 points total
+                                                const newScore = enemyGameScore + 1;
+                                                setEnemyGameScore(newScore);
+                                                
+                                                if (newScore >= 3) {
+                                                    setGameOver(true);
+                                                    alert("You lose! Your opponent has defeated 3 of your Pokémon!");
+                                                } else {
+                                                    alert("You have no more Pokémon in this position!");
+                                                }
                                             }
                                         }
                                     }

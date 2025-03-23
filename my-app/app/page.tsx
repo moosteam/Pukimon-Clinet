@@ -19,7 +19,6 @@ import {
   enemyHandListAtom,
   myUsedListAtom,
   enemyUsedListAtom,
-  myCardRearAtom,
   myBattlePokemonEnergyAtom,
   myBattlePokemonHPAtom,
   enemyBattlePokemonEnergyAtom,
@@ -28,7 +27,9 @@ import {
   myWaitingPokemonEnergyAtom,
   enemyWaitingPokemonHPAtom,
   enemyWaitingPokemonEnergyAtom,
-  isNowTurnGiveEnergyAtom
+  isNowTurnGiveEnergyAtom,
+  myGameScoreAtom,
+  enemyGameScoreAtom
 } from './atom'
 
 interface EndTurnButtonProps {
@@ -56,7 +57,6 @@ export default function App({
   const [enemyHandList, setEnemyHandList] = useAtom(enemyHandListAtom)
   const [myUsedList, setMyUsedList] = useAtom(myUsedListAtom)
   const [enemyUsedList, setEnemyUsedList] = useAtom(enemyUsedListAtom)
-  const [myCardRear, setMyCardRear] = useAtom(myCardRearAtom)
   const [myBattlePokemonEnergy, setMyBattlePokemonEnergy] = useAtom(myBattlePokemonEnergyAtom);
   const [myBattlePokemonHP, setMyBattlePokemonHP] = useAtom(myBattlePokemonHPAtom);
   const [enemyBattlePokemonEnergy, setEnemyBattlePokemonEnergy] = useAtom(enemyBattlePokemonEnergyAtom);
@@ -66,6 +66,8 @@ export default function App({
   const [enemyWaitingHP, setEnemyWaitingHP] = useAtom(enemyWaitingPokemonHPAtom);
   const [enemyWaitingEnergy, setEnemyWaitingEnergy] = useAtom(enemyWaitingPokemonEnergyAtom);
   const [isNowTurnGiveEnergy, setIsNowTurnGiveEnergy] = useAtom(isNowTurnGiveEnergyAtom);
+  const [myGameScore, setMyGameScore] = useAtom(myGameScoreAtom);
+  const [enemyGameScore, setEnemyGameScore] = useAtom(enemyGameScoreAtom);
 
   useEffect(() => {
     // 클라이언트 사이드 렌더링 확인
