@@ -12,7 +12,7 @@ interface WaitingProps {
     droppedCards: Record<string, string>;
     isMy: boolean;
 }
-
+//
 export const Waiting: React.FC<WaitingProps> = ({ droppedCards, isMy }) => {
     const ownerPrefix = isMy ? 'my' : 'enemy';
     const waitingZones = [1, 2, 3].map(num => `${ownerPrefix}_waiting_${num}`);
@@ -61,9 +61,9 @@ export const Waiting: React.FC<WaitingProps> = ({ droppedCards, isMy }) => {
                                         textShadow: "1px 1px 0 #000" 
                                     }}
                                 >{hpArray[index]}</div>
-                                
-                                <img
-                                    src={droppedCards[zoneId]}
+                                 
+                                <img 
+                                    src={droppedCards[zoneId]} 
                                     alt={droppedCards[zoneId]}
                                     className="w-full h-full object-cover"
                                 />
