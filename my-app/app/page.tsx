@@ -202,7 +202,7 @@ export default function App({
     alert(cardId)
     if (cardId == "energy") {
       if (dropzoneId=='my_battle') {
-        setEnemyBattlePokemonEnergy(prev => prev + 1)
+        setMyBattlePokemonEnergy(prev => prev + 1)
       }
     }
 
@@ -243,6 +243,7 @@ export default function App({
             setMyBattlePokemonHP(data[cardName].hp)
             setMyHandList(prev => prev.filter((_, i) => i !== index));
         } else {
+            setEnemyBattlePokemonHP(data[cardName].hp)
             setEnemyHandList(prev => prev.filter((_, i) => i !== index));
         }
     }
