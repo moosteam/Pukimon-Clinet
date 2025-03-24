@@ -11,26 +11,8 @@ import { FieldCards } from "./components/BattleField/FieldCards";
 import { Hand } from "./components/Area/Hand";
 import { Waiting } from "./components/Area/Waiting";
 import { data } from "./data/cards";
-
-import { 
-  myCardListAtom, 
-  enemyCardListAtom,
-  myHandListAtom,
-  enemyHandListAtom,
-  myUsedListAtom,
-  enemyUsedListAtom,
-  myBattlePokemonEnergyAtom,
-  myBattlePokemonHPAtom,
-  enemyBattlePokemonEnergyAtom,
-  enemyBattlePokemonHPAtom,
-  myWaitingPokemonHPAtom,
-  myWaitingPokemonEnergyAtom,
-  enemyWaitingPokemonHPAtom,
-  enemyWaitingPokemonEnergyAtom,
-  isNowTurnGiveEnergyAtom,
-  myGameScoreAtom,
-  enemyGameScoreAtom
-} from './atom'
+// 
+import * as Atoms from './atom';
 
 interface EndTurnButtonProps {
   onEndTurn: () => void;
@@ -51,23 +33,25 @@ export default function App({
   const [coinTextOpacity, setCoinTextOpacity] = useState(0);
   const [finalGroundRotate, setFinalGroundRotate] = useState(0);
 
-  const [myCardList, setMyCardList] = useAtom(myCardListAtom)
-  const [enemyCardList, setEnemyCardList] = useAtom(enemyCardListAtom)
-  const [myHandList, setMyHandList] = useAtom(myHandListAtom)
-  const [enemyHandList, setEnemyHandList] = useAtom(enemyHandListAtom)
-  const [myUsedList, setMyUsedList] = useAtom(myUsedListAtom)
-  const [enemyUsedList, setEnemyUsedList] = useAtom(enemyUsedListAtom)
-  const [myBattlePokemonEnergy, setMyBattlePokemonEnergy] = useAtom(myBattlePokemonEnergyAtom);
-  const [myBattlePokemonHP, setMyBattlePokemonHP] = useAtom(myBattlePokemonHPAtom);
-  const [enemyBattlePokemonEnergy, setEnemyBattlePokemonEnergy] = useAtom(enemyBattlePokemonEnergyAtom);
-  const [enemyBattlePokemonHP, setEnemyBattlePokemonHP] = useAtom(enemyBattlePokemonHPAtom);
-  const [myWaitingHP, setMyWaitingHP] = useAtom(myWaitingPokemonHPAtom);
-  const [myWaitingEnergy, setMyWaitingEnergy] = useAtom(myWaitingPokemonEnergyAtom);
-  const [enemyWaitingHP, setEnemyWaitingHP] = useAtom(enemyWaitingPokemonHPAtom);
-  const [enemyWaitingEnergy, setEnemyWaitingEnergy] = useAtom(enemyWaitingPokemonEnergyAtom);
-  const [isNowTurnGiveEnergy, setIsNowTurnGiveEnergy] = useAtom(isNowTurnGiveEnergyAtom);
-  const [myGameScore, setMyGameScore] = useAtom(myGameScoreAtom);
-  const [enemyGameScore, setEnemyGameScore] = useAtom(enemyGameScoreAtom);
+  //#region atom
+  const [myCardList, setMyCardList] = useAtom(Atoms.myCardListAtom)
+  const [enemyCardList, setEnemyCardList] = useAtom(Atoms.enemyCardListAtom)
+  const [myHandList, setMyHandList] = useAtom(Atoms.myHandListAtom)
+  const [enemyHandList, setEnemyHandList] = useAtom(Atoms.enemyHandListAtom)
+  const [myUsedList, setMyUsedList] = useAtom(Atoms.myUsedListAtom)
+  const [enemyUsedList, setEnemyUsedList] = useAtom(Atoms.enemyUsedListAtom)
+  const [myBattlePokemonEnergy, setMyBattlePokemonEnergy] = useAtom(Atoms.myBattlePokemonEnergyAtom);
+  const [myBattlePokemonHP, setMyBattlePokemonHP] = useAtom(Atoms.myBattlePokemonHPAtom);
+  const [enemyBattlePokemonEnergy, setEnemyBattlePokemonEnergy] = useAtom(Atoms.enemyBattlePokemonEnergyAtom);
+  const [enemyBattlePokemonHP, setEnemyBattlePokemonHP] = useAtom(Atoms.enemyBattlePokemonHPAtom);
+  const [myWaitingHP, setMyWaitingHP] = useAtom(Atoms.myWaitingPokemonHPAtom);
+  const [myWaitingEnergy, setMyWaitingEnergy] = useAtom(Atoms.myWaitingPokemonEnergyAtom);
+  const [enemyWaitingHP, setEnemyWaitingHP] = useAtom(Atoms.enemyWaitingPokemonHPAtom);
+  const [enemyWaitingEnergy, setEnemyWaitingEnergy] = useAtom(Atoms.enemyWaitingPokemonEnergyAtom);
+  const [isNowTurnGiveEnergy, setIsNowTurnGiveEnergy] = useAtom(Atoms.isNowTurnGiveEnergyAtom);
+  const [myGameScore, setMyGameScore] = useAtom(Atoms.myGameScoreAtom);
+  const [enemyGameScore, setEnemyGameScore] = useAtom(Atoms.enemyGameScoreAtom);
+  //#endregion
 
   useEffect(() => {
     // 클라이언트 사이드 렌더링 확인
