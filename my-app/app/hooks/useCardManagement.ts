@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useGameState } from "./useGameState";
+import { useAtom } from "jotai";
+import { isDrawCardAtom } from "../atom";
 
 export function useCardManagement() {
   const {
@@ -9,6 +11,8 @@ export function useCardManagement() {
     enemyHandList, setEnemyHandList,
     isNowTurnGiveEnergy, setIsNowTurnGiveEnergy
   } = useGameState();
+
+  const [isDrawCard, setIsDrawCard] = useAtom(isDrawCardAtom);
   
   const [myTurn, setMyTurn] = useState(true);
   const [droppedCards, setDroppedCards] = useState<{ [key: string]: string }>({});
@@ -19,6 +23,7 @@ export function useCardManagement() {
 
     initialCards.forEach((card, index) => {
       setTimeout(() => {
+        setIsDrawCard(prev => prev + 1)
         setMyHandList(prev => [...prev, card]);
       }, 300 * index);
     });

@@ -28,7 +28,7 @@ export function useAnimationSequence() {
         }
       },
       {
-        time: 3200,
+        time: 2400,
         action: () => {
           setSecondaryMyCardRotate(20);
           setSecondaryMyCardPosition(60);
@@ -36,33 +36,33 @@ export function useAnimationSequence() {
         }
       },
       {
-        time: 3600,
+        time: 2600,
         action: () => {
           setStartVideo(true);
         }
       },
       {
-        time: 5000,
+        time: 4000,
         action: () => {
           setOpeningScale(2.4);
           setCoinTextOpacity(100);
         }
       },
       {
-        time: 7000,
+        time: 5500,
         action: () => {
           setOpeningScale(1);
           setCoinTextOpacity(0);
         }
       },
       {
-        time: 7500,
+        time: 6000,
         action: () => {
           setStartVideo(false);
         }
       },
       {
-        time: 8500,
+        time: 7000,
         action: () => {
           setFinalGroundRotate(12);
         }
