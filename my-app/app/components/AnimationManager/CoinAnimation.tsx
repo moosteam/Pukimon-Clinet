@@ -14,7 +14,7 @@ export const CoinAnimation: React.FC<CoinAnimationProps> = ({
             {startVideo && (
                 <AutoplayVideo
                     src="FlipBack.webm"
-                    className="w-full max-w-lg absolute top-[52%] left-[50%] z-60 transform scale-50 translate-x-[-50%] translate-y-[-50%] pointer-events-none"
+                    className="w-full max-w-lg absolute top-[52%] left-[50%] transform scale-50 translate-x-[-50%] translate-y-[-50%] pointer-events-none z-1000"
                 />
             )}
 

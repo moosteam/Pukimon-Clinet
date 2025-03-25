@@ -40,37 +40,40 @@ export const Hand: React.FC<HandProps> = ({ handList, playedCards, isMy }) => {
                 </div>
             )}
 
-            {handList && handList.map((card: any, index: any) => {
-                const cardId = `card-${index}`;
-                // Only show cards that haven't been played yet
-                if (!playedCards[cardId]) {
-                    return (
-                        <Draggable 
-                            isReversed={!isMy} 
-                            key={isMy ? `draggable-${index}` : `enemydraggable-${index}`} 
-                            id={isMy ? `${cardId}` : `enemy${cardId}`}
-                            imgLink={`card/${card}.png`}
-                        >
-                            <div className="relative">
-                                <img
-                                    // {...longPressHandler()}
-                                    src={`card/${card}.png`}
-                                    alt=""
-                                    className="w-18 transition-all duration-500 cursor-grab hover:scale-110"
-                                />
-                            </div>
-                        </Draggable>
-                    );
+            {/* Add a CSS class for the container to properly handle the animation */}
+            <div className="flex flex-row items-center justify-center">
+                {handList && handList.map((card: any, index: any) => {
+                    const cardId = `card-${index}`;
+                    // Only show cards that haven't been played yet
+                    if (!playedCards[cardId]) {
+                        return (
+                            <Draggable 
+                                isReversed={!isMy} 
+                                key={isMy ? `draggable-${card}-${index}` : `enemydraggable-${card}-${index}`} 
+                                id={isMy ? `${cardId}` : `enemy${cardId}`}
+                                imgLink={`card/${card}.png`}
+                            >
+                                <div className="relative card-entry-animation">
+                                    <img
+                                        // {...longPressHandler()}
+                                        src={`card/${card}.png`}
+                                        alt=""
+                                        className="w-18 transition-all duration-500 cursor-grab hover:scale-110"
+                                    />
+                                </div>
+                            </Draggable>
+                        );
+                    }
+                    return null;
+                })}
+                {handList.length === 0 &&
+                    <img
+                        src="card/리자몽ex.png"
+                        alt=""
+                        className="w-18 transition-all duration-1500 invisible"
+                    />
                 }
-                return null;
-            })}
-            {handList.length === 0 &&
-                <img
-                    src="card/리자몽ex.png"
-                    alt=""
-                    className="w-18 transition-all duration-1500 invisible"
-                />
-            }
+            </div>
         </div>
     )
 }

@@ -26,13 +26,13 @@ export const BattleCard: React.FC<BattleCardProps> = ({
     return (
         <Droppable id={id}>
             <div 
-                className={`w-32 h-44 border-3 rounded-lg ${isMyCard ? 'mb-4' : 'mt-4'} bg-yellow-50 flex items-center justify-center`}
+                className={`w-32 h-44 border-3 rounded-lg ${isMyCard ? 'mb-4' : 'mt-4'} flex items-center justify-center`}
                 style={{
                     borderWidth: 2,
                     borderColor: shouldHighlight ? "blue" : "transparent",
                     boxShadow: shouldHighlight
                         ? "0 0 15px 5px rgba(0, 0, 255, 0.6)"
-                        : "none",
+                        : "0 0 0px 3px rgba(255, 255, 255, 1)",
                     borderRadius: "8px",
                     transition: "box-shadow 0.3s ease, border-color 0.3s ease",
                 }}
