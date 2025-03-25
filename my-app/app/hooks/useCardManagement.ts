@@ -1,0 +1,73 @@
+import { useState } from "react";
+import { useGameState } from "./useGameState";
+
+export function useCardManagement() {
+  const {
+    myCardList, setMyCardList,
+    enemyCardList, setEnemyCardList,
+    myHandList, setMyHandList,
+    enemyHandList, setEnemyHandList,
+    isNowTurnGiveEnergy, setIsNowTurnGiveEnergy
+  } = useGameState();
+  
+  const [myTurn, setMyTurn] = useState(true);
+  const [droppedCards, setDroppedCards] = useState<{ [key: string]: string }>({});
+
+  const addCardToMyHand = (cycle: number) => {
+    const initialCards = myCardList.slice(0, cycle);
+    setMyCardList(prev => prev.slice(cycle));
+
+    initialCards.forEach((card, index) => {
+      setTimeout(() => {
+        setMyHandList(prev => [...prev, card]);
+      }, 300 * index);
+    });
+  };
+
+  const addCardToEnemyHand = (cycle: number) => {
+    const initialCards = enemyCardList.slice(0, cycle);
+    setEnemyCardList(prev => prev.slice(cycle));
+
+    initialCards.forEach((card, index) => {
+      setTimeout(() => {
+        setEnemyHandList(prev => [...prev, card]);
+      }, 300 * index);
+    });
+  };
+
+  const onEndTurn = (openingRotate: number, setOpeningRotate: (value: number) => void, 
+                    finalGroundRotate: number, setFinalGroundRotate: (value: number) => void) => {
+    setOpeningRotate(openingRotate + 180);
+    setIsNowTurnGiveEnergy(false);
+    setFinalGroundRotate(finalGroundRotate * -1);
+    
+    if (!myTurn) {
+      if (myHandList.length === 0) {
+        addCardToMyHand(4);
+      } else {
+        addCardToMyHand(1);
+      }
+    } else {
+      if (enemyHandList.length === 0) {
+        addCardToEnemyHand(4);
+      } else {
+        addCardToEnemyHand(1);
+      }
+    }
+    
+    setMyTurn(!myTurn);
+  };
+
+  return {
+    myTurn,
+    setMyTurn,
+    droppedCards,
+    setDroppedCards,
+    addCardToMyHand,
+    addCardToEnemyHand,
+    onEndTurn,
+    // 추가: myHandList와 enemyHandList 반환
+    myHandList,
+    enemyHandList
+  };
+}
