@@ -46,4 +46,5 @@ export const enemyWaitingPokemonHPAtom = atom<number[]>([0, 0, 0]);
 export const myGameScoreAtom = atom<number>(0);
 export const enemyGameScoreAtom = atom<number>(0);
 
-export const isDrawCardAtom = atom<number>(0); // Add this atom to track the turn
+export const isMyDrawCardAtom = atom<number>(0); // Add this atom to track the turn
+export const isEnemyDrawCardAtom = atom<number>(0); // Add this atom to track the turn

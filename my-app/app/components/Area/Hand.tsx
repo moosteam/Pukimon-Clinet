@@ -53,7 +53,7 @@ export const Hand: React.FC<HandProps> = ({ handList, playedCards, isMy }) => {
                                 id={isMy ? `${cardId}` : `enemy${cardId}`}
                                 imgLink={`card/${card}.png`}
                             >
-                                <div className="relative card-entry-animation">
+                                <div className={`relative card-entry-animation${isMy ? "" : "-reverse"}`}>
                                     <img
                                         // {...longPressHandler()}
                                         src={`card/${card}.png`}

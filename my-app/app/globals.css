@@ -68,6 +68,18 @@ img {
   animation: cardEntryAnimation 0.7s ease-out forwards;
 }
 
+.card-entry-animation-reverse {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  animation: cardEntryAnimationReverse 0.7s ease-out forwards;
+}
+
+.deck-entry-animation-reverse {
+  animation: deckEntryAnimationReverse 0.7s ease-out forwards;
+  transform: translateY(-6.3rem);
+}
 .deck-entry-animation {
   animation: deckEntryAnimation 0.7s ease-out forwards;
   transform: translateY(-6.3rem);
@@ -88,6 +100,15 @@ img {
   }
 }
 
+@keyframes deckEntryAnimationReverse {
+  0% {
+    transform: translateY(-6.3rem);
+  }
+  100% {
+    transform: translateY(-40rem);
+  }
+}
+
 @keyframes cardEntryAnimation {
   0% {
     opacity: 0.9;
@@ -101,5 +122,20 @@ img {
     transform: perspective(800px) translateY(0) translateX(0) rotateY(0deg);
   }
 }
+
+@keyframes cardEntryAnimationReverse {
+  0% {
+    opacity: 0.9;
+    transform: perspective(800px) translateY(-300px) translateX(-100px) rotateY(-100deg);
+  }
+  50% {
+    opacity: 0.9;
+    transform: perspective(800px) translateY(-300px) translateX(-100px) rotateY(-100deg);
+  }
+  100% {
+    transform: perspective(800px) translateY(0) translateX(0) rotateY(0deg);
+  }
+}
+
 
 /* If you want staggered animations for multiple cards */
