@@ -4,6 +4,17 @@
   --background: #ffffff;
   --foreground: #171717;
 }
+/* 전체 바 스타일 */
+progress::-webkit-progress-bar {
+  background-color: #000000;
+  border-radius: 10px;
+}
+
+/* 채워지는 부분 스타일 */
+progress::-webkit-progress-value {
+  background-color: #00ff80;
+  border-radius: 10px;
+}
 
 @theme inline {
   --color-background: var(--background);

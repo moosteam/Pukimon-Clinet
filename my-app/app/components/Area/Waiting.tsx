@@ -55,12 +55,20 @@ export const Waiting: React.FC<WaitingProps> = ({ droppedCards, isMy }) => {
                                 }
                                 
                                 {/* Display HP */}
-                                <div 
-                                    className="bg-green-700 absolute mt-14  p-1 border-4"
-                                    style={{ 
-                                        textShadow: "1px 1px 0 #000" 
+                                <div
+                                    className={`absolute text-black font-bold text-xl mt-[-10]`}
+                                    style={{
+                                        textShadow: "-1px 0px white, 0px 1px white, 1px 0px white, 0px -1px white",
+                                        marginLeft: (hpArray[index]) >= 100 ? "4.2rem" : "3.2rem" // 3자리수면 공간 줄이고, 2자리수면 더 많은 공간 주기
                                     }}
                                 >{hpArray[index]}</div>
+                                <progress
+                                    className="text-green-300 progress absolute mt-[12] w-8 ml-10 h-[.6rem] border-2 border-black rounded-full"
+                                    id="progress"
+                                    value="100"
+                                    max="100"
+                                    style={{ zIndex: 10 }}
+                                ></progress>
                                  
                                 <img 
                                     src={droppedCards[zoneId]} 
