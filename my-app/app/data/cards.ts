@@ -7,6 +7,7 @@ interface Card {
   weakness: string;
   beforeEvo: string;
   afterEvo: string;
+  retreatCost: number;
 }
 
 interface CardData {
@@ -34,6 +35,7 @@ export const data: CardData = {
     weakness: "물",
     beforeEvo: "card/리자드.png",
     afterEvo: "",
+    retreatCost:2
   },
   "card/리자드.png": {
     name: "리자드",
@@ -50,6 +52,7 @@ export const data: CardData = {
     weakness: "물",
     beforeEvo: "card/파이리.png",
     afterEvo: "card/리자몽ex.png",
+    retreatCost:1
   },
   "card/파이리.png": {
     name: "파이리",
@@ -66,5 +69,6 @@ export const data: CardData = {
     weakness: "물",
     beforeEvo: "",
     afterEvo: "card/리자드.png",
+    retreatCost:1
   },
 };

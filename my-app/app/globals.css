@@ -102,6 +102,39 @@ img {
   height: 100%;
 }
 
+.is-ready-to-attack-inf {
+  animation: isReadyToAttackInfAnimation 4s infinite ease-in-out forwards;
+}
+
+
+@keyframes isReadyToAttackInfAnimation {
+  0% {
+    transform: perspective(800px) rotateY(-20deg) rotateZ(0deg);
+  }
+  50% {
+    transform: perspective(800px) rotateY(-30deg) rotateZ(2deg) ;
+  }
+  100% {
+    transform: perspective(800px)rotateY(-20deg) rotateZ(0deg);
+  }
+}
+
+@keyframes isReadyToAttackApproachAnimation {
+  0% {
+    opacity: 0;
+    transform: perspective(800px) scale(0.3) translateZ(-200px);
+  }
+  100% {
+    opacity: 1;
+    transform: perspective(800px) scale(1) translateZ(0);
+  }
+}
+
+/* Fix the class name to match the new animation */
+.is-ready-to-attack-apr {
+  animation: isReadyToAttackApproachAnimation 0.7s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+}
+
 @keyframes deckEntryAnimation {
   0% {
     transform: translateY(-6.3rem);
