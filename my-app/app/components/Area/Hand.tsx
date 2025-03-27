@@ -23,11 +23,11 @@ export const Hand: React.FC<HandProps> = ({ handList, playedCards, isMy }) => {
     }, []);
 
     return (
-        <div className="z-9999999999 flex flex-row">
+        <div className="z-10 flex flex-row">
             {/* Card zoom overlay */}
             {isCardZoomed && (
                 <div
-                    className="fixed inset-0 z-9999999999 flex items-center justify-center bg-black/50 transform scale-120"
+                    className="fixed inset-0 z-10 flex items-center justify-center bg-black/50 transform scale-120"
                     onClick={closeZoom}
                 >
                     <div className="relative w-[50%] max-w-[200px]">

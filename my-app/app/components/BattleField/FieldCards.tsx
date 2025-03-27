@@ -117,17 +117,21 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
             )}
             
             {isReadyToAttack && !gameOver && (
-                <div className="absolute w-full h-full flex items-center z-10">
+                <div className="absolute w-full h-full flex items-end justify-end" style={{ zIndex: 9999 }}>
                     <img 
                         src={droppedCards[attackingCard || 'my_battle']} 
                         alt=""
                         onClick={() => {
                             setIsReadyToAttack(false);
                         }}
+                        className="mb-12 mr-12 w-60"
+                        style={{ position: 'relative', zIndex: 10000 }}
                     />
-                    <div className="flex flex-col w-36 m-4">
+                    <div className="flex flex-col w-36 mb-24 mr-12  absolute justify-end items-end"
+                        style={{ zIndex: 10001 }}
+                    >
                         {data[droppedCards[attackingCard || 'my_battle']].skill.map((skill, index) => (
-                            <div key={index} className="bg-gray-300 text-gray-900 p-3 rounded-lg shadow-lg border-2 border-gray-400 z-10"
+                            <div key={index} className="bg-gray-300 text-gray-900 p-3 rounded-lg shadow-lg border-2 border-gray-400 z-9"
                                 onClick={() => {
                                     // Check if there's enough energy to use this skill
                                     const currentEnergy = attackingCard === 'my_battle' 

@@ -35,7 +35,7 @@ export const DeckArea: React.FC<DeckAreaProps> = ({
             {!isMyDeck
                 ?
                 <div className="relative">
-                    <img src="ui/pukimon_card_back.png" alt="Card Back" className="w-18 relative z-10" />
+                    <img src="ui/pukimon_card_back.png" alt="Card Back" className="w-18 relative" />
                     {Array.from({ length: isEnemyDrawCard }).map((_, index) => (
                         <img
                             key={index}
@@ -70,7 +70,7 @@ export const DeckArea: React.FC<DeckAreaProps> = ({
             {isMyDeck
                 ?
                 <div className="relative">
-                    <img src="ui/pukimon_card_back.png" alt="Card Back" className="w-18 relative z-10" />
+                    <img src="ui/pukimon_card_back.png" alt="Card Back" className="w-18 relative" />
                     {Array.from({ length: isMyDrawCard }).map((_, index) => (
                         <img
                             key={index}

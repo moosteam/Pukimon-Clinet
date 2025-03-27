@@ -30,7 +30,7 @@ export const Waiting: React.FC<WaitingProps> = ({ droppedCards, isMy }) => {
     const hpArray = isMy ? myWaitingHP : enemyWaitingHP;
 
     return (
-        <div className="z-50 flex flex-row gap-3">
+        <div className="flex flex-row gap-3" style={{ position: 'relative', zIndex: 10 }}>
             {waitingZones.map((zoneId, index) => (
                 <Droppable key={zoneId} id={zoneId}>
                     <div className="w-18 h-25 border-3 rounded-lg flex items-center justify-center">

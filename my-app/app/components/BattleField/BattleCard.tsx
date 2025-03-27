@@ -52,7 +52,6 @@ export const BattleCard: React.FC<BattleCardProps> = ({
                             id="progress"
                             value="100"
                             max="100"
-                            style={{ zIndex: 10 }}
                         ></progress>
                         {Array(energy >= 5 ? 1 : energy).fill(0).map((_, index) => (
                             <img
