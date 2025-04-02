@@ -1,5 +1,6 @@
 import React from "react";
 import { Droppable } from "../Droppable";
+import { data } from "../../data/cards"
 
 interface BattleCardProps {
     id: string;
@@ -50,8 +51,8 @@ export const BattleCard: React.FC<BattleCardProps> = ({
                         <progress
                             className="text-green-300 progress absolute mt-[20] w-12 ml-20 h-[.7rem] border-3 border-black rounded-full"
                             id="progress"
-                            value="100"
-                            max="100"
+                            value={`${hp}`}
+                            max={`${data[droppedCards[id]].hp}`} // 이부분 고쳐야함
                         ></progress>
                         {Array(energy >= 5 ? 1 : energy).fill(0).map((_, index) => (
                             <img

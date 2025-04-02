@@ -131,18 +131,30 @@ img {
 }
 
 .drop-card {
-  animation: dropCardAnimation 0.7s cubic-bezier(0.25, 0.25, 0.5, 1.0) forwards;
+  animation: dropCardAnimation 1s cubic-bezier(0.2, 1, 0.3, 1.0) forwards;
 }
 
 @keyframes dropCardAnimation {
   0% {
-    transform: perspective(800px) translateZ(11rem);
-  }
-  70% {
     transform: perspective(800px) translateZ(12rem);
   }
-  100% {
+  35% {
+    transform: perspective(800px) translateZ(13rem);
+    box-shadow:
+      0 0 10px 4px rgba(255, 255, 255, 0),
+      0 0 10px 5px rgb(0, 251, 255, 0);
+  }
+  70% {
     transform: perspective(800px) translateZ(0rem);
+    box-shadow:
+      0 0 10px 4px rgba(255, 255, 255, 1),
+      0 0 10px 5px rgb(0, 251, 255);
+  }
+  100% {
+    /* 다시 투명하게 돌아가도록 */
+    box-shadow:
+      0 0 10px 4px rgba(255, 255, 255, 0),
+      0 0 10px 5px rgb(0, 251, 255, 0);
   }
 }
 
@@ -196,6 +208,3 @@ img {
     transform: perspective(800px) translateY(0) translateX(0) rotateY(0deg);
   }
 }
-
-
-/* If you want staggered animations for multiple cards */
