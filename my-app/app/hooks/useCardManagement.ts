@@ -26,7 +26,7 @@ export function useCardManagement() {
       setTimeout(() => {
         setIsMyDrawCard(prev => prev + 1)
         setMyHandList(prev => [...prev, card]);
-      }, 300 * index);
+      }, 200 * index);
     });
   };
 
@@ -38,7 +38,7 @@ export function useCardManagement() {
       setTimeout(() => {
         setIsEnemyDrawCard(prev => prev + 1)
         setEnemyHandList(prev => [...prev, card]);
-      }, 300 * index);
+      }, 200 * index);
     });
   };
 

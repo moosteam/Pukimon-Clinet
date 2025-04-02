@@ -76,7 +76,7 @@ img {
   width: 100%;
   height: 100%;
   transform-style: preserve-3d;
-  animation: cardEntryAnimation 0.7s ease-out forwards;
+  animation: cardEntryAnimation 0.7s cubic-bezier(0.25, 0.25, 0.5, 1.0) forwards;
 }
 
 .card-entry-animation-reverse {
@@ -84,15 +84,15 @@ img {
   width: 100%;
   height: 100%;
   transform-style: preserve-3d;
-  animation: cardEntryAnimationReverse 0.7s ease-out forwards;
+  animation: cardEntryAnimationReverse 0.7s cubic-bezier(0.25, 0.25, 0.5, 1.0) forwards;
 }
 
 .deck-entry-animation-reverse {
-  animation: deckEntryAnimationReverse 0.7s ease-out forwards;
+  animation: deckEntryAnimationReverse 0.7s cubic-bezier(0.25, 0.25, 0.5, 1.0) forwards;
   transform: translateY(-6.3rem);
 }
 .deck-entry-animation {
-  animation: deckEntryAnimation 0.7s ease-out forwards;
+  animation: deckEntryAnimation 0.7s  cubic-bezier(0.25, 0.25, 0.5, 1.0) forwards;
   transform: translateY(-6.3rem);
 }
 
@@ -131,7 +131,7 @@ img {
 }
 
 .drop-card {
-  animation: dropCardAnimation 0.7s cubic-bezier(0.4, 1, 0.4, 1) forwards;
+  animation: dropCardAnimation 0.7s cubic-bezier(0.25, 0.25, 0.5, 1.0) forwards;
 }
 
 @keyframes dropCardAnimation {
