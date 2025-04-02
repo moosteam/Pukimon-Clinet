@@ -131,7 +131,7 @@ img {
 }
 
 .drop-card {
-  animation: dropCardAnimation 1s cubic-bezier(0.2, 1, 0.3, 1.0) forwards;
+  animation: dropCardAnimation 1s cubic-bezier(1, 0, 0, 1.0) forwards;
 }
 
 @keyframes dropCardAnimation {
@@ -139,7 +139,6 @@ img {
     transform: perspective(800px) translateZ(12rem);
   }
   35% {
-    transform: perspective(800px) translateZ(13rem);
     box-shadow:
       0 0 10px 4px rgba(255, 255, 255, 0),
       0 0 10px 5px rgb(0, 251, 255, 0);
@@ -155,6 +154,22 @@ img {
     box-shadow:
       0 0 10px 4px rgba(255, 255, 255, 0),
       0 0 10px 5px rgb(0, 251, 255, 0);
+  }
+}
+
+.attack {
+  animation: attackAnimation 1.3s cubic-bezier(0.28, 1, 0.2, 1) forwards;
+}
+
+@keyframes attackAnimation {
+  0% {
+    transform: perspective(800px) translateZ(0rem) rotateY(-30deg);
+  }
+  66% {
+    transform: perspective(800px) translateZ(24rem) rotateY(0deg);
+  }
+  100% {
+    transform: perspective(800px) translateZ(0rem) rotateY(0deg);
   }
 }
 

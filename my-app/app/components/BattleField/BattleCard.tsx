@@ -9,6 +9,7 @@ interface BattleCardProps {
     droppedCards: Record<string, string>;
     energy: number;
     hp: number;
+    isAttack: boolean;
     onCardClick?: () => void;
 }
 
@@ -19,6 +20,7 @@ export const BattleCard: React.FC<BattleCardProps> = ({
     droppedCards,
     energy,
     hp,
+    isAttack,
     onCardClick
 }) => {
     const shouldHighlight = !droppedCards[id] &&
@@ -40,7 +42,7 @@ export const BattleCard: React.FC<BattleCardProps> = ({
                 onClick={onCardClick}
             >
                 {droppedCards[id] && (
-                    <div className="drop-card">
+                    <div className={`drop-card ${isAttack ? "attack" : ""}`}>
                         <div
                             className={`absolute text-black font-bold text-3xl mt-[-10]`}
                             style={{

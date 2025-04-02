@@ -51,6 +51,9 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
     const [isReadyToAttack, setIsReadyToAttack] = useState(false);
     const [attackingCard, setAttackingCard] = useState<string | null>(null);
     const [gameOver, setGameOver] = useState(false);
+
+    const [isMyAttack, setIsMyAttack] = useState(false);
+    const [isEnemyAttack, setIsEnemyAttack] = useState(false);
     
     // Check for game over condition
     useEffect(() => {
@@ -102,6 +105,17 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
         
         setIsReadyToAttack(false);
         
+        
+        setIsMyAttack(myTurn);
+        setIsEnemyAttack(!myTurn);
+        
+        setTimeout(() => {
+            processAttackLogic(skill);
+        }, 2000);
+    };
+    
+    // Separate function to process attack logic after animation
+    const processAttackLogic = (skill: any) => {
         // Handle attack based on whose turn it is
         if (attackingCard === 'my_battle') {
             // Calculate new HP after damage
@@ -249,6 +263,8 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
             }
         }
         
+        setIsMyAttack(false);
+        setIsEnemyAttack(false);
         setAttackingCard(null);
         onEndTurn();
     };
@@ -466,6 +482,7 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
                     droppedCards={droppedCards}
                     energy={enemyBattlePokemonEnergy}
                     hp={enemyBattlePokemonHP}
+                    isAttack={isEnemyAttack}
                     onCardClick={() => {
                         if (!myTurn && droppedCards['y_battle']) {
                             setAttackingCard('y_battle');
@@ -481,6 +498,7 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
                     droppedCards={droppedCards}
                     energy={myBattlePokemonEnergy}
                     hp={myBattlePokemonHP}
+                    isAttack={isMyAttack}
                     onCardClick={() => {
                         if (myTurn && droppedCards['my_battle']) {
                             setAttackingCard('my_battle');
