@@ -39,7 +39,7 @@ export const BattleCard: React.FC<BattleCardProps> = ({
                 onClick={onCardClick}
             >
                 {droppedCards[id] && (
-                    <div>
+                    <div className="drop-card">
                         <div
                             className={`absolute text-black font-bold text-3xl mt-[-10]`}
                             style={{

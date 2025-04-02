@@ -130,6 +130,22 @@ img {
   }
 }
 
+.drop-card {
+  animation: dropCardAnimation 0.7s cubic-bezier(0.4, 1, 0.4, 1) forwards;
+}
+
+@keyframes dropCardAnimation {
+  0% {
+    transform: perspective(800px) translateZ(11rem);
+  }
+  70% {
+    transform: perspective(800px) translateZ(12rem);
+  }
+  100% {
+    transform: perspective(800px) translateZ(0rem);
+  }
+}
+
 /* Fix the class name to match the new animation */
 .is-ready-to-attack-apr {
   animation: isReadyToAttackApproachAnimation 0.7s cubic-bezier(0.19, 1, 0.22, 1) forwards;

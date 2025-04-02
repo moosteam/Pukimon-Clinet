@@ -50,7 +50,7 @@ export default function App({
     // 10초 후에 실행될 타이머 설정
     const timer = setTimeout(() => {
       addCardToMyHand(4);
-    }, 8000); // 10000ms = 10초
+    }, 0.1*8000); // 10000ms = 10초
 
     // 컴포넌트가 언마운트될 때 타이머 정리
     return () => clearTimeout(timer);
@@ -72,7 +72,7 @@ export default function App({
         {/* 게임 필드 */}
         <GameBoard openingRotate={openingRotate} openingScale={openingScale} finalGroundRotate={finalGroundRotate}>
           {/* 적 카드 영역 */}
-          <Hand handList={enemyHandList} playedCards={PlayerCards} isMy={false} />
+          <Hand handList={enemyHandList} playedCards={PlayerCards} isMy={false}  />
           {/* 필드 카드 영역 */}
           <Waiting droppedCards={droppedCards} isMy={false} />
           {/* 중앙 카드 영역 */}

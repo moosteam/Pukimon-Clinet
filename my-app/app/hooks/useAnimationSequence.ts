@@ -19,7 +19,7 @@ export function useAnimationSequence() {
     // 애니메이션 시퀀스 정의
     const animationSequence = [
       {
-        time: 0,
+        time: 0.1*0,
         action: () => {
           setOpeningRotate(0);
           setOpeningScale(1);
@@ -28,7 +28,7 @@ export function useAnimationSequence() {
         }
       },
       {
-        time: 2400,
+        time: 0.1*2400,
         action: () => {
           setSecondaryMyCardRotate(20);
           setSecondaryMyCardPosition(60);
@@ -36,33 +36,33 @@ export function useAnimationSequence() {
         }
       },
       {
-        time: 2600,
+        time: 0.1*2600,
         action: () => {
           setStartVideo(true);
         }
       },
       {
-        time: 4000,
+        time: 0.1*4000,
         action: () => {
           setOpeningScale(2.4);
           setCoinTextOpacity(100);
         }
       },
       {
-        time: 5500,
+        time: 0.1*5500,
         action: () => {
           setOpeningScale(1);
           setCoinTextOpacity(0);
         }
       },
       {
-        time: 6000,
+        time: 0.1*6000,
         action: () => {
           setStartVideo(false);
         }
       },
       {
-        time: 7000,
+        time: 0.1*7000,
         action: () => {
           setFinalGroundRotate(12);
         }

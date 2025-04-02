@@ -33,9 +33,9 @@ export const Waiting: React.FC<WaitingProps> = ({ droppedCards, isMy }) => {
         <div className="flex flex-row gap-3" style={{ position: 'relative', zIndex: 10 }}>
             {waitingZones.map((zoneId, index) => (
                 <Droppable key={zoneId} id={zoneId}>
-                    <div className="w-18 h-25 border-3 rounded-lg flex items-center justify-center">
+                    <div className="w-18 h-25 border-3 rounded-lg flex items-center justify-center ">
                         {droppedCards[zoneId] && (
-                            <div>
+                            <div className="drop-card">
                                 {/* Display energy icons */}
                                 {Array(energyArray[index] >= 5 ? 1 : energyArray[index]).fill(0).map((_, i) => (
                                     <img 
