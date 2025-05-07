@@ -56,18 +56,18 @@ export const Hand: React.FC<HandProps> = ({ handList, playedCards, isMy, myTurn 
                             >
                                 <div 
                                     className={`relative card-entry-animation${isMy ? "" : "-reverse"}`}
-                                    style={{
-                                        transition: "transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
-                                        transform: myTurn ? "scale(1)" : "scale(-1, -1)",
-                                        transformOrigin: "center center",
-                                        perspective: "1000px"
-                                    }}
                                 >
                                     <img
                                         // {...longPressHandler()}
                                         src={`card/${card}.png`}
                                         alt=""
                                         className="w-18 transition-all duration-500 cursor-grab hover:scale-110"
+                                        style={{
+                                            transition: "transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
+                                            transform: myTurn ? "scale(1)" : "scale(-1, -1)",
+                                            transformOrigin: "center center",
+                                            perspective: "1000px"
+                                        }}
                                     />
                                 </div>
                             </Draggable>
