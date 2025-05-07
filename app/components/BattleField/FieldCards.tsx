@@ -359,13 +359,6 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
     return (
         <div className={`z-50 flex flex-row w-full justify-between items-center`}>
             {/* Display scores */}
-            <div className="absolute top-4 left-4 bg-blue-500 text-white p-2 rounded-lg z-50">
-                Your Score: {myGameScore}
-            </div>
-            <div className="absolute top-4 right-4 bg-red-500 text-white p-2 rounded-lg z-50">
-                Enemy Score: {enemyGameScore}
-            </div>
-            
             {gameOver && (
                 <div className="absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
                     <div className="bg-white p-8 rounded-lg text-center">
@@ -384,18 +377,25 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
             )}
             
             {isReadyToAttack && !gameOver && (
-                <div className="absolute w-full h-full flex items-end justify-end is-ready-to-attack-apr" style={{ zIndex: 9999 }}>
+                <div className={`${myTurn ? 'items-end justify-end w-full h-full ' : 'items-start justify-start  w-[100%] h-[90%]'} absolute flex  is-ready-to-attack-apr`} style={{ zIndex: 9999 }}>
                     <img 
                         src={droppedCards[attackingCard || 'my_battle']} 
                         alt=""
                         onClick={() => {
                             setIsReadyToAttack(false);
                         }}
-                        className="mb-12 mr-12 w-60  is-ready-to-attack-inf"
-                        style={{ position: 'relative', zIndex: 10000 }}
+                        className={`m-12 w-60 is-ready-to-attack-inf ${!myTurn ? 'scale-x-[-1] scale-y-[-1]' : ''}`}
+                        style={{ 
+                            position: 'relative', 
+                            zIndex: 10000,
+                            transition: 'transform 0.3s ease'
+                        }}
                     />
-                    <div className="flex flex-col w-36 mb-24 mr-12  absolute justify-end items-end"
-                        style={{ zIndex: 10001 }}
+                    <div className={`flex flex-col w-36 my-24 mx-12 absolute justify-end items-end ${!myTurn ? 'scale-x-[-1] scale-y-[-1]' : ''}`}
+                        style={{ 
+                            zIndex: 10001,
+                            transition: 'transform 0.3s ease'
+                        }}
                     >
                         {data[droppedCards[attackingCard || 'my_battle']].skill.map((skill, index) => (
                             <div 

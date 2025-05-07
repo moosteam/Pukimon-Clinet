@@ -9,6 +9,7 @@ import { GameBoard } from "./components/BattleField/GameBoard";
 import { FieldCards } from "./components/BattleField/FieldCards";
 import { Hand } from "./components/Area/Hand";
 import { Waiting } from "./components/Area/Waiting";
+import ScoreTimer from "./components/ScoreTimer";
 
 // Import custom hooks
 import { useAnimationSequence } from "./hooks/useAnimationSequence";
@@ -60,6 +61,8 @@ export default function App({
   return (
     <DndContext onDragEnd={handleDragEnd}>
       <div className="w-full h-full bg-[#C2DAF6] relative overflow-hidden">
+        <ScoreTimer isPrimary myTurn={myTurn}/>
+        <ScoreTimer myTurn={myTurn}/>
         {/* 플레이어 카드 */}
         <PlayerCards
           secondaryMyCardRotate={secondaryMyCardRotate}

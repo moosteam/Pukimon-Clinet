@@ -28,9 +28,14 @@ export const DeckArea: React.FC<DeckAreaProps> = ({
 
     return (
         // 플레이어 덱일 경우에만 flex column 레이아웃을 가진 컨테이너 div
-        <div className={`${isMyDeck ? "flex items-center flex-col" : ""}`}>
+        <div>
             {/* 상대방 덱일 경우, 상대방 턴이고 에너지가 아직 부여되지 않았을 때만 에너지 카드 표시 */}
-            {!isMyDeck && <EnergyCard isReversed={true} isVisible={!myTurn && !isNowTurnGiveEnergy} />}
+            {
+                (!myTurn && !isMyDeck && !isNowTurnGiveEnergy) ?
+                <EnergyCard isReversed={true} isVisible={!myTurn && !isMyDeck && !isNowTurnGiveEnergy} /> :
+                <div className="w-18 h-18"></div>
+
+            }
             {/* 덱의 뒷면 표시 */}
             {!isMyDeck
                 ?
@@ -91,12 +96,12 @@ export const DeckArea: React.FC<DeckAreaProps> = ({
                 <div className="w-18 h-25 rounded-sm bg-black/10 shadow-[inset_0_0_4px_rgba(0,0,0,0.3)]"></div>
             }
             {/* 플레이어 덱일 경우, 버림 더미 자리와 에너지 카드 표시 */}
-            {isMyDeck && (
-                <>
-                    {/* 플레이어 턴이고 에너지가 아직 부여되지 않았을 때만 에너지 카드 표시 */}
-                    <EnergyCard isReversed={false} isVisible={myTurn && !isNowTurnGiveEnergy} />
-                </>
-            )}
+            {
+                (myTurn && isMyDeck && !isNowTurnGiveEnergy) ?
+                <EnergyCard isReversed={false} isVisible={myTurn && isMyDeck && !isNowTurnGiveEnergy} /> :
+                <div className="w-18 h-18"></div>
+
+            }
         </div>
     );
 };

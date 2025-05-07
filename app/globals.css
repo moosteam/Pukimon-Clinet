@@ -167,7 +167,7 @@ img {
     transform: perspective(800px) translateZ(0rem) rotateY(-30deg);
   }
   66% {
-    transform: perspective(800px) translateZ(24rem) rotateY(0deg);
+    transform: perspective(800px) translateZ(16rem) rotateY(0deg);
   }
   100% {
     transform: perspective(800px) translateZ(0rem) rotateY(0deg);
@@ -223,4 +223,36 @@ img {
   100% {
     transform: perspective(800px) translateY(0) translateX(0) rotateY(0deg);
   }
+}
+
+.droppable-glow {
+  animation: drop-shadow-glow .8s ease-in-out infinite;
+}
+
+@keyframes drop-shadow-glow {
+  0% {
+    box-shadow:
+      0 0 12px 8px rgba(255, 255, 255, 0),
+      0 0 8px 8px rgba(0, 251, 255, 0);
+  }
+
+  50% {
+    box-shadow:
+      0 0 4px 4px rgba(255, 255, 255, 1),
+      0 0 8px 8px rgb(0, 255, 255);
+  }
+
+  /* 100% 시점: 다시 투명 상태로 복귀 */
+  100% {
+    box-shadow:
+      0 0 8px 8px rgba(255, 255, 255, 0),
+      0 0 8px 8px rgba(0, 251, 255, 0);
+  }
+}
+
+
+
+
+[data-nextjs-toast] {
+  display: none !important;
 }
