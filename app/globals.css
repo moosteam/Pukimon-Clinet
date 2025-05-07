@@ -131,29 +131,30 @@ img {
 }
 
 .drop-card {
-  animation: dropCardAnimation 1s cubic-bezier(1, 0, 0, 1.0) forwards;
+  animation: dropCardAnimation 1s cubic-bezier(1, 0, 0, 1) forwards;
 }
 
 @keyframes dropCardAnimation {
   0% {
-    transform: perspective(800px) translateZ(12rem);
+    transform: perspective(800px) translateZ(10rem);
   }
-  35% {
+  30% {
     box-shadow:
-      0 0 10px 4px rgba(255, 255, 255, 0),
-      0 0 10px 5px rgb(0, 251, 255, 0);
+    0 0 10px 4px rgba(255, 255, 255, 0),
+    0 0 10px 5px rgb(0, 251, 255, 0);
   }
-  70% {
+  71% {
     transform: perspective(800px) translateZ(0rem);
+    
     box-shadow:
       0 0 10px 4px rgba(255, 255, 255, 1),
-      0 0 10px 5px rgb(0, 251, 255);
+      0 0 10px 4px rgb(0, 251, 255);
   }
   100% {
     /* 다시 투명하게 돌아가도록 */
     box-shadow:
       0 0 10px 4px rgba(255, 255, 255, 0),
-      0 0 10px 5px rgb(0, 251, 255, 0);
+      0 0 10px 4px rgb(0, 251, 255, 0);
   }
 }
 

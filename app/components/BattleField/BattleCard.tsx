@@ -37,7 +37,10 @@ export const BattleCard: React.FC<BattleCardProps> = ({
                         ? "0 0 15px 5px rgba(0, 0, 255, 0.6)"
                         : "0 0 0px 3px rgba(255, 255, 255, 1)",
                     borderRadius: "8px",
-                    transition: "box-shadow 0.3s ease, border-color 0.3s ease",
+                    transition: "box-shadow 0.3s ease, border-color 0.3s ease, transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
+                    transform: myTurn ? "scale(1)" : "scale(-1, -1)",
+                    transformOrigin: "center center",
+                    perspective: "1000px",
                 }}
                 onClick={onCardClick}
             >

@@ -72,9 +72,9 @@ export default function App({
         {/* 게임 필드 */}
         <GameBoard openingRotate={openingRotate} openingScale={openingScale} finalGroundRotate={finalGroundRotate}>
           {/* 적 카드 영역 */}
-          <Hand handList={enemyHandList} playedCards={PlayerCards} isMy={false}  />
+          <Hand handList={enemyHandList} playedCards={PlayerCards} isMy={false} myTurn={myTurn}/>
           {/* 필드 카드 영역 */}
-          <Waiting droppedCards={droppedCards} isMy={false} />
+          <Waiting droppedCards={droppedCards} isMy={false} myTurn={myTurn}/>
           {/* 중앙 카드 영역 */}
           <FieldCards 
             onEndTurn={() => onEndTurn(openingRotate, setOpeningRotate, finalGroundRotate, setFinalGroundRotate)} 
@@ -83,9 +83,9 @@ export default function App({
             setDroppedCards={setDroppedCards}
           />
           {/* 하단 필드 카드 영역 */}
-          <Waiting droppedCards={droppedCards} isMy={true} />
+          <Waiting droppedCards={droppedCards} isMy={true} myTurn={myTurn}/>
           {/* 내 핸드 영역 - 드래그 가능한 카드들 */}
-          <Hand handList={myHandList} playedCards={PlayerCards} isMy={true} />
+          <Hand handList={myHandList} playedCards={PlayerCards} isMy={true} myTurn={myTurn}/>
           {/* 비디오 영역 */}
           <CoinAnimation startVideo={startVideo} coinTextOpacity={coinTextOpacity} />
         </GameBoard>

@@ -18,6 +18,7 @@ import {
 import { Draggable } from "../Draggable";
 import { BattleCard } from "./BattleCard";
 import { DeckArea } from "../Area/DeckArea";
+import { scale } from "framer-motion";
 
 interface FieldCardsProps {
     onEndTurn: any;
@@ -356,7 +357,7 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
     };
         
     return (
-        <div className="z-50 flex flex-row w-full justify-between items-center">
+        <div className={`z-50 flex flex-row w-full justify-between items-center`}>
             {/* Display scores */}
             <div className="absolute top-4 left-4 bg-blue-500 text-white p-2 rounded-lg z-50">
                 Your Score: {myGameScore}

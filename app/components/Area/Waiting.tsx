@@ -11,9 +11,10 @@ import {
 interface WaitingProps {
     droppedCards: Record<string, string>;
     isMy: boolean;
+    myTurn: boolean;
 }
 //
-export const Waiting: React.FC<WaitingProps> = ({ droppedCards, isMy }) => {
+export const Waiting: React.FC<WaitingProps> = ({ droppedCards, isMy, myTurn }) => {
     const ownerPrefix = isMy ? 'my' : 'enemy';
     const waitingZones = [1, 2, 3].map(num => `${ownerPrefix}_waiting_${num}`);
     
@@ -33,7 +34,15 @@ export const Waiting: React.FC<WaitingProps> = ({ droppedCards, isMy }) => {
         <div className="flex flex-row gap-3" style={{ position: 'relative', zIndex: 10 }}>
             {waitingZones.map((zoneId, index) => (
                 <Droppable key={zoneId} id={zoneId}>
-                    <div className="w-18 h-25 border-3 rounded-lg flex items-center justify-center ">
+                    <div 
+                        className="w-18 h-25 border-3 rounded-lg flex items-center justify-center"
+                        style={{
+                            transition: "transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
+                            transform: myTurn ? "scale(1)" : "scale(-1, -1)",
+                            transformOrigin: "center center",
+                            perspective: "1000px"
+                        }}
+                    >
                         {droppedCards[zoneId] && (
                             <div className="drop-card">
                                 {/* Display energy icons */}

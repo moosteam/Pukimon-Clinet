@@ -7,9 +7,10 @@ interface HandProps {
     handList: any;
     playedCards: any;
     isMy: any;
+    myTurn: boolean;
 }
 
-export const Hand: React.FC<HandProps> = ({ handList, playedCards, isMy }) => {
+export const Hand: React.FC<HandProps> = ({ handList, playedCards, isMy, myTurn }) => {
 
     const [isCardZoomed, setIsCardZoomed] = useState(false);
     const [zoomedCardSrc, setZoomedCardSrc] = useState("Charizard.jpg");
@@ -53,7 +54,15 @@ export const Hand: React.FC<HandProps> = ({ handList, playedCards, isMy }) => {
                                 id={isMy ? `${cardId}` : `enemy${cardId}`}
                                 imgLink={`card/${card}.png`}
                             >
-                                <div className={`relative card-entry-animation${isMy ? "" : "-reverse"}`}>
+                                <div 
+                                    className={`relative card-entry-animation${isMy ? "" : "-reverse"}`}
+                                    style={{
+                                        transition: "transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
+                                        transform: myTurn ? "scale(1)" : "scale(-1, -1)",
+                                        transformOrigin: "center center",
+                                        perspective: "1000px"
+                                    }}
+                                >
                                     <img
                                         // {...longPressHandler()}
                                         src={`card/${card}.png`}
