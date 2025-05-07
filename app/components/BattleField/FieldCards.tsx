@@ -19,6 +19,8 @@ import { Draggable } from "../Draggable";
 import { BattleCard } from "./BattleCard";
 import { DeckArea } from "../Area/DeckArea";
 import { scale } from "framer-motion";
+import { useFieldCards } from "../../hooks/useFieldCards";
+import SlidingBanner from "../SlidingBanner";
 
 interface FieldCardsProps {
     onEndTurn: any;
@@ -33,329 +35,49 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
     droppedCards,
     setDroppedCards,
 }) => {
-    
-    const [myBattlePokemonEnergy, setMyBattlePokemonEnergy] = useAtom(myBattlePokemonEnergyAtom);
-    const [myBattlePokemonHP, setMyBattlePokemonHP] = useAtom(myBattlePokemonHPAtom);
-    const [enemyBattlePokemonEnergy, setEnemyBattlePokemonEnergy] = useAtom(enemyBattlePokemonEnergyAtom);
-    const [enemyBattlePokemonHP, setEnemyBattlePokemonHP] = useAtom(enemyBattlePokemonHPAtom);
-    
-    // Add the waiting Pokémon atoms
-    const [myWaitingEnergy, setMyWaitingEnergy] = useAtom(myWaitingPokemonEnergyAtom);
-    const [myWaitingHP, setMyWaitingHP] = useAtom(myWaitingPokemonHPAtom);
-    const [enemyWaitingEnergy, setEnemyWaitingEnergy] = useAtom(enemyWaitingPokemonEnergyAtom);
-    const [enemyWaitingHP, setEnemyWaitingHP] = useAtom(enemyWaitingPokemonHPAtom);
-    
-    // Add game score atoms
-    const [myGameScore, setMyGameScore] = useAtom(myGameScoreAtom);
-    const [enemyGameScore, setEnemyGameScore] = useAtom(enemyGameScoreAtom);
-    
-    const [isReadyToAttack, setIsReadyToAttack] = useState(false);
-    const [attackingCard, setAttackingCard] = useState<string | null>(null);
-    const [gameOver, setGameOver] = useState(false);
+    const {
+        isReadyToAttack,
+        setIsReadyToAttack,
+        attackingCard,
+        setAttackingCard,
+        gameOver,
+        isMyAttack,
+        isEnemyAttack,
+        handleAttack,
+        handleRetreat,
+        myBattlePokemonEnergy,
+        myBattlePokemonHP,
+        enemyBattlePokemonEnergy,
+        enemyBattlePokemonHP,
+        myGameScore,
+        enemyGameScore
+    } = useFieldCards({
+        myTurn,
+        droppedCards,
+        setDroppedCards,
+        onEndTurn
+    });
 
-    const [isMyAttack, setIsMyAttack] = useState(false);
-    const [isEnemyAttack, setIsEnemyAttack] = useState(false);
-    
-    // Check for game over condition
+    const [showAttackEffect, setShowAttackEffect] = useState(false);
+    const [attackPosition, setAttackPosition] = useState<'opponent' | 'player'>('opponent');
+
     useEffect(() => {
-        if (myGameScore >= 3) {
-            setGameOver(true);
-            alert("You win! You've defeated 3 Pokémon!");
-        } else if (enemyGameScore >= 3) {
-            setGameOver(true);
-            alert("You lose! Your opponent has defeated 3 of your Pokémon!");
+        if (isMyAttack || isEnemyAttack) {
+            // 공격 위치 설정 - 내 턴일 때는 상대방 위치에, 상대방 턴일 때는 내 위치에
+            setAttackPosition(myTurn ? 'opponent' : 'player');
+            
+            // 1.75초 후에 이펙트 표시
+            const timer = setTimeout(() => {
+                setShowAttackEffect(true);
+            }, 1600);
+
+            return () => {
+                clearTimeout(timer);
+                setShowAttackEffect(false);
+            };
         }
-    }, [myGameScore, enemyGameScore]);
-    
-    // Helper function to find the first available bench Pokémon
-    const findFirstBenchPokemon = (prefix: string): number | null => {
-        for (let i = 1; i <= 3; i++) {
-            if (droppedCards[`${prefix}_waiting_${i}`]) {
-                return i;
-            }
-        }
-        return null;
-    };
-    
-    // Helper function to shift bench Pokémon after one is moved to battle
-    const shiftBenchPokemon = (updatedCards: Record<string, string>, prefix: string, startIndex: number) => {
-        for (let i = startIndex; i < 3; i++) {
-            if (updatedCards[`${prefix}_waiting_${i+1}`]) {
-                updatedCards[`${prefix}_waiting_${i}`] = updatedCards[`${prefix}_waiting_${i+1}`];
-                delete updatedCards[`${prefix}_waiting_${i+1}`];
-            } else {
-                delete updatedCards[`${prefix}_waiting_${i}`];
-                break;
-            }
-        }
-        return updatedCards;
-    };
-    
-    // Function to handle attack
-    const handleAttack = (skill: any) => {
-        // Check if there's enough energy to use this skill
-        const currentEnergy = attackingCard === 'my_battle' 
-            ? myBattlePokemonEnergy 
-            : enemyBattlePokemonEnergy;
-        
-        if (currentEnergy < skill.energy) {
-            alert("Not enough energy to use this skill!");
-            setIsReadyToAttack(false);
-            return;
-        }
-        
-        setIsReadyToAttack(false);
-        
-        
-        setIsMyAttack(myTurn);
-        setIsEnemyAttack(!myTurn);
-        
-        setTimeout(() => {
-            processAttackLogic(skill);
-        }, 2000);
-    };
-    
-    // Separate function to process attack logic after animation
-    const processAttackLogic = (skill: any) => {
-        // Handle attack based on whose turn it is
-        if (attackingCard === 'my_battle') {
-            // Calculate new HP after damage
-            const newEnemyHP = enemyBattlePokemonHP - skill.damage;
-            setEnemyBattlePokemonHP(newEnemyHP);
-            
-            // Check if enemy Pokémon fainted
-            if (newEnemyHP <= 0) {
-                // Increment player's score
-                setMyGameScore(prev => prev + 1);
-                
-                // Find first available bench Pokémon
-                const benchIndex = findFirstBenchPokemon('enemy');
-                
-                if (benchIndex !== null) {
-                    // Move bench Pokémon to battle position
-                    const updatedDroppedCards = {...droppedCards};
-                    
-                    // Store bench Pokémon info before moving
-                    const benchPokemon = updatedDroppedCards[`enemy_waiting_${benchIndex}`];
-                    const benchHP = enemyWaitingHP[benchIndex - 1];
-                    const benchEnergy = enemyWaitingEnergy[benchIndex - 1];
-                    
-                    // Update battle position with bench Pokémon
-                    updatedDroppedCards['y_battle'] = benchPokemon;
-                    
-                    // Remove the Pokémon from bench
-                    delete updatedDroppedCards[`enemy_waiting_${benchIndex}`];
-                    
-                    // Shift remaining bench Pokémon
-                    const finalCards = shiftBenchPokemon(updatedDroppedCards, 'enemy', benchIndex);
-                    
-                    // Update the dropped cards state
-                    setDroppedCards(finalCards);
-                    
-                    // Update HP and energy for the new battle Pokémon
-                    setEnemyBattlePokemonHP(benchHP);
-                    setEnemyBattlePokemonEnergy(benchEnergy);
-                    
-                    // Update bench HP and energy arrays
-                    const newWaitingHP = [...enemyWaitingHP];
-                    const newWaitingEnergy = [...enemyWaitingEnergy];
-                    
-                    // Shift HP and energy values
-                    for (let i = benchIndex - 1; i < 2; i++) {
-                        if (i + 1 < 3) {
-                            newWaitingHP[i] = newWaitingHP[i + 1];
-                            newWaitingEnergy[i] = newWaitingEnergy[i + 1];
-                        } else {
-                            newWaitingHP[i] = 0;
-                            newWaitingEnergy[i] = 0;
-                        }
-                    }
-                    
-                    setEnemyWaitingHP(newWaitingHP);
-                    setEnemyWaitingEnergy(newWaitingEnergy);
-                } else {
-                    // No bench Pokémon available
-                    delete droppedCards['y_battle'];
-                    setDroppedCards({...droppedCards});
-                    
-                    // Check if this win gives the player 3 points total
-                    const newScore = myGameScore + 1;
-                    setMyGameScore(newScore);
-                    
-                    if (newScore >= 3) {
-                        setGameOver(true);
-                        alert("You win! You've defeated 3 Pokémon!");
-                    } else {
-                        alert("Enemy has no more Pokémon in this position!");
-                    }
-                }
-            }
-        } else {
-            // Calculate new HP after damage
-            const newMyHP = myBattlePokemonHP - skill.damage;
-            setMyBattlePokemonHP(newMyHP);
-            
-            // Check if my Pokémon fainted
-            if (newMyHP <= 0) {
-                // Increment enemy's score
-                setEnemyGameScore(prev => prev + 1);
-                
-                // Find first available bench Pokémon
-                const benchIndex = findFirstBenchPokemon('my');
-                
-                if (benchIndex !== null) {
-                    // Move bench Pokémon to battle position
-                    const updatedDroppedCards = {...droppedCards};
-                    
-                    // Store bench Pokémon info before moving
-                    const benchPokemon = updatedDroppedCards[`my_waiting_${benchIndex}`];
-                    const benchHP = myWaitingHP[benchIndex - 1];
-                    const benchEnergy = myWaitingEnergy[benchIndex - 1];
-                    
-                    // Update battle position with bench Pokémon
-                    updatedDroppedCards['my_battle'] = benchPokemon;
-                    
-                    // Remove the Pokémon from bench
-                    delete updatedDroppedCards[`my_waiting_${benchIndex}`];
-                    
-                    // Shift remaining bench Pokémon
-                    const finalCards = shiftBenchPokemon(updatedDroppedCards, 'my', benchIndex);
-                    
-                    // Update the dropped cards state
-                    setDroppedCards(finalCards);
-                    
-                    // Update HP and energy for the new battle Pokémon
-                    setMyBattlePokemonHP(benchHP);
-                    setMyBattlePokemonEnergy(benchEnergy);
-                    
-                    // Update bench HP and energy arrays
-                    const newWaitingHP = [...myWaitingHP];
-                    const newWaitingEnergy = [...myWaitingEnergy];
-                    
-                    // Shift HP and energy values
-                    for (let i = benchIndex - 1; i < 2; i++) {
-                        if (i + 1 < 3) {
-                            newWaitingHP[i] = newWaitingHP[i + 1];
-                            newWaitingEnergy[i] = newWaitingEnergy[i + 1];
-                        } else {
-                            newWaitingHP[i] = 0;
-                            newWaitingEnergy[i] = 0;
-                        }
-                    }
-                    
-                    setMyWaitingHP(newWaitingHP);
-                    setMyWaitingEnergy(newWaitingEnergy);
-                } else {
-                    // No bench Pokémon available
-                    delete droppedCards['my_battle'];
-                    setDroppedCards({...droppedCards});
-                    
-                    // Check if this win gives the enemy 3 points total
-                    const newScore = enemyGameScore + 1;
-                    setEnemyGameScore(newScore);
-                    
-                    if (newScore >= 3) {
-                        setGameOver(true);
-                        alert("You lose! Your opponent has defeated 3 of your Pokémon!");
-                    } else {
-                        alert("You have no more Pokémon in this position!");
-                    }
-                }
-            }
-        }
-        
-        setIsMyAttack(false);
-        setIsEnemyAttack(false);
-        setAttackingCard(null);
-        onEndTurn();
-    };
-    // Function to handle retreat
-    const handleRetreat = () => {
-        // Check if there's enough energy to retreat (need 1 energy)
-        const currentEnergy = attackingCard === 'my_battle' 
-            ? myBattlePokemonEnergy 
-            : enemyBattlePokemonEnergy;
-        
-        if (currentEnergy < 1) {
-            alert("Not enough energy to retreat! You need at least 1 energy.");
-            setIsReadyToAttack(false);
-            return;
-        }
-        
-        // Find first available bench Pokémon
-        const prefix = attackingCard === 'my_battle' ? 'my' : 'enemy';
-        const benchIndex = findFirstBenchPokemon(prefix);
-        
-        if (benchIndex === null) {
-            alert("No Pokémon on bench to swap with!");
-            setIsReadyToAttack(false);
-            return;
-        }
-        
-        // Create updated cards object
-        const updatedDroppedCards = {...droppedCards};
-        
-        if (attackingCard === 'my_battle') {
-            // Store current battle and bench Pokémon info
-            const battlePokemon = updatedDroppedCards['my_battle'];
-            const battleHP = myBattlePokemonHP;
-            const battleEnergy = myBattlePokemonEnergy - 1; // Reduce energy by 1 for retreat
-            
-            const benchPokemon = updatedDroppedCards[`my_waiting_${benchIndex}`];
-            const benchHP = myWaitingHP[benchIndex - 1];
-            const benchEnergy = myWaitingEnergy[benchIndex - 1];
-            
-            // Swap Pokémon
-            updatedDroppedCards['my_battle'] = benchPokemon;
-            updatedDroppedCards[`my_waiting_${benchIndex}`] = battlePokemon;
-            
-            // Update HP and energy states
-            setMyBattlePokemonHP(benchHP);
-            setMyBattlePokemonEnergy(benchEnergy);
-            
-            // Update bench HP and energy
-            const newWaitingHP = [...myWaitingHP];
-            newWaitingHP[benchIndex - 1] = battleHP;
-            setMyWaitingHP(newWaitingHP);
-            
-            const newWaitingEnergy = [...myWaitingEnergy];
-            newWaitingEnergy[benchIndex - 1] = battleEnergy;
-            setMyWaitingEnergy(newWaitingEnergy);
-        } else {
-            // Store current battle and bench Pokémon info
-            const battlePokemon = updatedDroppedCards['y_battle'];
-            const battleHP = enemyBattlePokemonHP;
-            const battleEnergy = enemyBattlePokemonEnergy - 1; // Reduce energy by 1 for retreat
-            
-            const benchPokemon = updatedDroppedCards[`enemy_waiting_${benchIndex}`];
-            const benchHP = enemyWaitingHP[benchIndex - 1];
-            const benchEnergy = enemyWaitingEnergy[benchIndex - 1];
-            
-            // Swap Pokémon
-            updatedDroppedCards['y_battle'] = benchPokemon;
-            updatedDroppedCards[`enemy_waiting_${benchIndex}`] = battlePokemon;
-            
-            // Update HP and energy states
-            setEnemyBattlePokemonHP(benchHP);
-            setEnemyBattlePokemonEnergy(benchEnergy);
-            
-            // Update bench HP and energy
-            const newWaitingHP = [...enemyWaitingHP];
-            newWaitingHP[benchIndex - 1] = battleHP;
-            setEnemyWaitingHP(newWaitingHP);
-            
-            const newWaitingEnergy = [...enemyWaitingEnergy];
-            newWaitingEnergy[benchIndex - 1] = battleEnergy;
-            setEnemyWaitingEnergy(newWaitingEnergy);
-        }
-        
-        // Update the dropped cards state
-        setDroppedCards(updatedDroppedCards);
-        
-        setIsReadyToAttack(false);
-        onEndTurn();
-    };
-        
+    }, [isMyAttack, isEnemyAttack, myTurn]);
+
     return (
         <div className={`z-50 flex flex-row w-full justify-between items-center`}>
             {/* Display scores */}
@@ -375,6 +97,36 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
                     </div>
                 </div>
             )}
+
+            {
+                (isMyAttack || isEnemyAttack) &&       
+                <SlidingBanner
+                    title="트로피컬 해머"
+                    subtitle="알로라 나시"
+                    bgColor="bg-green-600"
+                    textColor="text-white"
+                    tiltAngle="-8deg"
+                    bottomOffset="bottom-10"
+                />
+            }
+
+            {
+                showAttackEffect &&       
+                <div className={`attack-effect ${attackPosition}`}>
+                    <video
+                        autoPlay
+                        muted={false}
+                        playsInline
+                        onEnded={(e) => {
+                            const video = e.target as HTMLVideoElement;
+                            video.remove();
+                            setShowAttackEffect(false);
+                        }}
+                    >
+                        <source src="/Bomb.webm" type="video/webm" />
+                    </video>
+                </div>
+            }
             
             {isReadyToAttack && !gameOver && (
                 <div className={`${myTurn ? 'items-end justify-end w-full h-full ' : 'items-start justify-start  w-[100%] h-[90%]'} absolute flex  is-ready-to-attack-apr`} style={{ zIndex: 9999 }}>
