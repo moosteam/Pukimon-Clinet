@@ -107,6 +107,7 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
                     textColor="text-white"
                     tiltAngle="-8deg"
                     bottomOffset="bottom-10"
+                    isReverse={isEnemyAttack}
                 />
             }
 

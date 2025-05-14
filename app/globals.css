@@ -258,22 +258,43 @@ img {
 
 @keyframes slidePause {
   0% {
-    transform: translateX(-140vw) translateY(-20vw) rotateZ(-10deg) skewX(var(--tilt-angle));
+    transform: translateX(-140vw) translateY(-10vw) rotateZ(-10deg) skewX(var(--tilt-angle));
   }
   20% {
-    transform: translateX(-140vw) translateY(-20vw) rotateZ(-10deg) skewX(var(--tilt-angle));
+    transform: translateX(-140vw) translateY(-10vw) rotateZ(-10deg) skewX(var(--tilt-angle));
   }
-  40% {
+  35% {
     transform: translateX(calc(-10vw)) translateY(-30vw) rotateZ(-10deg) skewX(var(--tilt-angle));
   }
-  50% {
+  45% {
     transform: translateX(calc(-10vw)) translateY(-30vw) rotateZ(-10deg) skewX(var(--tilt-angle));
   }
-  80% {
+  60% {
     transform: translateX(calc(110vw)) translateY(-50vw) rotateZ(-10deg) skewX(var(--tilt-angle));
   }
   100% {
     transform: translateX(calc(110vw)) translateY(-50vw) rotateZ(-10deg) skewX(var(--tilt-angle));
+  }
+}
+
+@keyframes slidePauseReverse {
+  0% {
+    transform: translateX(-140vw) translateY(-10vw) rotateZ(-190deg) skewX(var(--tilt-angle));
+  }
+  20% {
+    transform: translateX(-140vw) translateY(-10vw) rotateZ(-190deg) skewX(var(--tilt-angle));
+  }
+  35% {
+    transform: translateX(calc(-10vw)) translateY(-30vw) rotateZ(-190deg) skewX(var(--tilt-angle));
+  }
+  45% {
+    transform: translateX(calc(-10vw)) translateY(-30vw) rotateZ(-190deg) skewX(var(--tilt-angle));
+  }
+  60% {
+    transform: translateX(calc(110vw)) translateY(-50vw) rotateZ(-190deg) skewX(var(--tilt-angle));
+  }
+  100% {
+    transform: translateX(calc(110vw)) translateY(-50vw) rotateZ(-190deg) skewX(var(--tilt-angle));
   }
 }
 
@@ -286,11 +307,33 @@ img {
   text-align: center;
   background: linear-gradient(to bottom, 
     rgb(147, 147, 147) 0%,
-    rgba(128, 128, 128, 1) 100%
+    rgba(128, 128, 128) 100%
   );
   backdrop-filter: blur(4px);
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.banner-slide-reverse {
+  animation: slidePauseReverse 3.1s cubic-bezier(0.4, 0, 0.2, 1);
+  position: fixed;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  text-align: center;
+  background: linear-gradient(to bottom, 
+    rgb(147, 147, 147) 0%,
+    rgba(128, 128, 128) 100%
+  );
+  backdrop-filter: blur(4px);
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.banner-slide-reverse span {
+  display: block;
+  text-align: center;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .banner-slide span {
@@ -325,4 +368,17 @@ img {
 .attack-effect.player {
   bottom: 0;
   right: 0;
+}
+
+/* 파일 끝에 추가 */
+.banner-reverse {
+  direction: ltr;
+  text-align: right;
+  /* transform: rotateY(180deg); */
+  /* transform: rotateZ(180deg); */
+}
+
+.banner-reverse span {
+  direction: ltr;
+  display: inline-block;
 }

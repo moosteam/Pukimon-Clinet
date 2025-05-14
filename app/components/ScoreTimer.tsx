@@ -92,10 +92,10 @@ const ScoreTimer: React.FC<ScoreTimerProps> = ({
 
   return (
     <div 
-      className={`fixed text-white shadow-lg flex items-center space-x-4 z-9999999 gap-3 ${
+      className={`fixed text-white shadow-lg flex items-center space-x-2 z-9999999 gap-3 ${
         isPrimary 
-          ? 'top-0 right-0 rounded-bl-xl py-1 px-3' 
-          : 'bottom-0 left-0 rounded-tr-xl py-0.5 px-2'
+          ? 'top-0 right-0 rounded-bl-xl py-0.5 px-1.5' 
+          : 'bottom-0 left-0 rounded-tr-xl py-0.5 px-1.5'
       }`}
       style={{
         background: "linear-gradient(135deg, rgba(55, 65, 81, 0.95) 0%, rgba(17, 24, 39, 0.95) 100%)",
