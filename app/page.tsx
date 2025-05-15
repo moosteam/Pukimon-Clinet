@@ -59,7 +59,7 @@ export default function App() {
     setFinalGroundRotate(originalRotate); // 원래 회전 값으로 복원
     handleDragEnd(event); // 기존 드래그 종료 핸들러 호출
   };
-  // Initial card draw effect
+  // Initial c ard draw effect 
   useEffect(() => {
     // 10초 후에 실행될 타이머 설정
     const timer = setTimeout(() => {
