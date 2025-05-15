@@ -48,3 +48,21 @@ export const enemyGameScoreAtom = atom<number>(0);
 
 export const isMyDrawCardAtom = atom<number>(0); // Add this atom to track the turn
 export const isEnemyDrawCardAtom = atom<number>(0); // Add this atom to track the turn
+
+// 새로 추가하는 atom들
+export const showAlertAtom = atom<boolean>(false);
+export const isDraggingAtom = atom<boolean>(false);
+export const originalRotateAtom = atom<number>(0);
+export const myTurnAtom = atom<boolean>(true);
+export const droppedCardsAtom = atom<{ [key: string]: string }>({});
+
+// useAnimationSequence 훅에서 사용하는 atom들
+export const openingRotateAtom = atom<number>(70);
+export const openingScaleAtom = atom<number>(0.5);
+export const openingOpacityAtom = atom<number>(100);
+export const secondaryMyCardRotateAtom = atom<number>(-30);
+export const secondaryMyCardPositionAtom = atom<number>(-130);
+export const startVideoAtom = atom<boolean>(false);
+export const coinTextOpacityAtom = atom<number>(0);
+export const coinScaleAtom = atom<number>(1);
+export const finalGroundRotateAtom = atom<number>(0);

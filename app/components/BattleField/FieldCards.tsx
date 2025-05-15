@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useAtom } from "jotai";
 
 import { data } from "../../data/cards";
+
 import { 
     myBattlePokemonEnergyAtom, 
     myBattlePokemonHPAtom, 
@@ -13,7 +14,11 @@ import {
     enemyWaitingPokemonEnergyAtom,
     enemyWaitingPokemonHPAtom,
     myGameScoreAtom,
-    enemyGameScoreAtom
+    enemyGameScoreAtom,
+    myTurnAtom,
+    droppedCardsAtom,
+    openingRotateAtom,
+    finalGroundRotateAtom
 } from "../../atom";
 import { Draggable } from "../Draggable";
 import { BattleCard } from "./BattleCard";
@@ -21,20 +26,17 @@ import { DeckArea } from "../Area/DeckArea";
 import { scale } from "framer-motion";
 import { useFieldCards } from "../../hooks/useFieldCards";
 import SlidingBanner from "../SlidingBanner";
+import { useCardManagement } from '../../hooks/useCardManagement';
 
 interface FieldCardsProps {
     onEndTurn: any;
-    myTurn: any;
-    droppedCards: Record<string, string>;
-    setDroppedCards: (cards: Record<string, string>) => void;
 }
 
-export const FieldCards: React.FC<FieldCardsProps> = ({
-    onEndTurn,
-    myTurn,
-    droppedCards,
-    setDroppedCards,
-}) => {
+export const BattleFieldCards: React.FC<FieldCardsProps> = ({ onEndTurn }) => {
+    // Jotai atom에서 직접 상태 가져오기
+    const [myTurn] = useAtom(myTurnAtom);
+    const [droppedCards, setDroppedCards] = useAtom(droppedCardsAtom);
+    
     const {
         isReadyToAttack,
         setIsReadyToAttack,
@@ -225,15 +227,13 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
             )}
             
             {/* 적의 효과칸과 덱 */}
-            <DeckArea isMyDeck={false} myTurn={myTurn} onEndTurn={onEndTurn} />
+            <DeckArea isMyDeck={false} onEndTurn={onEndTurn} />
             
             {/* 배틀 필드 */}
             <div>
                 <BattleCard 
                     id="y_battle"
                     isMyCard={false}
-                    myTurn={myTurn}
-                    droppedCards={droppedCards}
                     energy={enemyBattlePokemonEnergy}
                     hp={enemyBattlePokemonHP}
                     isAttack={isEnemyAttack}
@@ -248,8 +248,6 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
                 <BattleCard 
                     id="my_battle"
                     isMyCard={true}
-                    myTurn={myTurn}
-                    droppedCards={droppedCards}
                     energy={myBattlePokemonEnergy}
                     hp={myBattlePokemonHP}
                     isAttack={isMyAttack}
@@ -263,7 +261,32 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
             </div>
             
             {/* 나의 효과칸과 덱 */}
-            <DeckArea isMyDeck={true} myTurn={myTurn} onEndTurn={onEndTurn} />
+            <DeckArea isMyDeck={true} onEndTurn={onEndTurn} />
         </div>
     );
 };
+
+// FieldCards 컴포넌트는 이미 Jotai atom을 사용하고 있으므로 변경 필요 없음
+export const FieldCards: React.FC<FieldCardsProps> = ({ onEndTurn }) => {
+    const [myTurn] = useAtom(myTurnAtom);
+    const [droppedCards] = useAtom(droppedCardsAtom);
+    const [openingRotate, setOpeningRotate] = useAtom(openingRotateAtom);
+    const [finalGroundRotate, setFinalGroundRotate] = useAtom(finalGroundRotateAtom);
+    
+    const { onEndTurn: endTurnHandler } = useCardManagement();
+
+    const handleEndTurn = () => {
+        endTurnHandler(openingRotate, setOpeningRotate, finalGroundRotate, setFinalGroundRotate);
+        onEndTurn();
+    };
+
+    return (
+        <div className="absolute inset-0 flex items-center justify-center">
+            <button 
+                onClick={handleEndTurn}
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">
+                {myTurn ? '내 턴 종료' : '상대 턴 종료'}
+            </button>
+        </div>
+    )
+}

@@ -1,12 +1,38 @@
 import { DragEndEvent } from '@dnd-kit/core';
+import { useAtom } from 'jotai';
+import { myTurnAtom, droppedCardsAtom } from '../atom';
 import { useGameState } from './useGameState';
 import { data } from '../data/cards';
 
-export function useDragHandlers(
-  myTurn: boolean,
-  droppedCards: { [key: string]: string },
-  setDroppedCards: (cards: { [key: string]: string }) => void
-) {
+// Legacy 함수는 그대로 유지
+export function useDragHandlersLegacy() {
+  const [myTurn] = useAtom(myTurnAtom);
+  const [droppedCards, setDroppedCards] = useAtom(droppedCardsAtom);
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    
+    if (over && active.id !== over.id) {
+      const activeId = String(active.id);
+      const overId = String(over.id);
+      
+      // 드롭 영역에 카드 추가
+      setDroppedCards(prev => ({
+        ...prev,
+        [overId]: activeId
+      }));
+    }
+  };
+
+  return { handleDragEnd };
+}
+
+// 메인 useDragHandlers 함수 - props 제거하고 Jotai atom 사용
+export function useDragHandlers() {
+  // Jotai atom에서 직접 상태 가져오기
+  const [myTurn] = useAtom(myTurnAtom);
+  const [droppedCards, setDroppedCards] = useAtom(droppedCardsAtom);
+  
   const {
     myHandList, setMyHandList,
     enemyHandList, setEnemyHandList,

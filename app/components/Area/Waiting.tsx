@@ -5,16 +5,20 @@ import {
     myWaitingPokemonEnergyAtom, 
     enemyWaitingPokemonEnergyAtom,
     myWaitingPokemonHPAtom,
-    enemyWaitingPokemonHPAtom 
+    enemyWaitingPokemonHPAtom,
+    droppedCardsAtom,
+    myTurnAtom
 } from '../../atom';
 
 interface WaitingProps {
-    droppedCards: Record<string, string>;
     isMy: boolean;
-    myTurn: boolean;
 }
 //
-export const Waiting: React.FC<WaitingProps> = ({ droppedCards, isMy, myTurn }) => {
+export const WaitingArea: React.FC<WaitingProps> = ({ isMy }) => {
+    // Jotai atom에서 직접 상태 가져오기
+    const [droppedCards] = useAtom(droppedCardsAtom);
+    const [myTurn] = useAtom(myTurnAtom);
+    
     const ownerPrefix = isMy ? 'my' : 'enemy';
     const waitingZones = [1, 2, 3].map(num => `${ownerPrefix}_waiting_${num}`);
     
@@ -88,6 +92,25 @@ export const Waiting: React.FC<WaitingProps> = ({ droppedCards, isMy, myTurn }) 
                         )}
                     </div>
                 </Droppable>
+            ))}
+        </div>
+    )
+}
+
+// Waiting 컴포넌트는 이미 Jotai atom을 사용하고 있으므로 변경 필요 없음
+export const Waiting: React.FC<WaitingProps> = ({ isMy }) => {
+    const [droppedCards] = useAtom(droppedCardsAtom);
+    const [myTurn] = useAtom(myTurnAtom);
+
+    return (
+        <div className={`absolute ${isMy ? 'bottom-20' : 'top-20'} left-0 right-0 flex justify-center p-4`}>
+            {/* 드롭된 카드 렌더링 로직 */}
+            {Object.entries(droppedCards).map(([zone, card]) => (
+                <div key={zone}>
+                    {zone.includes(isMy ? 'my' : 'enemy') && (
+                        <div className="dropped-card">{card}</div>
+                    )}
+                </div>
             ))}
         </div>
     )

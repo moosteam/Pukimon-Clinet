@@ -1,22 +1,30 @@
-import { useState } from "react";
 import { useGameState } from "./useGameState";
 import { useAtom } from "jotai";
-import { isEnemyDrawCardAtom, isMyDrawCardAtom } from "../atom";
+import {
+  isEnemyDrawCardAtom,
+  isMyDrawCardAtom,
+  myTurnAtom,
+  droppedCardsAtom,
+  myHandListAtom,
+  enemyHandListAtom
+} from "../atom";
 
 export function useCardManagement() {
   const {
     myCardList, setMyCardList,
     enemyCardList, setEnemyCardList,
-    myHandList, setMyHandList,
-    enemyHandList, setEnemyHandList,
+    setMyHandList,
+    setEnemyHandList,
     isNowTurnGiveEnergy, setIsNowTurnGiveEnergy
   } = useGameState();
 
   const [isMyDrawCard, setIsMyDrawCard] = useAtom(isMyDrawCardAtom);
   const [isEnemyDrawCard, setIsEnemyDrawCard] = useAtom(isEnemyDrawCardAtom);
   
-  const [myTurn, setMyTurn] = useState(true);
-  const [droppedCards, setDroppedCards] = useState<{ [key: string]: string }>({});
+  const [myTurn, setMyTurn] = useAtom(myTurnAtom);
+  const [droppedCards, setDroppedCards] = useAtom(droppedCardsAtom);
+  const [myHandList] = useAtom(myHandListAtom);
+  const [enemyHandList] = useAtom(enemyHandListAtom);
 
   const addCardToMyHand = (cycle: number) => {
     const initialCards = myCardList.slice(0, cycle);
@@ -67,15 +75,8 @@ export function useCardManagement() {
   };
 
   return {
-    myTurn,
-    setMyTurn,
-    droppedCards,
-    setDroppedCards,
     addCardToMyHand,
     addCardToEnemyHand,
-    onEndTurn,
-    // 추가: myHandList와 enemyHandList 반환
-    myHandList,
-    enemyHandList
+    onEndTurn
   };
 }

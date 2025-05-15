@@ -1,25 +1,39 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
+import { useAtom } from "jotai";
+import {
+  openingRotateAtom,
+  openingScaleAtom,
+  openingOpacityAtom,
+  secondaryMyCardRotateAtom,
+  secondaryMyCardPositionAtom,
+  startVideoAtom,
+  coinTextOpacityAtom,
+  coinScaleAtom,
+  finalGroundRotateAtom
+} from "../atom";
 
 export function useAnimationSequence() {
-  const [openingRotate, setOpeningRotate] = useState(70);
-  const [openingScale, setOpeningScale] = useState(0.5);
-  const [openingOpacity, setOpeningOpacity] = useState(100);
-  const [secondaryMyCardRotate, setSecondaryMyCardRotate] = useState(-30);
-  const [secondaryMyCardPosition, setSecondaryMyCardPosition] = useState(-130);
-  const [startVideo, setStartVideo] = useState(false);
-  const [coinTextOpacity, setCoinTextOpacity] = useState(0);
-  const [finalGroundRotate, setFinalGroundRotate] = useState(0);
+  const [openingRotate, setOpeningRotate] = useAtom(openingRotateAtom);
+  const [openingScale, setOpeningScale] = useAtom(openingScaleAtom);
+  const [openingOpacity, setOpeningOpacity] = useAtom(openingOpacityAtom);
+  const [secondaryMyCardRotate, setSecondaryMyCardRotate] = useAtom(secondaryMyCardRotateAtom);
+  const [secondaryMyCardPosition, setSecondaryMyCardPosition] = useAtom(secondaryMyCardPositionAtom);
+  const [startVideo, setStartVideo] = useAtom(startVideoAtom);
+  const [coinTextOpacity, setCoinTextOpacity] = useAtom(coinTextOpacityAtom);
+  const [coinScale, setCoinScale] = useAtom(coinScaleAtom);
+  const [finalGroundRotate, setFinalGroundRotate] = useAtom(finalGroundRotateAtom);
 
   useEffect(() => {
     // 초기 상태 설정
     setOpeningRotate(120);
     setOpeningScale(1.5);
     setOpeningOpacity(0);
+    setCoinScale(1); // 초기 스케일 설정
 
     // 애니메이션 시퀀스 정의
     const animationSequence = [
       {
-        time: 0.1*0,
+        time: 0,
         action: () => {
           setOpeningRotate(0);
           setOpeningScale(1);
@@ -28,7 +42,7 @@ export function useAnimationSequence() {
         }
       },
       {
-        time: 0.1*2400,
+        time: 2400,
         action: () => {
           setSecondaryMyCardRotate(20);
           setSecondaryMyCardPosition(60);
@@ -36,33 +50,48 @@ export function useAnimationSequence() {
         }
       },
       {
-        time: 0.1*2600,
+        time: 2600,
         action: () => {
           setStartVideo(true);
         }
       },
       {
-        time: 0.1*4000,
+        time: 4000,
         action: () => {
           setOpeningScale(2.4);
           setCoinTextOpacity(100);
+          setCoinScale(1); // 코인 표시 시 원래 크기
         }
       },
       {
-        time: 0.1*5500,
+        time: 5000, // 사라지기 시작하는 시간
+        action: () => {
+          setCoinScale(0.8); // 스케일 감소 시작
+        }
+      },
+      {
+        time: 5300, // 더 작아지는 시간
+        action: () => {
+          setCoinScale(0.5); // 더 작게
+        }
+      },
+      {
+        time: 5500,
         action: () => {
           setOpeningScale(1);
           setCoinTextOpacity(0);
+          setCoinScale(0.2); // 아주 작게
         }
       },
       {
-        time: 0.1*6000,
+        time: 6000,
         action: () => {
           setStartVideo(false);
+          setCoinScale(0); // 완전히 사라짐
         }
       },
       {
-        time: 0.1*7000,
+        time: 7000,
         action: () => {
           setFinalGroundRotate(12);
         }
@@ -88,6 +117,7 @@ export function useAnimationSequence() {
     secondaryMyCardPosition, setSecondaryMyCardPosition,
     startVideo, setStartVideo,
     coinTextOpacity, setCoinTextOpacity,
+    coinScale, setCoinScale,
     finalGroundRotate, setFinalGroundRotate
   };
 }

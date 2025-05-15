@@ -1,32 +1,30 @@
 import React from 'react';
-import { PlayerCard } from './PlayerCard';
+import { useAtom } from 'jotai';
+import { secondaryMyCardRotateAtom, secondaryMyCardPositionAtom } from '../../atom';
 
-interface PlayerCardProps {
-  secondaryMyCardRotate: number;
-  secondaryMyCardPosition: number;
-  myImageSrc: string;
-  emenyImageSrc: string;
+interface PlayerCardsProps {
+    myImageSrc: string;
+    emenyImageSrc: string;
 }
 
-export const PlayerCards: React.FC<PlayerCardProps> = ({ secondaryMyCardRotate, secondaryMyCardPosition, myImageSrc, emenyImageSrc }) => {
-  return (
-    <>
-      {/* 플레이어 카드 1 */}
-      <PlayerCard
-          imageSrc={myImageSrc}
-          rotate={secondaryMyCardRotate}
-          position={secondaryMyCardPosition}
-          translateY={4}
-        />
-        {/* 플레이어 카드 2 */}
-        <PlayerCard
-          imageSrc={emenyImageSrc}
-          rotate={-secondaryMyCardRotate}
-          position={-secondaryMyCardPosition}
-          translateY={26}
-        />
-    </>
-  );
-};
+export const PlayerCards: React.FC<PlayerCardsProps> = ({ myImageSrc, emenyImageSrc }) => {
+    const [secondaryMyCardRotate] = useAtom(secondaryMyCardRotateAtom);
+    const [secondaryMyCardPosition] = useAtom(secondaryMyCardPositionAtom);
+
+    return (
+        <>
+            {/* 내 플레이어 카드 */}
+            <div className="absolute bottom-0 left-0 z-50 w-[20%] max-w-[150px] min-w-[100px] transition-all duration-1000"
+                style={{ transform: `translateY(${secondaryMyCardPosition}%) rotate(${secondaryMyCardRotate}deg)` }}>
+                <img src={myImageSrc} alt="My Player" className="w-full" />
+            </div>
+            {/* 적 플레이어 카드 */}
+            <div className="absolute top-0 right-0 z-50 w-[20%] max-w-[150px] min-w-[100px] transition-all duration-1000"
+                style={{ transform: `translateY(${secondaryMyCardPosition * -1}%) rotate(${secondaryMyCardRotate * -1}deg)` }}>
+                <img src={emenyImageSrc} alt="Enemy Player" className="w-full" />
+            </div>
+        </>
+    )
+}
 
 

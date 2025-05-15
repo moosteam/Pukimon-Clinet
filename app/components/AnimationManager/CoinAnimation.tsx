@@ -1,33 +1,40 @@
 import AutoplayVideo from "./AutoplayVideo";
+import { useAtom } from "jotai";
+import { startVideoAtom, coinTextOpacityAtom, coinScaleAtom } from "../../atom";
 
-interface CoinAnimationProps {
-    startVideo: any;
-    coinTextOpacity: any;
-}
+export const CoinAnimation: React.FC = () => {
+    const [startVideo] = useAtom(startVideoAtom);
+    const [coinTextOpacity] = useAtom(coinTextOpacityAtom);
+    const [coinScale] = useAtom(coinScaleAtom);
 
-export const CoinAnimation: React.FC<CoinAnimationProps> = ({
-    startVideo,
-    coinTextOpacity,
-}) => {
     return (
         <>
             {startVideo && (
                 <AutoplayVideo
                     src="FlipBack.webm"
                     className="w-full max-w-lg absolute top-[52%] left-[50%] transform scale-50 translate-x-[-50%] translate-y-[-50%] pointer-events-none z-1000"
+                    style={`transform: translate(-50%, -50%) scale(${coinScale * 0.5})`} // Scale application
                 />
             )}
 
             {/* 코인 텍스트 */}
             <div
                 className="w-[35%] max-w-lg absolute z-70 top-[42%] left-[50%] translate-x-[-50%] translate-y-[-50%] text-center rounded-4xl bg-gradient-to-r from-[#09B9FE] to-[#3A8AFE] font-extrabold transform transition-all duration-1500 text-[.8rem]"
-                style={{ opacity: `${coinTextOpacity}` }}>
+                style={{ 
+                    opacity: `${coinTextOpacity}`,
+                    boxShadow: '0 1px 4px rgba(0, 0, 0, 0.1)',
+                    transform: `translate(-50%, -50%) scale(${coinScale})` // 스케일 적용
+                }}>
                 후공
             </div>
 
             {/* 코인 배경 효과 */}
-            <div className="w-full h-full absolute z-65 transition-all duration-1000 bg-[linear-gradient(to_bottom,#FE8E68,#FF9C6A,#FFB679,#FF9C6A,#FE8E68)]"
-                style={{ opacity: `${coinTextOpacity}`, pointerEvents: "none" }}>
+            <div className="w-full h-full absolute z-65 transition-all duration-1000 bg-[linear-gradient(to_bottom,#2C7DBE,#85D2F9,#0DD8FF)]"
+                style={{ 
+                    opacity: `${coinTextOpacity}`, 
+                    pointerEvents: "none",
+                    transform: `scale(${coinScale})` // 스케일 적용
+                }}>
             </div>
         </>
     )
