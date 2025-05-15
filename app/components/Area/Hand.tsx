@@ -1,16 +1,15 @@
 import React from 'react';
-import { useAtom } from 'jotai';
+import { useAtomValue } from 'jotai';
 import { myHandListAtom, enemyHandListAtom, myTurnAtom } from '../../atom';
 
 interface HandProps {
     isMy: boolean;
-    playedCards: any;
 }
 
-export const Hand: React.FC<HandProps> = ({ isMy, playedCards }) => {
-    const [myHandList] = useAtom(myHandListAtom);
-    const [enemyHandList] = useAtom(enemyHandListAtom);
-    const [myTurn] = useAtom(myTurnAtom);
+export const Hand: React.FC<HandProps> = ({ isMy }) => {
+    const myHandList = useAtomValue(myHandListAtom);
+    const enemyHandList = useAtomValue(enemyHandListAtom);
+    const myTurn = useAtomValue(myTurnAtom);
     
     const handList = isMy ? myHandList : enemyHandList;
 

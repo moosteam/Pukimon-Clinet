@@ -1,5 +1,5 @@
 import React from 'react';
-import { useAtom } from 'jotai';
+import { useAtomValue } from 'jotai';
 import { openingRotateAtom, openingScaleAtom, finalGroundRotateAtom } from '../../atom';
 
 interface GameBoardProps {
@@ -7,9 +7,9 @@ interface GameBoardProps {
 }
 
 export const GameBoard: React.FC<GameBoardProps> = ({ children }) => {
-    const [openingRotate] = useAtom(openingRotateAtom);
-    const [openingScale] = useAtom(openingScaleAtom);
-    const [finalGroundRotate] = useAtom(finalGroundRotateAtom);
+    const openingRotate = useAtomValue(openingRotateAtom);
+    const openingScale = useAtomValue(openingScaleAtom);
+    const finalGroundRotate = useAtomValue(finalGroundRotateAtom);
 
     // finalGroundRotate 값에 따라 Y축 이동 계산
     const translateY = finalGroundRotate === 0 ? 0 : 

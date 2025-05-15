@@ -1,17 +1,21 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import {
+  showAlertAtom
+} from "../atom";
+import { useAtom } from "jotai";
 
 type AlertProps = {
   mainText: string;
   subText?: string;
-  /** 컨트롤러: 나타날지 여부 */
-  isVisible: boolean;
 };
 
-const Alert: React.FC<AlertProps> = ({ mainText, subText, isVisible }) => {
+const Alert: React.FC<AlertProps> = ({ mainText, subText }) => {
+  const [showAlert] = useAtom(showAlertAtom);
+
   return (
     <AnimatePresence>
-      {isVisible && (
+      {showAlert && (
         <motion.div
           className="absolute top-4 left-1/2 transform -translate-x-1/2 w-full max-w-xs z-[100000000]"
           initial={{ opacity: 0, y: -20 }}

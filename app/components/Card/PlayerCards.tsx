@@ -1,5 +1,5 @@
 import React from 'react';
-import { useAtom } from 'jotai';
+import { useAtomValue } from 'jotai';
 import { secondaryMyCardRotateAtom, secondaryMyCardPositionAtom } from '../../atom';
 
 interface PlayerCardsProps {
@@ -8,8 +8,8 @@ interface PlayerCardsProps {
 }
 
 export const PlayerCards: React.FC<PlayerCardsProps> = ({ myImageSrc, emenyImageSrc }) => {
-    const [secondaryMyCardRotate] = useAtom(secondaryMyCardRotateAtom);
-    const [secondaryMyCardPosition] = useAtom(secondaryMyCardPositionAtom);
+    const secondaryMyCardRotate = useAtomValue(secondaryMyCardRotateAtom);
+    const secondaryMyCardPosition = useAtomValue(secondaryMyCardPositionAtom);
 
     return (
         <>

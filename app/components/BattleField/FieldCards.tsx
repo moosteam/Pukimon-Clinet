@@ -1,6 +1,6 @@
 import { Droppable } from "../Droppable";
 import { useState, useEffect } from "react";
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 
 import { data } from "../../data/cards";
 
@@ -34,7 +34,7 @@ interface FieldCardsProps {
 
 export const BattleFieldCards: React.FC<FieldCardsProps> = ({ onEndTurn }) => {
     // Jotai atom에서 직접 상태 가져오기
-    const [myTurn] = useAtom(myTurnAtom);
+    const myTurn = useAtomValue(myTurnAtom);
     const [droppedCards, setDroppedCards] = useAtom(droppedCardsAtom);
     
     const {
@@ -267,9 +267,9 @@ export const BattleFieldCards: React.FC<FieldCardsProps> = ({ onEndTurn }) => {
 };
 
 // FieldCards 컴포넌트는 이미 Jotai atom을 사용하고 있으므로 변경 필요 없음
-export const FieldCards: React.FC<FieldCardsProps> = ({ onEndTurn }) => {
-    const [myTurn] = useAtom(myTurnAtom);
-    const [droppedCards] = useAtom(droppedCardsAtom);
+export const FieldCards = () => {
+    const myTurn = useAtomValue(myTurnAtom);
+    const droppedCards = useAtomValue(droppedCardsAtom);
     const [openingRotate, setOpeningRotate] = useAtom(openingRotateAtom);
     const [finalGroundRotate, setFinalGroundRotate] = useAtom(finalGroundRotateAtom);
     
@@ -277,7 +277,6 @@ export const FieldCards: React.FC<FieldCardsProps> = ({ onEndTurn }) => {
 
     const handleEndTurn = () => {
         endTurnHandler(openingRotate, setOpeningRotate, finalGroundRotate, setFinalGroundRotate);
-        onEndTurn();
     };
 
     return (

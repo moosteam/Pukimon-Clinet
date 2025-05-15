@@ -1,6 +1,6 @@
 import React from 'react';
 import { Droppable } from '../Droppable';
-import { useAtom } from 'jotai';
+import { useAtomValue } from 'jotai';
 import { myTurnAtom, droppedCardsAtom } from '../../atom';
 
 interface BattleCardProps {
@@ -20,8 +20,8 @@ export const BattleCard: React.FC<BattleCardProps> = ({
     isAttack,
     onCardClick
 }) => {
-    const [myTurn] = useAtom(myTurnAtom);
-    const [droppedCards] = useAtom(droppedCardsAtom);
+    const myTurn = useAtomValue(myTurnAtom);
+    const droppedCards = useAtomValue(droppedCardsAtom);
 
     return (
         <Droppable id={id}>

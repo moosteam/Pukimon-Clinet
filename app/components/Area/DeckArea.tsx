@@ -1,7 +1,8 @@
 import React from 'react';
 import { Draggable } from '../Draggable';
-import { useAtom } from 'jotai';
+import { useAtomValue } from 'jotai';
 import { myTurnAtom } from '../../atom';
+import Image from 'next/image';
 
 interface DeckAreaProps {
     isMyDeck: boolean;
@@ -9,7 +10,7 @@ interface DeckAreaProps {
 }
 
 export const DeckArea: React.FC<DeckAreaProps> = ({ isMyDeck, onEndTurn }) => {
-    const [myTurn] = useAtom(myTurnAtom);
+    const myTurn = useAtomValue(myTurnAtom);
     
     return (
         <div className="flex flex-col items-center">
@@ -17,7 +18,7 @@ export const DeckArea: React.FC<DeckAreaProps> = ({ isMyDeck, onEndTurn }) => {
             {((isMyDeck && myTurn) || (!isMyDeck && !myTurn)) && (
                 <Draggable id="energy" imgLink="/ui/energy.png">
                     <div className="w-16 h-16 bg-yellow-400 rounded-full flex items-center justify-center mb-4 cursor-grab">
-                        <img src="/ui/energy.png" alt="Energy" className="w-full h-full" />
+                        <Image src="/ui/energy.png" alt="Energy" className="w-full h-full" />
                     </div>
                 </Draggable>
             )}

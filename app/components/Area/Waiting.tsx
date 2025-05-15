@@ -1,6 +1,6 @@
 import React from 'react';
 import { Droppable } from '../Droppable';
-import { useAtom } from 'jotai';
+import { useAtomValue } from 'jotai';
 import { 
     myWaitingPokemonEnergyAtom, 
     enemyWaitingPokemonEnergyAtom,
@@ -16,21 +16,19 @@ interface WaitingProps {
 //
 export const WaitingArea: React.FC<WaitingProps> = ({ isMy }) => {
     // Jotai atom에서 직접 상태 가져오기
-    const [droppedCards] = useAtom(droppedCardsAtom);
-    const [myTurn] = useAtom(myTurnAtom);
+    const droppedCards = useAtomValue(droppedCardsAtom);
+    const myTurn = useAtomValue(myTurnAtom);
     
     const ownerPrefix = isMy ? 'my' : 'enemy';
     const waitingZones = [1, 2, 3].map(num => `${ownerPrefix}_waiting_${num}`);
     
     // Get the appropriate energy and HP atoms
-    const [myWaitingEnergy] = useAtom(myWaitingPokemonEnergyAtom);
-    const [enemyWaitingEnergy] = useAtom(enemyWaitingPokemonEnergyAtom);
-    const [myWaitingHP] = useAtom(myWaitingPokemonHPAtom);
-    const [enemyWaitingHP] = useAtom(enemyWaitingPokemonHPAtom);
+    const myWaitingEnergy = useAtomValue(myWaitingPokemonEnergyAtom);
+    const enemyWaitingEnergy = useAtomValue(enemyWaitingPokemonEnergyAtom);
+    const myWaitingHP = useAtomValue(myWaitingPokemonHPAtom);
+    const enemyWaitingHP = useAtomValue(enemyWaitingPokemonHPAtom);
     
     // Use the appropriate energy and HP arrays
-    console.log("m:  " + myWaitingEnergy);
-    console.log("e:  " + enemyWaitingEnergy);
     const energyArray = isMy ? myWaitingEnergy : enemyWaitingEnergy;
     const hpArray = isMy ? myWaitingHP : enemyWaitingHP;
 
@@ -99,9 +97,7 @@ export const WaitingArea: React.FC<WaitingProps> = ({ isMy }) => {
 
 // Waiting 컴포넌트는 이미 Jotai atom을 사용하고 있으므로 변경 필요 없음
 export const Waiting: React.FC<WaitingProps> = ({ isMy }) => {
-    const [droppedCards] = useAtom(droppedCardsAtom);
-    const [myTurn] = useAtom(myTurnAtom);
-
+    const droppedCards = useAtomValue(droppedCardsAtom);
     return (
         <div className={`absolute ${isMy ? 'bottom-20' : 'top-20'} left-0 right-0 flex justify-center p-4`}>
             {/* 드롭된 카드 렌더링 로직 */}
