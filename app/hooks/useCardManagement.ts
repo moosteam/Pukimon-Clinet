@@ -1,22 +1,33 @@
-import { useState } from "react";
-import { useGameState } from "./useGameState";
+import { useState, useEffect } from "react";
 import { useAtom } from "jotai";
-import { isEnemyDrawCardAtom, isMyDrawCardAtom } from "../atom";
+import { 
+  isEnemyDrawCardAtom, 
+  isMyDrawCardAtom, 
+  isNowTurnGiveEnergyAtom, 
+  myTurnAtom,
+  boardRotateZAtom, 
+  boardRotateXAtom,
+  myCardListAtom,
+  enemyCardListAtom,
+  myHandListAtom,
+  enemyHandListAtom,
+  droppedCardsAtom
+} from "../atom";
 
 export function useCardManagement() {
-  const {
-    myCardList, setMyCardList,
-    enemyCardList, setEnemyCardList,
-    myHandList, setMyHandList,
-    enemyHandList, setEnemyHandList,
-    isNowTurnGiveEnergy, setIsNowTurnGiveEnergy
-  } = useGameState();
-
-  const [isMyDrawCard, setIsMyDrawCard] = useAtom(isMyDrawCardAtom);
-  const [isEnemyDrawCard, setIsEnemyDrawCard] = useAtom(isEnemyDrawCardAtom);
+  // useGameState 대신 jotai의 atom 사용
+  const [myCardList, setMyCardList] = useAtom(myCardListAtom);
+  const [enemyCardList, setEnemyCardList] = useAtom(enemyCardListAtom);
+  const [myHandList, setMyHandList] = useAtom(myHandListAtom);
+  const [enemyHandList, setEnemyHandList] = useAtom(enemyHandListAtom);
+  const [isNowTurnGiveEnergy, setIsNowTurnGiveEnergy] = useAtom(isNowTurnGiveEnergyAtom);
+  const [myTurn, setMyTurn] = useAtom(myTurnAtom);
   
-  const [myTurn, setMyTurn] = useState(true);
-  const [droppedCards, setDroppedCards] = useState<{ [key: string]: string }>({});
+  const [, setIsMyDrawCard] = useAtom(isMyDrawCardAtom);
+  const [, setIsEnemyDrawCard] = useAtom(isEnemyDrawCardAtom);
+  
+  // droppedCards도 atom으로 변경
+  const [droppedCards, setDroppedCards] = useAtom(droppedCardsAtom);
 
   const addCardToMyHand = (cycle: number) => {
     const initialCards = myCardList.slice(0, cycle);
@@ -42,11 +53,15 @@ export function useCardManagement() {
     });
   };
 
-  const onEndTurn = (openingRotate: number, setOpeningRotate: (value: number) => void, 
-                    finalGroundRotate: number, setFinalGroundRotate: (value: number) => void) => {
-    setOpeningRotate(openingRotate + 180);
+  // onEndTurn 함수 내에서 useAtom 호출 제거 (React 훅 규칙 위반)
+  // 대신 외부에서 선언된 atom 값 사용
+  const [boardRotateZ, setBoardRotateZ] = useAtom(boardRotateZAtom);
+  const [boardRotateX, setBoardRotateX] = useAtom(boardRotateXAtom);
+  
+  const onEndTurn = () => {
+    setBoardRotateZ(boardRotateZ + 180);
     setIsNowTurnGiveEnergy(false);
-    setFinalGroundRotate(finalGroundRotate * -1);
+    setBoardRotateX(boardRotateX * -1);
     
     if (!myTurn) {
       if (myHandList.length === 0) {
@@ -57,7 +72,6 @@ export function useCardManagement() {
     } else {
       if (enemyHandList.length === 0) {
         addCardToEnemyHand(4);
-
       } else {
         addCardToEnemyHand(1);
       }
@@ -67,14 +81,9 @@ export function useCardManagement() {
   };
 
   return {
-    myTurn,
-    setMyTurn,
-    droppedCards,
-    setDroppedCards,
     addCardToMyHand,
     addCardToEnemyHand,
     onEndTurn,
-    // 추가: myHandList와 enemyHandList 반환
     myHandList,
     enemyHandList
   };

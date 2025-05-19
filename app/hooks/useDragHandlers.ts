@@ -1,25 +1,38 @@
 import { DragEndEvent } from '@dnd-kit/core';
-import { useGameState } from './useGameState';
 import { data } from '../data/cards';
+import { useAtom, useAtomValue } from 'jotai';
+import { 
+  myTurnAtom, 
+  myHandListAtom, 
+  enemyHandListAtom,
+  myBattlePokemonEnergyAtom,
+  myBattlePokemonHPAtom,
+  enemyBattlePokemonEnergyAtom,
+  enemyBattlePokemonHPAtom,
+  myWaitingHPAtom,
+  myWaitingEnergyAtom,
+  enemyWaitingHPAtom,
+  enemyWaitingEnergyAtom,
+  isNowTurnGiveEnergyAtom,
+  droppedCardsAtom,
+} from '../atom';
 
-export function useDragHandlers(
-  myTurn: boolean,
-  droppedCards: { [key: string]: string },
-  setDroppedCards: (cards: { [key: string]: string }) => void
-) {
-  const {
-    myHandList, setMyHandList,
-    enemyHandList, setEnemyHandList,
-    myBattlePokemonEnergy, setMyBattlePokemonEnergy,
-    myBattlePokemonHP, setMyBattlePokemonHP,
-    enemyBattlePokemonEnergy, setEnemyBattlePokemonEnergy,
-    enemyBattlePokemonHP, setEnemyBattlePokemonHP,
-    myWaitingHP, setMyWaitingHP,
-    myWaitingEnergy, setMyWaitingEnergy,
-    enemyWaitingHP, setEnemyWaitingHP,
-    enemyWaitingEnergy, setEnemyWaitingEnergy,
-    isNowTurnGiveEnergy, setIsNowTurnGiveEnergy
-  } = useGameState();
+export function useDragHandlers() {
+  const myTurn = useAtomValue(myTurnAtom);
+  
+  // useGameState 대신 jotai의 atom 사용
+  const [myHandList, setMyHandList] = useAtom(myHandListAtom);
+  const [enemyHandList, setEnemyHandList] = useAtom(enemyHandListAtom);
+  const [myBattlePokemonEnergy, setMyBattlePokemonEnergy] = useAtom(myBattlePokemonEnergyAtom);
+  const [myBattlePokemonHP, setMyBattlePokemonHP] = useAtom(myBattlePokemonHPAtom);
+  const [enemyBattlePokemonEnergy, setEnemyBattlePokemonEnergy] = useAtom(enemyBattlePokemonEnergyAtom);
+  const [enemyBattlePokemonHP, setEnemyBattlePokemonHP] = useAtom(enemyBattlePokemonHPAtom);
+  const [myWaitingHP, setMyWaitingHP] = useAtom(myWaitingHPAtom);
+  const [myWaitingEnergy, setMyWaitingEnergy] = useAtom(myWaitingEnergyAtom);
+  const [enemyWaitingHP, setEnemyWaitingHP] = useAtom(enemyWaitingHPAtom);
+  const [enemyWaitingEnergy, setEnemyWaitingEnergy] = useAtom(enemyWaitingEnergyAtom);
+  const [isNowTurnGiveEnergy, setIsNowTurnGiveEnergy] = useAtom(isNowTurnGiveEnergyAtom);
+  const [droppedCards, setDroppedCards] = useAtom(droppedCardsAtom);
 
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;

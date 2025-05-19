@@ -1,23 +1,23 @@
 interface GameBoardProps {
-  openingRotate: number;
-  openingScale: number;
-  finalGroundRotate: number;
+  boardRotateZ: number;
+  boardScale: number;
+  boardRotateX: number;
   children?: React.ReactNode; // children prop 추가
 }
 
 export const GameBoard: React.FC<GameBoardProps> = ({
-  openingRotate, 
-  openingScale, 
-  finalGroundRotate,
+  boardRotateZ, 
+  boardScale, 
+  boardRotateX,
   children // children prop 추가
 }) => {
   return (
     <div 
       className="absolute w-full h-full z-40 bg-none flex justify-between flex-col items-center p-2 transition-all duration-1500"
       style={{
-        transform: `perspective(800px) rotateZ(${openingRotate}deg) scale(${openingScale}) rotateX(${finalGroundRotate}deg) translateY(${finalGroundRotate > 0 ? finalGroundRotate * -1 / 1.5 : 0}rem)`,
+        transform: `perspective(800px) rotateZ(${boardRotateZ}deg) scale(${boardScale}) rotateX(${boardRotateX}deg) translateY(${boardRotateX > 0 ? boardRotateX * -1 / 1.5 : 0}rem)`,
         // 오프닝 부분 클릭 금지를 위해 rotate가 0일때 클릭할 수 없게 함
-        pointerEvents: finalGroundRotate != 0 ? "auto" : "none"
+        pointerEvents: boardRotateX != 0 ? "auto" : "none"
       }}
     >
       <div className="w-full h-full absolute">

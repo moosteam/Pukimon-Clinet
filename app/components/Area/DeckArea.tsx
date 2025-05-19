@@ -1,20 +1,19 @@
 import React from "react";
 import { EnergyCard } from "../Card/EnergyCard";
 import { useAtomValue } from "jotai";
-import { isEnemyDrawCardAtom, isMyDrawCardAtom, isNowTurnGiveEnergyAtom } from "../../atom"
+import { isEnemyDrawCardAtom, isMyDrawCardAtom, isNowTurnGiveEnergyAtom, myTurnAtom } from "../../atom";
 
 // DeckArea 컴포넌트를 위한 Props 인터페이스
 interface DeckAreaProps {
     isMyDeck: boolean;  // 이 덱이 플레이어의 것인지(true) 상대방의 것인지(false)
-    myTurn: boolean;    // 현재 플레이어의 턴인지 여부
-    onEndTurn: () => void; // 턴을 종료할 때 호출할 함수
+    onEndTurn: () => void;  // 턴 종료 버튼 클릭 시 호출될 함수
 }
 
 export const DeckArea: React.FC<DeckAreaProps> = ({
     isMyDeck,
-    myTurn,
-    onEndTurn,
+    onEndTurn
 }) => {
+    const myTurn = useAtomValue(myTurnAtom);
     // 이번 턴에 에너지가 이미 부여되었는지 상태 가져오기
     const isNowTurnGiveEnergy = useAtomValue(isNowTurnGiveEnergyAtom);
     const isMyDrawCard = useAtomValue(isMyDrawCardAtom);

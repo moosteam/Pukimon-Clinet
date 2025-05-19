@@ -1,20 +1,22 @@
 import React from 'react';
 import { Droppable } from '../Droppable';
-import { useAtom } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import { 
     myWaitingPokemonEnergyAtom, 
     enemyWaitingPokemonEnergyAtom,
     myWaitingPokemonHPAtom,
-    enemyWaitingPokemonHPAtom 
+    enemyWaitingPokemonHPAtom,
+    myTurnAtom,
+    droppedCardsAtom
 } from '../../atom';
 
 interface WaitingProps {
-    droppedCards: Record<string, string>;
     isMy: boolean;
-    myTurn: boolean;
 }
-//
-export const Waiting: React.FC<WaitingProps> = ({ droppedCards, isMy, myTurn }) => {
+
+export const Waiting: React.FC<WaitingProps> = ({ isMy }) => {
+    const myTurn = useAtomValue(myTurnAtom);
+    const droppedCards = useAtomValue(droppedCardsAtom);
     const ownerPrefix = isMy ? 'my' : 'enemy';
     const waitingZones = [1, 2, 3].map(num => `${ownerPrefix}_waiting_${num}`);
     

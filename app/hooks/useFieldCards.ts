@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
-import { useAtom } from "jotai";
-import { data } from "../data/cards";
+import { useAtom, useAtomValue } from "jotai";
 import { 
     myBattlePokemonEnergyAtom, 
     myBattlePokemonHPAtom, 
@@ -11,22 +10,22 @@ import {
     enemyWaitingPokemonEnergyAtom,
     enemyWaitingPokemonHPAtom,
     myGameScoreAtom,
-    enemyGameScoreAtom
+    enemyGameScoreAtom,
+    myTurnAtom
 } from "../atom";
 
 interface UseFieldCardsProps {
-    myTurn: boolean;
     droppedCards: Record<string, string>;
     setDroppedCards: (cards: Record<string, string>) => void;
     onEndTurn: () => void;
 }
 
 export const useFieldCards = ({
-    myTurn,
     droppedCards,
     setDroppedCards,
     onEndTurn
 }: UseFieldCardsProps) => {
+    const myTurn = useAtomValue(myTurnAtom);
     const [myBattlePokemonEnergy, setMyBattlePokemonEnergy] = useAtom(myBattlePokemonEnergyAtom);
     const [myBattlePokemonHP, setMyBattlePokemonHP] = useAtom(myBattlePokemonHPAtom);
     const [enemyBattlePokemonEnergy, setEnemyBattlePokemonEnergy] = useAtom(enemyBattlePokemonEnergyAtom);
@@ -303,4 +302,4 @@ export const useFieldCards = ({
         myGameScore,
         enemyGameScore
     };
-}; 
+};

@@ -1,16 +1,17 @@
 import React, { useState, useCallback } from 'react';
 import { Draggable } from '../Draggable';
 import { useLongPress } from 'use-long-press';
-
+import { useAtomValue } from 'jotai';
+import { myTurnAtom } from '../../atom';
 
 interface HandProps {
     handList: any;
     playedCards: any;
     isMy: any;
-    myTurn: boolean;
 }
 
-export const Hand: React.FC<HandProps> = ({ handList, playedCards, isMy, myTurn }) => {
+export const Hand: React.FC<HandProps> = ({ handList, playedCards, isMy }) => {
+    const myTurn = useAtomValue(myTurnAtom);
 
     const [isCardZoomed, setIsCardZoomed] = useState(false);
     const [zoomedCardSrc, setZoomedCardSrc] = useState("Charizard.jpg");

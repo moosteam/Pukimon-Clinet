@@ -1,38 +1,49 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
+import { useAtom } from "jotai";
+import {
+  boardRotateZAtom,
+  boardScaleAtom,
+  boardOpacityAtom,
+  playerCardRotateAtom,
+  playerCardPositionAtom,
+  startVideoAtom,
+  coinTextOpacityAtom,
+  boardRotateXAtom
+} from "../atom";
 
 export function useAnimationSequence() {
-  const [openingRotate, setOpeningRotate] = useState(70);
-  const [openingScale, setOpeningScale] = useState(0.5);
-  const [openingOpacity, setOpeningOpacity] = useState(100);
-  const [secondaryMyCardRotate, setSecondaryMyCardRotate] = useState(-30);
-  const [secondaryMyCardPosition, setSecondaryMyCardPosition] = useState(-130);
-  const [startVideo, setStartVideo] = useState(false);
-  const [coinTextOpacity, setCoinTextOpacity] = useState(0);
-  const [finalGroundRotate, setFinalGroundRotate] = useState(0);
+  const [boardRotateZ, setBoardRotateZ] = useAtom(boardRotateZAtom);
+  const [boardScale, setBoardScale] = useAtom(boardScaleAtom);
+  const [boardOpacity, setBoardOpacity] = useAtom(boardOpacityAtom);
+  const [playerCardRotate, setPlayerCardRotate] = useAtom(playerCardRotateAtom);
+  const [playerCardPosition, setPlayerCardPosition] = useAtom(playerCardPositionAtom);
+  const [startVideo, setStartVideo] = useAtom(startVideoAtom);
+  const [coinTextOpacity, setCoinTextOpacity] = useAtom(coinTextOpacityAtom);
+  const [boardRotateX, setBoardRotateX] = useAtom(boardRotateXAtom);
 
   useEffect(() => {
     // 초기 상태 설정
-    setOpeningRotate(120);
-    setOpeningScale(1.5);
-    setOpeningOpacity(0);
+    setBoardRotateZ(120);
+    setBoardScale(1.5);
+    setBoardOpacity(0);
 
     // 애니메이션 시퀀스 정의
     const animationSequence = [
       {
         time: 0.1*0,
         action: () => {
-          setOpeningRotate(0);
-          setOpeningScale(1);
-          setSecondaryMyCardRotate(-20);
-          setSecondaryMyCardPosition(0);
+          setBoardRotateZ(0);
+          setBoardScale(1);
+          setPlayerCardRotate(-20);
+          setPlayerCardPosition(0);
         }
       },
       {
         time: 0.1*2400,
         action: () => {
-          setSecondaryMyCardRotate(20);
-          setSecondaryMyCardPosition(60);
-          setOpeningScale(1.6);
+          setPlayerCardRotate(20);
+          setPlayerCardPosition(60);
+          setBoardScale(1.6);
         }
       },
       {
@@ -44,14 +55,14 @@ export function useAnimationSequence() {
       {
         time: 0.1*4000,
         action: () => {
-          setOpeningScale(2.4);
+          setBoardScale(2.4);
           setCoinTextOpacity(100);
         }
       },
       {
         time: 0.1*5500,
         action: () => {
-          setOpeningScale(1);
+          setBoardScale(1);
           setCoinTextOpacity(0);
         }
       },
@@ -64,7 +75,7 @@ export function useAnimationSequence() {
       {
         time: 0.1*7000,
         action: () => {
-          setFinalGroundRotate(12);
+          setBoardRotateX(12);
         }
       }
     ];
@@ -81,13 +92,13 @@ export function useAnimationSequence() {
   }, []);
 
   return {
-    openingRotate, setOpeningRotate,
-    openingScale, setOpeningScale,
-    openingOpacity, setOpeningOpacity,
-    secondaryMyCardRotate, setSecondaryMyCardRotate,
-    secondaryMyCardPosition, setSecondaryMyCardPosition,
+    boardRotateZ, setBoardRotateZ,
+    boardScale, setBoardScale,
+    boardOpacity, setBoardOpacity,
+    playerCardRotate, setPlayerCardRotate,
+    playerCardPosition, setPlayerCardPosition,
     startVideo, setStartVideo,
     coinTextOpacity, setCoinTextOpacity,
-    finalGroundRotate, setFinalGroundRotate
+    boardRotateX, setBoardRotateX
   };
 }

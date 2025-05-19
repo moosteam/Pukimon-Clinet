@@ -1,11 +1,12 @@
 import React from "react";
 import { Droppable } from "../Droppable";
-import { data } from "../../data/cards"
+import { data } from "../../data/cards";
+import { useAtomValue } from "jotai";
+import { myTurnAtom } from "../../atom";
 
 interface BattleCardProps {
     id: string;
     isMyCard: boolean;
-    myTurn: boolean;
     droppedCards: Record<string, string>;
     energy: number;
     hp: number;
@@ -16,13 +17,13 @@ interface BattleCardProps {
 export const BattleCard: React.FC<BattleCardProps> = ({
     id,
     isMyCard,
-    myTurn,
     droppedCards,
     energy,
     hp,
     isAttack,
     onCardClick
 }) => {
+    const myTurn = useAtomValue(myTurnAtom);
     const shouldHighlight = !droppedCards[id] &&
         ((isMyCard && myTurn) || (!isMyCard && !myTurn));
 

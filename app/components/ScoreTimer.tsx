@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { FiClock } from 'react-icons/fi';
+import { useAtomValue } from 'jotai';
+import { myTurnAtom } from '../atom';
 
 interface ScoreTimerProps {
   totalMinutes?: number;
   maxDeaths?: number;
   /** 현재 사망 포켓몬 수를 부모 컴포넌트에서 전달하세요 */
   deaths?: number;
-  /** 현재 턴이 누구의 턴인지 */
-  myTurn: boolean;
   /** true면 오른쪽 상단, false면 왼쪽 하단에 배치 */
   isPrimary?: boolean;
 }
@@ -16,11 +16,11 @@ const ScoreTimer: React.FC<ScoreTimerProps> = ({
   totalMinutes = 20,
   maxDeaths = 3,
   deaths = 0,
-  myTurn,
   isPrimary = false,
 }) => {
   // 남은 시간(초)
   const [secondsLeft, setSecondsLeft] = useState(totalMinutes * 60);
+  const myTurn = useAtomValue(myTurnAtom);
 
   useEffect(() => {
     const timer = setInterval(() => {

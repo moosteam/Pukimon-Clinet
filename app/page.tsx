@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect } from "react";
-import { DndContext } from '@dnd-kit/core';
+import { DndContext, DragEndEvent } from '@dnd-kit/core';
 import { OpeningOverlay } from "./components/AnimationManager/OpeningOverlay";
 import { CoinAnimation } from "./components/AnimationManager/CoinAnimation";
 import { PlayerCards } from "./components/Card/PlayerCards";
@@ -23,28 +23,26 @@ export default function App({
 }>) {
   // Use animation hook
   const {
-    openingRotate, setOpeningRotate,
-    openingScale, setOpeningScale,
-    openingOpacity,
-    secondaryMyCardRotate,
-    secondaryMyCardPosition,
+    boardRotateZ, 
+    boardScale,
+    boardOpacity,
+    playerCardRotate,
+    playerCardPosition,
     startVideo,
     coinTextOpacity,
-    finalGroundRotate, setFinalGroundRotate
+    boardRotateX,
   } = useAnimationSequence();
 
   // Use card management hook
   const {
-    myTurn,
-    droppedCards, setDroppedCards,
     addCardToMyHand,
-    onEndTurn,
+    // onEndTurn 제거
     myHandList,
     enemyHandList
   } = useCardManagement();
 
   // Use drag handlers hook
-  const { handleDragEnd } = useDragHandlers(myTurn, droppedCards, setDroppedCards);
+  const { handleDragEnd } = useDragHandlers();
 
   // Initial card draw effect
   useEffect(() => {
@@ -61,34 +59,29 @@ export default function App({
   return (
     <DndContext onDragEnd={handleDragEnd}>
       <div className="w-full h-full bg-[#C2DAF6] relative overflow-hidden">
-        <ScoreTimer isPrimary myTurn={myTurn}/>
-        <ScoreTimer myTurn={myTurn}/>
+        <ScoreTimer isPrimary/>
+        <ScoreTimer/>
         {/* 플레이어 카드 */}
         <PlayerCards
-          secondaryMyCardRotate={secondaryMyCardRotate}
-          secondaryMyCardPosition={secondaryMyCardPosition}
+          playerCardRotate={playerCardRotate}
+          playerCardPosition={playerCardPosition}
           myImageSrc={"/ui/player1.png"}
           emenyImageSrc={"/ui/player2.png"}
         />
         {/* 오프닝 애니메이션 오버레이 */}
-        <OpeningOverlay openingOpacity={openingOpacity} />
+        <OpeningOverlay boardOpacity={boardOpacity} />
         {/* 게임 필드 */}
-        <GameBoard openingRotate={openingRotate} openingScale={openingScale} finalGroundRotate={finalGroundRotate}>
+        <GameBoard boardRotateZ={boardRotateZ} boardScale={boardScale} boardRotateX={boardRotateX}>
           {/* 적 카드 영역 */}
-          <Hand handList={enemyHandList} playedCards={PlayerCards} isMy={false} myTurn={myTurn}/>
+          <Hand handList={enemyHandList} playedCards={PlayerCards} isMy={false}/>
           {/* 필드 카드 영역 */}
-          <Waiting droppedCards={droppedCards} isMy={false} myTurn={myTurn}/>
+          <Waiting isMy={false} />
           {/* 중앙 카드 영역 */}
-          <FieldCards 
-            onEndTurn={() => onEndTurn(openingRotate, setOpeningRotate, finalGroundRotate, setFinalGroundRotate)} 
-            myTurn={myTurn} 
-            droppedCards={droppedCards} 
-            setDroppedCards={setDroppedCards}
-          />
+          <FieldCards />
           {/* 하단 필드 카드 영역 */}
-          <Waiting droppedCards={droppedCards} isMy={true} myTurn={myTurn}/>
+          <Waiting isMy={true} />
           {/* 내 핸드 영역 - 드래그 가능한 카드들 */}
-          <Hand handList={myHandList} playedCards={PlayerCards} isMy={true} myTurn={myTurn}/>
+          <Hand handList={myHandList} playedCards={PlayerCards} isMy={true} />
           {/* 비디오 영역 */}
           <CoinAnimation startVideo={startVideo} coinTextOpacity={coinTextOpacity} />
         </GameBoard>

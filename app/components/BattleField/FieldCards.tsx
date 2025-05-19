@@ -1,19 +1,11 @@
 import { Droppable } from "../Droppable";
 import { useState, useEffect } from "react";
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 
 import { data } from "../../data/cards";
 import { 
-    myBattlePokemonEnergyAtom, 
-    myBattlePokemonHPAtom, 
-    enemyBattlePokemonEnergyAtom, 
-    enemyBattlePokemonHPAtom,
-    myWaitingPokemonEnergyAtom,
-    myWaitingPokemonHPAtom,
-    enemyWaitingPokemonEnergyAtom,
-    enemyWaitingPokemonHPAtom,
-    myGameScoreAtom,
-    enemyGameScoreAtom
+    myTurnAtom,
+    droppedCardsAtom,
 } from "../../atom";
 import { Draggable } from "../Draggable";
 import { BattleCard } from "./BattleCard";
@@ -21,20 +13,14 @@ import { DeckArea } from "../Area/DeckArea";
 import { scale } from "framer-motion";
 import { useFieldCards } from "../../hooks/useFieldCards";
 import SlidingBanner from "../SlidingBanner";
+import { useCardManagement } from "../../hooks/useCardManagement";
 
-interface FieldCardsProps {
-    onEndTurn: any;
-    myTurn: any;
-    droppedCards: Record<string, string>;
-    setDroppedCards: (cards: Record<string, string>) => void;
-}
 
-export const FieldCards: React.FC<FieldCardsProps> = ({
-    onEndTurn,
-    myTurn,
-    droppedCards,
-    setDroppedCards,
-}) => {
+export const FieldCards = () => {
+    const myTurn = useAtomValue(myTurnAtom);
+    const [droppedCards, setDroppedCards] = useAtom(droppedCardsAtom);
+    const { onEndTurn } = useCardManagement();
+    
     const {
         isReadyToAttack,
         setIsReadyToAttack,
@@ -52,7 +38,6 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
         myGameScore,
         enemyGameScore
     } = useFieldCards({
-        myTurn,
         droppedCards,
         setDroppedCards,
         onEndTurn
@@ -225,14 +210,13 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
             )}
             
             {/* 적의 효과칸과 덱 */}
-            <DeckArea isMyDeck={false} myTurn={myTurn} onEndTurn={onEndTurn} />
+            <DeckArea isMyDeck={false} onEndTurn={onEndTurn}/>
             
             {/* 배틀 필드 */}
             <div>
                 <BattleCard 
                     id="y_battle"
                     isMyCard={false}
-                    myTurn={myTurn}
                     droppedCards={droppedCards}
                     energy={enemyBattlePokemonEnergy}
                     hp={enemyBattlePokemonHP}
@@ -248,7 +232,6 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
                 <BattleCard 
                     id="my_battle"
                     isMyCard={true}
-                    myTurn={myTurn}
                     droppedCards={droppedCards}
                     energy={myBattlePokemonEnergy}
                     hp={myBattlePokemonHP}
@@ -263,7 +246,7 @@ export const FieldCards: React.FC<FieldCardsProps> = ({
             </div>
             
             {/* 나의 효과칸과 덱 */}
-            <DeckArea isMyDeck={true} myTurn={myTurn} onEndTurn={onEndTurn} />
+            <DeckArea isMyDeck={true} onEndTurn={onEndTurn} />
         </div>
     );
 };
