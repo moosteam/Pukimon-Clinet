@@ -11,18 +11,15 @@ import {
     enemyWaitingPokemonHPAtom,
     myGameScoreAtom,
     enemyGameScoreAtom,
-    myTurnAtom
+    myTurnAtom,
+    droppedCardsAtom
 } from "../atom";
 
 interface UseFieldCardsProps {
-    droppedCards: Record<string, string>;
-    setDroppedCards: (cards: Record<string, string>) => void;
     onEndTurn: () => void;
 }
 
 export const useFieldCards = ({
-    droppedCards,
-    setDroppedCards,
     onEndTurn
 }: UseFieldCardsProps) => {
     const myTurn = useAtomValue(myTurnAtom);
@@ -30,7 +27,8 @@ export const useFieldCards = ({
     const [myBattlePokemonHP, setMyBattlePokemonHP] = useAtom(myBattlePokemonHPAtom);
     const [enemyBattlePokemonEnergy, setEnemyBattlePokemonEnergy] = useAtom(enemyBattlePokemonEnergyAtom);
     const [enemyBattlePokemonHP, setEnemyBattlePokemonHP] = useAtom(enemyBattlePokemonHPAtom);
-    
+    const [droppedCards, setDroppedCards] = useAtom(droppedCardsAtom);
+
     const [myWaitingEnergy, setMyWaitingEnergy] = useAtom(myWaitingPokemonEnergyAtom);
     const [myWaitingHP, setMyWaitingHP] = useAtom(myWaitingPokemonHPAtom);
     const [enemyWaitingEnergy, setEnemyWaitingEnergy] = useAtom(enemyWaitingPokemonEnergyAtom);

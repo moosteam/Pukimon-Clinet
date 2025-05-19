@@ -1,16 +1,12 @@
-import { Droppable } from "../Droppable";
 import { useState, useEffect } from "react";
-import { useAtom, useAtomValue } from "jotai";
-
+import { useAtomValue } from "jotai";
 import { data } from "../../data/cards";
 import { 
     myTurnAtom,
     droppedCardsAtom,
 } from "../../atom";
-import { Draggable } from "../Draggable";
 import { BattleCard } from "./BattleCard";
 import { DeckArea } from "../Area/DeckArea";
-import { scale } from "framer-motion";
 import { useFieldCards } from "../../hooks/useFieldCards";
 import SlidingBanner from "../SlidingBanner";
 import { useCardManagement } from "../../hooks/useCardManagement";
@@ -18,7 +14,7 @@ import { useCardManagement } from "../../hooks/useCardManagement";
 
 export const FieldCards = () => {
     const myTurn = useAtomValue(myTurnAtom);
-    const [droppedCards, setDroppedCards] = useAtom(droppedCardsAtom);
+    const droppedCards = useAtomValue(droppedCardsAtom);
     const { onEndTurn } = useCardManagement();
     
     const {
@@ -38,8 +34,6 @@ export const FieldCards = () => {
         myGameScore,
         enemyGameScore
     } = useFieldCards({
-        droppedCards,
-        setDroppedCards,
         onEndTurn
     });
 
@@ -50,22 +44,18 @@ export const FieldCards = () => {
         if (isMyAttack || isEnemyAttack) {
             // 공격 위치 설정 - 내 턴일 때는 상대방 위치에, 상대방 턴일 때는 내 위치에
             setAttackPosition(myTurn ? 'opponent' : 'player');
-            
             // 1.75초 후에 이펙트 표시
             const timer = setTimeout(() => {
                 setShowAttackEffect(true);
             }, 1600);
-
             return () => {
                 clearTimeout(timer);
                 setShowAttackEffect(false);
             };
         }
     }, [isMyAttack, isEnemyAttack, myTurn]);
-
     return (
         <div className={`z-50 flex flex-row w-full justify-between items-center`}>
-            {/* Display scores */}
             {gameOver && (
                 <div className="absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
                     <div className="bg-white p-8 rounded-lg text-center">
@@ -82,7 +72,6 @@ export const FieldCards = () => {
                     </div>
                 </div>
             )}
-
             {
                 (isMyAttack || isEnemyAttack) &&       
                 <SlidingBanner
@@ -95,7 +84,6 @@ export const FieldCards = () => {
                     isReverse={isEnemyAttack}
                 />
             }
-
             {
                 showAttackEffect &&       
                 <div className={`attack-effect ${attackPosition}`}>

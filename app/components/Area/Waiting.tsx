@@ -1,6 +1,6 @@
 import React from 'react';
 import { Droppable } from '../Droppable';
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtomValue } from 'jotai';
 import { 
     myWaitingPokemonEnergyAtom, 
     enemyWaitingPokemonEnergyAtom,
@@ -21,14 +21,12 @@ export const Waiting: React.FC<WaitingProps> = ({ isMy }) => {
     const waitingZones = [1, 2, 3].map(num => `${ownerPrefix}_waiting_${num}`);
     
     // Get the appropriate energy and HP atoms
-    const [myWaitingEnergy] = useAtom(myWaitingPokemonEnergyAtom);
-    const [enemyWaitingEnergy] = useAtom(enemyWaitingPokemonEnergyAtom);
-    const [myWaitingHP] = useAtom(myWaitingPokemonHPAtom);
-    const [enemyWaitingHP] = useAtom(enemyWaitingPokemonHPAtom);
+    const myWaitingEnergy = useAtomValue(myWaitingPokemonEnergyAtom);
+    const enemyWaitingEnergy = useAtomValue(enemyWaitingPokemonEnergyAtom);
+    const myWaitingHP = useAtomValue(myWaitingPokemonHPAtom);
+    const enemyWaitingHP = useAtomValue(enemyWaitingPokemonHPAtom);
     
     // Use the appropriate energy and HP arrays
-    console.log("m:  " + myWaitingEnergy);
-    console.log("e:  " + enemyWaitingEnergy);
     const energyArray = isMy ? myWaitingEnergy : enemyWaitingEnergy;
     const hpArray = isMy ? myWaitingHP : enemyWaitingHP;
 

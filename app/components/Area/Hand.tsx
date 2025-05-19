@@ -1,24 +1,19 @@
 import React, { useState, useCallback } from 'react';
 import { Draggable } from '../Draggable';
-import { useLongPress } from 'use-long-press';
 import { useAtomValue } from 'jotai';
 import { myTurnAtom } from '../../atom';
+import { myHandListAtom, enemyHandListAtom } from '../../atom';
 
 interface HandProps {
-    handList: any;
-    playedCards: any;
     isMy: any;
 }
 
-export const Hand: React.FC<HandProps> = ({ handList, playedCards, isMy }) => {
+export const Hand: React.FC<HandProps> = ({ isMy }) => {
     const myTurn = useAtomValue(myTurnAtom);
 
     const [isCardZoomed, setIsCardZoomed] = useState(false);
-    const [zoomedCardSrc, setZoomedCardSrc] = useState("Charizard.jpg");
-
-    const longPressHandler = useLongPress(() => {
-        setIsCardZoomed(true);
-    });
+    const [zoomedCardSrc,] = useState("Charizard.jpg");
+    const handList = useAtomValue(isMy ? myHandListAtom : enemyHandListAtom);
 
     const closeZoom = useCallback(() => {
         setIsCardZoomed(false);
@@ -47,15 +42,15 @@ export const Hand: React.FC<HandProps> = ({ handList, playedCards, isMy }) => {
                 {handList && handList.map((card: any, index: any) => {
                     const cardId = `card-${index}`;
                     // Only show cards that haven't been played yet
-                    if (!playedCards[cardId]) {
+                    if (true) {
                         return (
-                            <Draggable 
-                                isReversed={!isMy} 
-                                key={isMy ? `draggable-${card}-${index}` : `enemydraggable-${card}-${index}`} 
+                            <Draggable
+                                isReversed={!isMy}
+                                key={isMy ? `draggable-${card}-${index}` : `enemy-draggable-${card}-${index}`}
                                 id={isMy ? `${cardId}` : `enemy${cardId}`}
                                 imgLink={`card/${card}.png`}
                             >
-                                <div 
+                                <div
                                     className={`relative card-entry-animation${isMy ? "" : "-reverse"}`}
                                 >
                                     <img
@@ -74,7 +69,6 @@ export const Hand: React.FC<HandProps> = ({ handList, playedCards, isMy }) => {
                             </Draggable>
                         );
                     }
-                    return null;
                 })}
                 {handList.length === 0 &&
                     <img

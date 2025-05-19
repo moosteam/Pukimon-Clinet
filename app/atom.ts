@@ -7,20 +7,20 @@ export const isNowTurnGiveEnergyAtom = atom<boolean>(true);
 
 export const myCardListAtom = atom<string[]>([
   "파이리",
+  "리자드",
+  "리자몽ex",
   "파이리",
-  "파이리",
-  "파이리",
-  "파이리",
-  "파이리",
+  "리자드",
+  "리자몽ex",
 ]);
 
 export const enemyCardListAtom = atom<string[]>([
   "파이리",
+  "리자드",
+  "리자몽ex",
   "파이리",
-  "파이리",
-  "파이리",
-  "파이리",
-  "파이리",
+  "리자드",
+  "리자몽ex",
 ]);
 
 export const myCardRearAtom = atom<number>(0);

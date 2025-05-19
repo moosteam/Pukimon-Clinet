@@ -12,7 +12,7 @@ interface ScoreTimerProps {
   isPrimary?: boolean;
 }
 
-const ScoreTimer: React.FC<ScoreTimerProps> = ({
+export const ScoreTimer: React.FC<ScoreTimerProps> = ({
   totalMinutes = 20,
   maxDeaths = 3,
   deaths = 0,
@@ -110,4 +110,3 @@ const ScoreTimer: React.FC<ScoreTimerProps> = ({
   );
 };
 
-export default ScoreTimer;
