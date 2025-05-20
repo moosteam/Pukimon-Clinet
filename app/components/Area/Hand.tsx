@@ -16,10 +16,10 @@ export const Hand: React.FC<HandProps> = ({ isMy }) => {
     const [zoomedCardSrc, setZoomedCardSrc] = useState("");
     const handList = useAtomValue(isMy ? myHandListAtom : enemyHandListAtom);
     
-    // 롱 프레스 감지를 위한 타이머 참조
-    const timerRef = useRef<NodeJS.Timeout | null>(null);
     // 드래그 시작 여부를 추적
     const isDraggingRef = useRef(false);
+    // 마우스 다운 시간 추적
+    const mouseDownTimeRef = useRef(0);
 
     const openZoom = useCallback((cardName: string) => {
         console.log("Opening zoom for card:", cardName);
@@ -30,34 +30,6 @@ export const Hand: React.FC<HandProps> = ({ isMy }) => {
     const closeZoom = useCallback(() => {
         console.log("Closing zoom");
         setIsCardZoomed(false);
-    }, []);
-    
-    // 롱 프레스 시작 핸들러
-    const handleTouchStart = useCallback((card: string, e: React.TouchEvent) => {
-        isDraggingRef.current = false;
-        
-        timerRef.current = setTimeout(() => {
-            if (!isDraggingRef.current) {
-                openZoom(card);
-            }
-        }, 500);
-    }, [openZoom]);
-    
-    // 터치 이동 핸들러
-    const handleTouchMove = useCallback(() => {
-        isDraggingRef.current = true;
-        if (timerRef.current) {
-            clearTimeout(timerRef.current);
-            timerRef.current = null;
-        }
-    }, []);
-    
-    // 터치 종료 핸들러
-    const handleTouchEnd = useCallback(() => {
-        if (timerRef.current) {
-            clearTimeout(timerRef.current);
-            timerRef.current = null;
-        }
     }, []);
 
     return (
@@ -72,9 +44,9 @@ export const Hand: React.FC<HandProps> = ({ isMy }) => {
                             transform: 'none',
                             perspective: 'none'
                         }}
-                        initial={{ opacity: 0, }}
-                        animate={{ opacity: 1, }}
-                        exit={{ opacity: 0, }}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
                         transition={{ duration: 0.3 }}
                     >
                         <motion.div 
@@ -111,9 +83,6 @@ export const Hand: React.FC<HandProps> = ({ isMy }) => {
                         <div 
                             key={isMy ? `card-container-${index}` : `enemy-card-container-${index}`} 
                             className="relative"
-                            onTouchStart={(e) => handleTouchStart(card, e)}
-                            onTouchMove={handleTouchMove}
-                            onTouchEnd={handleTouchEnd}
                         >
                             <Draggable
                                 isReversed={!isMy}
@@ -123,6 +92,48 @@ export const Hand: React.FC<HandProps> = ({ isMy }) => {
                             >
                                 <div
                                     className={`relative card-entry-animation${isMy ? "" : "-reverse"}`}
+                                    onMouseDown={(e) => {
+                                        // 마우스 다운 시간 기록
+                                        mouseDownTimeRef.current = Date.now();
+                                        isDraggingRef.current = false;
+                                    }}
+                                    onMouseMove={() => {
+                                        // 마우스 이동 시 드래그 중으로 표시
+                                        if (mouseDownTimeRef.current > 0) {
+                                            isDraggingRef.current = true;
+                                        }
+                                    }}
+                                    onMouseUp={(e) => {
+                                        // 마우스 업 시 클릭인지 드래그인지 판단
+                                        const clickDuration = Date.now() - mouseDownTimeRef.current;
+                                        
+                                        // 짧은 클릭이고 드래그가 아니면 확대 기능 활성화
+                                        if (clickDuration < 200 && !isDraggingRef.current) {
+                                            openZoom(card);
+                                        }
+                                        
+                                        mouseDownTimeRef.current = 0;
+                                    }}
+                                    onTouchStart={() => {
+                                        // 터치 시작 시간 기록
+                                        mouseDownTimeRef.current = Date.now();
+                                        isDraggingRef.current = false;
+                                    }}
+                                    onTouchMove={() => {
+                                        // 터치 이동 시 드래그 중으로 표시
+                                        isDraggingRef.current = true;
+                                    }}
+                                    onTouchEnd={() => {
+                                        // 터치 종료 시 클릭인지 드래그인지 판단
+                                        const clickDuration = Date.now() - mouseDownTimeRef.current;
+                                        
+                                        // 짧은 터치이고 드래그가 아니면 확대 기능 활성화
+                                        if (clickDuration < 200 && !isDraggingRef.current) {
+                                            openZoom(card);
+                                        }
+                                        
+                                        mouseDownTimeRef.current = 0;
+                                    }}
                                 >
                                     <img
                                         src={`card/${card}.png`}
@@ -137,15 +148,6 @@ export const Hand: React.FC<HandProps> = ({ isMy }) => {
                                     />
                                 </div>
                             </Draggable>
-                            {/* 롱 프레스 대신 더블 클릭으로 확대 기능 활성화 */}
-                            <div 
-                                className="absolute inset-0 z-10"
-                                onDoubleClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    openZoom(card);
-                                }}
-                            />
                         </div>
                     );
                 })}
@@ -160,3 +162,7 @@ export const Hand: React.FC<HandProps> = ({ isMy }) => {
         </div>
     )
 }
+
+// 카드 확대 기능 배경 제거
+
+// 현재 카드 확대 기능이 잘 작동하고 있네요! 요청하신 대로 확대된 카드의 배경을 제거하겠습니다.
