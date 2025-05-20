@@ -26,9 +26,6 @@ export function useCardManagement() {
   const [, setIsMyDrawCard] = useAtom(isMyDrawCardAtom);
   const [, setIsEnemyDrawCard] = useAtom(isEnemyDrawCardAtom);
   
-  // droppedCards도 atom으로 변경
-  const [droppedCards, setDroppedCards] = useAtom(droppedCardsAtom);
-
   const addCardToMyHand = (cycle: number) => {
     const initialCards = myCardList.slice(0, cycle);
     setMyCardList(prev => prev.slice(cycle));

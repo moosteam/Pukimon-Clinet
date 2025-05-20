@@ -29,7 +29,7 @@ const SlidingBanner: React.FC<SlidingBannerProps> = ({
           {title}
         </span>
         {subtitle && (
-          <span className={`block text-xl mt-1 transform w-[500px] bg-gray-700 [skew-x:var(--tilt-angle)] p-2`}>
+          <span className={` block text-xl mt-1 transform w-[500px] bg-gray-700 [skew-x:var(--tilt-angle)] p-2`}>
             {subtitle}
           </span>
         )}

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Droppable } from "../Droppable";
 import { data } from "../../data/cards";
 import { useAtomValue } from "jotai";
@@ -26,6 +26,32 @@ export const BattleCard: React.FC<BattleCardProps> = ({
     const myTurn = useAtomValue(myTurnAtom);
     const shouldHighlight = !droppedCards[id] &&
         ((isMyCard && myTurn) || (!isMyCard && !myTurn));
+    
+    // 애니메이션을 위한 상태 추가
+    const [isEvolving, setIsEvolving] = useState(false);
+    const prevCardRef = useRef<string | null>(null);
+    
+    // droppedCards[id]가 변경될 때마다 애니메이션 트리거
+    useEffect(() => {
+        // 카드가 있고, 이전 카드와 다르다면 진화 중
+        if (droppedCards[id] && prevCardRef.current !== droppedCards[id]) {
+            setIsEvolving(true);
+            
+            // 애니메이션 시간 후 상태 초기화
+            const timer = setTimeout(() => {
+                setIsEvolving(false);
+            }, 1500); // 애니메이션 지속 시간 늘림
+            
+            return () => clearTimeout(timer);
+        }
+        
+        // 현재 카드 저장
+        prevCardRef.current = droppedCards[id];
+    }, [droppedCards[id]]);
+
+    // 진화 애니메이션 클래스 결정
+    const animationClass = isEvolving ? 
+        (isMyCard ? "cardEntryAnimation" : "cardEntryAnimationReverse") : "";
 
     return (
         <Droppable id={id}>
@@ -45,7 +71,7 @@ export const BattleCard: React.FC<BattleCardProps> = ({
                 onClick={onCardClick}
             >
                 {droppedCards[id] && (
-                    <div className={`drop-card ${isAttack ? "attack" : ""}`}>
+                    <div key={droppedCards[id]} className={`drop-card ${isAttack ? "attack" : ""} ${animationClass}`}>
                         <div
                             className={`absolute text-black font-bold text-3xl mt-[-10]`}
                             style={{
@@ -57,7 +83,7 @@ export const BattleCard: React.FC<BattleCardProps> = ({
                             className="text-green-300 progress absolute mt-[20] w-12 ml-20 h-[.7rem] border-3 border-black rounded-full"
                             id="progress"
                             value={`${hp}`}
-                            max={`${data[droppedCards[id]].hp}`} // 이부분 고쳐야함
+                            max={`${data[droppedCards[id]].hp}`}
                         ></progress>
                         {Array(energy >= 5 ? 1 : energy).fill(0).map((_, index) => (
                             <img

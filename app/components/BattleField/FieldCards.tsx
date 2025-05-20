@@ -183,14 +183,16 @@ export const FieldCards = () => {
                             "
                           onClick={handleRetreat}
                         >
+                                <div className="flex items-center gap-1">
                             {Array(data[droppedCards[attackingCard || 'my_battle']].retreatCost).fill(0).map((_, i) => (
-                                <img 
-                                    key={i} 
-                                    src="/ui/energy.png"
-                                    className="h-[1rem]"
-                                    style={{marginLeft: i > 0 ? '-0.5rem' : '0'}}
-                                />
+                                    <img 
+                                        key={i} 
+                                        src="/ui/energy.png"
+                                        className="h-[1rem]"
+                                        style={{marginLeft: i > 0 ? '-0.5rem' : '0'}}
+                                    />
                             ))}
+                                </div>
                             <div>후퇴</div>
                         </div>
                     </div>

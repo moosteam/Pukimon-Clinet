@@ -95,6 +95,38 @@ export function useDragHandlers() {
         console.log("진화체가 아님");
         return;
       }
+      
+      // 진화 시에도 애니메이션 적용
+      // 기존 카드를 새 카드로 업데이트하고 애니메이션 효과 적용
+      setDroppedCards({...droppedCards, [dropzoneId]: cardName });
+      
+      // 진화 시 HP 업데이트
+      if (dropzoneId === 'my_battle') {
+        setMyBattlePokemonHP(data[cardName].hp);
+        setMyHandList(prev => prev.filter((_, i) => i !== index));
+      } 
+      else if (dropzoneId === 'y_battle') {
+        setEnemyBattlePokemonHP(data[cardName].hp);
+        setEnemyHandList(prev => prev.filter((_, i) => i !== index));
+      }
+      // 대기 영역 진화 처리
+      else if (dropzoneId.includes('waiting_')) {
+        const waitingPosition = parseInt(dropzoneId.split('_').pop() || '1') - 1;
+        
+        if (dropzoneId.startsWith('enemy_')) {
+          const newHP = [...enemyWaitingHP];
+          newHP[waitingPosition] = data[cardName].hp;
+          setEnemyWaitingHP(newHP);
+          setEnemyHandList(prev => prev.filter((_, i) => i !== index));
+        } else {
+          const newHP = [...myWaitingHP];
+          newHP[waitingPosition] = data[cardName].hp;
+          setMyWaitingHP(newHP);
+          setMyHandList(prev => prev.filter((_, i) => i !== index));
+        }
+      }
+      
+      return;
     }
     // 카드가 없다면
     else {
