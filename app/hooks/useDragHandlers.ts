@@ -152,6 +152,28 @@ export function useDragHandlers() {
   }
 
   /**
+   * 포켓몬 진화 가능 여부 확인
+   * 진화 가능 조건을 검사합니다.
+   */
+  function canEvolvePokemon(dropzoneId: string, cardName: string): boolean {
+    // 진화 가능 여부 확인
+    if (droppedCards[dropzoneId] !== data[cardName]?.beforeEvo) {
+      console.log("진화체가 아님");
+      return false;
+    }
+    
+    // 배치된 턴 확인
+    const placementTurn = pokemonPlacementTurn[dropzoneId] || 0;
+    
+    // 최소 1턴이 지났는지 확인 (현재 턴 - 배치 턴 >= 1)
+    if (gameTurnCount - placementTurn < 1) {
+      return false;
+    }
+    
+    return true;
+  }
+
+  /**
    * 포켓몬 진화 처리
    * 이미 배치된 포켓몬을 진화시킵니다.
    * 포켓몬은 배치 후 최소 1턴이 지나야 진화할 수 있습니다.
@@ -160,18 +182,12 @@ export function useDragHandlers() {
     console.log("이미 카드가 드롭됨 : " + droppedCards[dropzoneId]);
     
     // 진화 가능 여부 확인
-    if (droppedCards[dropzoneId] !== data[cardName]?.beforeEvo) {
-      console.log("진화체가 아님");
-      alert("이 카드는 현재 포켓몬의 진화 형태가 아닙니다!");
-      return;
-    }
-    
-    // 배치된 턴 확인
-    const placementTurn = pokemonPlacementTurn[dropzoneId] || 0;
-    
-    // 최소 1턴이 지났는지 확인 (현재 턴 - 배치 턴 >= 1)
-    if (gameTurnCount - placementTurn < 1) {
-      alert("포켓몬은 필드에 나온 후 한 턴이 지나야 진화할 수 있습니다!");
+    if (!canEvolvePokemon(dropzoneId, cardName)) {
+      if (droppedCards[dropzoneId] !== data[cardName]?.beforeEvo) {
+        alert("이 카드는 현재 포켓몬의 진화 형태가 아닙니다!");
+      } else {
+        alert("포켓몬은 필드에 나온 후 한 턴이 지나야 진화할 수 있습니다!");
+      }
       return;
     }
     

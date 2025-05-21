@@ -2,7 +2,10 @@ import React, { useEffect, useState, useRef } from "react";
 import { Droppable } from "../Droppable";
 import { data } from "../../data/cards";
 import { useAtomValue } from "jotai";
-import { myTurnAtom, pokemonPlacementTurnAtom, gameTurnCountAtom } from "../../atom";
+import { myTurnAtom, droppedCardsAtom } from "../../atom";
+import { useCanEvolve } from "../../utils/evolution";
+import { evolutionStyles } from "../../styles/evolution";
+import { EvolutionIndicator } from "../Evolution/EvolutionIndicator";
 
 interface BattleCardProps {
     id: string;
@@ -24,20 +27,17 @@ export const BattleCard: React.FC<BattleCardProps> = ({
     onCardClick
 }) => {
     const myTurn = useAtomValue(myTurnAtom);
-    const pokemonPlacementTurn = useAtomValue(pokemonPlacementTurnAtom);
-    const gameTurnCount = useAtomValue(gameTurnCountAtom);
     
-    // 진화 가능 여부 확인
-    const canEvolve = droppedCards[id] && 
-                     (gameTurnCount - (pokemonPlacementTurn[id] || 0) >= 1);
+    // 진화 가능 여부 확인 - 유틸리티 함수 사용
+    const canEvolve = useCanEvolve(id, isMyCard);
     
     const shouldHighlight = !droppedCards[id] &&
         ((isMyCard && myTurn) || (!isMyCard && !myTurn));
     
-    // 진화 가능한 포켓몬에 대한 특별 하이라이트
+    // 진화 가능한 포켓몬에 대한 특별 하이라이트 - 전역 스타일 사용
     const evolutionHighlight = canEvolve ? 
-        "0 0 15px 5px rgba(255, 215, 0, 0.6)" : // 황금색 하이라이트
-        "0 0 0px 3px rgba(255, 255, 255, 1)";
+        evolutionStyles.evolveBoxShadow : 
+        evolutionStyles.normalBoxShadow;
     
     // 애니메이션을 위한 상태 추가
     const [isEvolving, setIsEvolving] = useState(false);
@@ -84,11 +84,9 @@ export const BattleCard: React.FC<BattleCardProps> = ({
             >
                 {droppedCards[id] && (
                     <div key={droppedCards[id]} className={`drop-card ${isAttack ? "attack" : ""} ${animationClass}`}>
-                        {canEvolve && (
-                            <div className="absolute top-0 right-0 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center z-10 animate-pulse">
-                                <span className="text-xs font-bold">↑</span>
-                            </div>
-                        )}
+                        {/* 진화 가능 표시 - 컴포넌트 사용 */}
+                        {canEvolve && <EvolutionIndicator size="large" />}
+                        
                         <div
                             className={`absolute text-black font-bold text-3xl mt-[-10]`}
                             style={{

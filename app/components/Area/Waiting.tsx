@@ -10,6 +10,9 @@ import {
     myTurnAtom,
     droppedCardsAtom
 } from '../../atom';
+import { useCanEvolve } from '../../utils/evolution';
+import { evolutionStyles } from '../../styles/evolution';
+import { EvolutionIndicator } from '../Evolution/EvolutionIndicator';
 
 interface WaitingProps {
     isMy: boolean;
@@ -37,9 +40,8 @@ export const Waiting: React.FC<WaitingProps> = ({ isMy }) => {
     return (
         <div className="flex flex-row" style={{ position: 'relative', zIndex: 10 }}>
             {waitingZones.map((zoneId, index) => {
-                // 진화 가능 여부 확인
-                const canEvolve = droppedCards[zoneId] && 
-                                 (gameTurnCount - (pokemonPlacementTurn[zoneId] || 0) >= 1);
+                // 진화 가능 여부 확인 - 유틸리티 함수 사용
+                const canEvolve = useCanEvolve(zoneId, isMy);
                 
                 return (
                     <Droppable key={zoneId} id={zoneId}>
@@ -51,18 +53,14 @@ export const Waiting: React.FC<WaitingProps> = ({ isMy }) => {
                                 transformOrigin: "center center",
                                 perspective: "1000px",
                                 boxShadow: canEvolve ? 
-                                    "0 0 10px 3px rgba(255, 215, 0, 0.6)" : // 황금색 하이라이트
+                                    evolutionStyles.evolveBoxShadow : 
                                     "none"
                             }}
                         >
                             {droppedCards[zoneId] && (
                                 <div className="drop-card">
-                                    {/* 진화 가능 표시 */}
-                                    {canEvolve && (
-                                        <div className="absolute top-0 right-0 w-4 h-4 bg-yellow-400 rounded-full flex items-center justify-center z-10 animate-pulse">
-                                            <span className="text-xs font-bold">↑</span>
-                                        </div>
-                                    )}
+                                    {/* 진화 가능 표시 - 컴포넌트 사용 */}
+                                    {canEvolve && <EvolutionIndicator size="small" />}
                                     
                                     {/* Display energy icons */}
                                     {Array((isMy ? myWaitingEnergy : enemyWaitingEnergy)[index] >= 5 ? 1 : (isMy ? myWaitingEnergy : enemyWaitingEnergy)[index]).fill(0).map((_, i) => (
