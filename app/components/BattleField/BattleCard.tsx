@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { Droppable } from "../Droppable";
 import { data } from "../../data/cards";
 import { useAtomValue } from "jotai";
-import { myTurnAtom } from "../../atom";
+import { myTurnAtom, pokemonPlacementTurnAtom, gameTurnCountAtom } from "../../atom";
 
 interface BattleCardProps {
     id: string;
@@ -24,8 +24,20 @@ export const BattleCard: React.FC<BattleCardProps> = ({
     onCardClick
 }) => {
     const myTurn = useAtomValue(myTurnAtom);
+    const pokemonPlacementTurn = useAtomValue(pokemonPlacementTurnAtom);
+    const gameTurnCount = useAtomValue(gameTurnCountAtom);
+    
+    // 진화 가능 여부 확인
+    const canEvolve = droppedCards[id] && 
+                     (gameTurnCount - (pokemonPlacementTurn[id] || 0) >= 1);
+    
     const shouldHighlight = !droppedCards[id] &&
         ((isMyCard && myTurn) || (!isMyCard && !myTurn));
+    
+    // 진화 가능한 포켓몬에 대한 특별 하이라이트
+    const evolutionHighlight = canEvolve ? 
+        "0 0 15px 5px rgba(255, 215, 0, 0.6)" : // 황금색 하이라이트
+        "0 0 0px 3px rgba(255, 255, 255, 1)";
     
     // 애니메이션을 위한 상태 추가
     const [isEvolving, setIsEvolving] = useState(false);
@@ -61,7 +73,7 @@ export const BattleCard: React.FC<BattleCardProps> = ({
                     borderWidth: 2,
                     boxShadow: shouldHighlight
                         ? "0 0 15px 5px rgba(0, 255, 255, 0.6)"
-                        : "0 0 0px 3px rgba(255, 255, 255, 1)",
+                        : evolutionHighlight,
                     borderRadius: "8px",
                     transition: "box-shadow 0.3s ease, border-color 0.3s ease, transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
                     transform: myTurn ? "scale(1)" : "scale(-1, -1)",
@@ -72,6 +84,11 @@ export const BattleCard: React.FC<BattleCardProps> = ({
             >
                 {droppedCards[id] && (
                     <div key={droppedCards[id]} className={`drop-card ${isAttack ? "attack" : ""} ${animationClass}`}>
+                        {canEvolve && (
+                            <div className="absolute top-0 right-0 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center z-10 animate-pulse">
+                                <span className="text-xs font-bold">↑</span>
+                            </div>
+                        )}
                         <div
                             className={`absolute text-black font-bold text-3xl mt-[-10]`}
                             style={{

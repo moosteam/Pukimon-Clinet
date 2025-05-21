@@ -15,6 +15,8 @@ import {
   enemyWaitingPokemonEnergyAtom,
   isNowTurnGiveEnergyAtom,
   droppedCardsAtom,
+  pokemonPlacementTurnAtom,
+  gameTurnCountAtom,
 } from '../atom';
 import { useEffect } from 'react';
 
@@ -38,7 +40,9 @@ export function useDragHandlers() {
   const [enemyWaitingEnergy, setEnemyWaitingEnergy] = useAtom(enemyWaitingPokemonEnergyAtom);
   const [isNowTurnGiveEnergy, setIsNowTurnGiveEnergy] = useAtom(isNowTurnGiveEnergyAtom);
   const [droppedCards, setDroppedCards] = useAtom(droppedCardsAtom);
-
+  const [pokemonPlacementTurn, setPokemonPlacementTurn] = useAtom(pokemonPlacementTurnAtom);
+  const gameTurnCount = useAtomValue(gameTurnCountAtom);
+  
   /**
    * 드래그 종료 시 카드 배치 처리
    * 카드나 에너지를 드래그하여 필드에 배치할 때 호출됩니다.
@@ -93,6 +97,18 @@ export function useDragHandlers() {
    * 에너지 카드를 포켓몬에게 부여합니다.
    */
   function handleEnergyPlacement(dropzoneId: string) {
+    // 내 턴일 때는 상대방 포켓몬에 에너지를 붙일 수 없음
+    if (myTurn && (dropzoneId === 'enemy_battle' || dropzoneId.includes('enemy_waiting_'))) {
+      alert("내 턴에는 상대방 포켓몬에 에너지를 붙일 수 없습니다!");
+      return;
+    }
+    
+    // 상대 턴일 때는 내 포켓몬에 에너지를 붙일 수 없음
+    if (!myTurn && (dropzoneId === 'my_battle' || dropzoneId.includes('my_waiting_'))) {
+      alert("상대 턴에는 내 포켓몬에 에너지를 붙일 수 없습니다!");
+      return;
+    }
+    
     setIsNowTurnGiveEnergy(true);
     
     // 전투 영역 에너지 추가
@@ -138,6 +154,7 @@ export function useDragHandlers() {
   /**
    * 포켓몬 진화 처리
    * 이미 배치된 포켓몬을 진화시킵니다.
+   * 포켓몬은 배치 후 최소 1턴이 지나야 진화할 수 있습니다.
    */
   function handlePokemonEvolution(dropzoneId: string, cardName: string, index: number) {
     console.log("이미 카드가 드롭됨 : " + droppedCards[dropzoneId]);
@@ -145,11 +162,27 @@ export function useDragHandlers() {
     // 진화 가능 여부 확인
     if (droppedCards[dropzoneId] !== data[cardName]?.beforeEvo) {
       console.log("진화체가 아님");
+      alert("이 카드는 현재 포켓몬의 진화 형태가 아닙니다!");
+      return;
+    }
+    
+    // 배치된 턴 확인
+    const placementTurn = pokemonPlacementTurn[dropzoneId] || 0;
+    
+    // 최소 1턴이 지났는지 확인 (현재 턴 - 배치 턴 >= 1)
+    if (gameTurnCount - placementTurn < 1) {
+      alert("포켓몬은 필드에 나온 후 한 턴이 지나야 진화할 수 있습니다!");
       return;
     }
     
     // 카드 업데이트
     setDroppedCards({...droppedCards, [dropzoneId]: cardName });
+    
+    // 진화한 포켓몬의 배치 턴을 현재 턴으로 업데이트
+    setPokemonPlacementTurn(prev => ({
+      ...prev,
+      [dropzoneId]: gameTurnCount
+    }));
     
     // 진화 시 HP 업데이트
     if (dropzoneId === 'my_battle') {
@@ -157,7 +190,7 @@ export function useDragHandlers() {
       setMyBattlePokemonHP(data[cardName].hp);
       setMyHandList(prev => prev.filter((_, i) => i !== index));
     } 
-    else if (dropzoneId === 'y_battle') {
+    else if (dropzoneId === 'enemy_battle') {
       // 적 전투 포켓몬 진화
       setEnemyBattlePokemonHP(data[cardName].hp);
       setEnemyHandList(prev => prev.filter((_, i) => i !== index));
@@ -197,6 +230,12 @@ export function useDragHandlers() {
   function placePokemonInBattleArea(dropzoneId: string, cardName: string, index: number) {
     setDroppedCards(({...droppedCards, [dropzoneId]: cardName }));
     
+    // 포켓몬 배치 턴 기록
+    setPokemonPlacementTurn(prev => ({
+      ...prev,
+      [dropzoneId]: gameTurnCount
+    }));
+    
     if (myTurn) {
       // 내 전투 포켓몬 설정
       setMyBattlePokemonHP(data[cardName].hp);
@@ -218,12 +257,17 @@ export function useDragHandlers() {
     if (droppedCards[battleArea]) {
       setDroppedCards({ ...droppedCards, [dropzoneId]: cardName });
       
+      // 포켓몬 배치 턴 기록
+      setPokemonPlacementTurn(prev => ({
+        ...prev,
+        [dropzoneId]: gameTurnCount
+      }));
+      
       // 대기 위치 번호 추출 (1, 2, 3)
       const waitingPosition = parseInt(dropzoneId.split('_').pop() || '1') - 1;
       
       // 카드 데이터에서 최대 체력 가져오기
-      const maxHP = data[cardName].hp; // 기본값 100으로 설정
-      console.log(data[cardName].hp)
+      const maxHP = data[cardName].hp;
       
       if (dropzoneId.startsWith('enemy_')) {
         // 적 대기 포켓몬 설정

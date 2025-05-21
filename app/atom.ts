@@ -69,3 +69,9 @@ export const boardRotateXAtom = atom(0);
 
 // 드롭된 카드 상태 관리를 위한 atom
 export const droppedCardsAtom = atom<{ [key: string]: string }>({});
+
+// 포켓몬 배치 턴을 추적하는 atom
+export const pokemonPlacementTurnAtom = atom<Record<string, number>>({});
+
+// 현재 게임 턴 수를 추적하는 atom
+export const gameTurnCountAtom = atom<number>(1);

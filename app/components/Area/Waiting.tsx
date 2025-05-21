@@ -15,6 +15,11 @@ interface WaitingProps {
     isMy: boolean;
 }
 
+import { 
+    pokemonPlacementTurnAtom,
+    gameTurnCountAtom
+} from '../../atom';
+
 export const Waiting: React.FC<WaitingProps> = ({ isMy }) => {
     const myTurn = useAtomValue(myTurnAtom);
     const droppedCards = useAtomValue(droppedCardsAtom);
@@ -26,68 +31,84 @@ export const Waiting: React.FC<WaitingProps> = ({ isMy }) => {
     const enemyWaitingEnergy = useAtomValue(enemyWaitingPokemonEnergyAtom);
     const myWaitingHP = useAtomValue(myWaitingPokemonHPAtom);
     const enemyWaitingHP = useAtomValue(enemyWaitingPokemonHPAtom);
-
-
+    const pokemonPlacementTurn = useAtomValue(pokemonPlacementTurnAtom);
+    const gameTurnCount = useAtomValue(gameTurnCountAtom);
     
     return (
         <div className="flex flex-row" style={{ position: 'relative', zIndex: 10 }}>
-            {waitingZones.map((zoneId, index) => (
-                <Droppable key={zoneId} id={zoneId}>
-                    <div 
-                        className="w-18 h-25 border-3 rounded-lg flex items-center justify-center"
-                        style={{
-                            transition: "transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
-                            transform: myTurn ? "scale(1)" : "scale(-1, -1)",
-                            transformOrigin: "center center",
-                            perspective: "1000px"
-                        }}
-                    >
-                        {droppedCards[zoneId] && (
-                            <div className="drop-card">
-                                {/* Display energy icons */}
-                                {Array((isMy ? myWaitingEnergy : enemyWaitingEnergy)[index] >= 5 ? 1 : (isMy ? myWaitingEnergy : enemyWaitingEnergy)[index]).fill(0).map((_, i) => (
-                                    <img 
-                                        key={i} 
-                                        src="ui/energy.png"
-                                        className="absolute h-[1.5rem]"
-                                        style={{paddingLeft: `${i*1.7}rem`}}
-                                    />
-                                ))}
-                                {(isMy ? myWaitingEnergy : enemyWaitingEnergy)[index] >= 5 &&
+            {waitingZones.map((zoneId, index) => {
+                // 진화 가능 여부 확인
+                const canEvolve = droppedCards[zoneId] && 
+                                 (gameTurnCount - (pokemonPlacementTurn[zoneId] || 0) >= 1);
+                
+                return (
+                    <Droppable key={zoneId} id={zoneId}>
+                        <div 
+                            className="w-18 h-25 border-3 rounded-lg flex items-center justify-center"
+                            style={{
+                                transition: "transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
+                                transform: myTurn ? "scale(1)" : "scale(-1, -1)",
+                                transformOrigin: "center center",
+                                perspective: "1000px",
+                                boxShadow: canEvolve ? 
+                                    "0 0 10px 3px rgba(255, 215, 0, 0.6)" : // 황금색 하이라이트
+                                    "none"
+                            }}
+                        >
+                            {droppedCards[zoneId] && (
+                                <div className="drop-card">
+                                    {/* 진화 가능 표시 */}
+                                    {canEvolve && (
+                                        <div className="absolute top-0 right-0 w-4 h-4 bg-yellow-400 rounded-full flex items-center justify-center z-10 animate-pulse">
+                                            <span className="text-xs font-bold">↑</span>
+                                        </div>
+                                    )}
+                                    
+                                    {/* Display energy icons */}
+                                    {Array((isMy ? myWaitingEnergy : enemyWaitingEnergy)[index] >= 5 ? 1 : (isMy ? myWaitingEnergy : enemyWaitingEnergy)[index]).fill(0).map((_, i) => (
+                                        <img 
+                                            key={i} 
+                                            src="ui/energy.png"
+                                            className="absolute h-[1.5rem]"
+                                            style={{paddingLeft: `${i*1.7}rem`}}
+                                        />
+                                    ))}
+                                    {(isMy ? myWaitingEnergy : enemyWaitingEnergy)[index] >= 5 &&
+                                        <div
+                                            className="absolute h-[1.5rem] pl-[2rem] text-white font-bold"
+                                            style={{ 
+                                                textShadow: "2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000" 
+                                            }}
+                                        >{(isMy ? myWaitingEnergy : enemyWaitingEnergy)[index]}</div>
+                                    }
+                                    
+                                    {/* Display HP */}
                                     <div
-                                        className="absolute h-[1.5rem] pl-[2rem] text-white font-bold"
-                                        style={{ 
-                                            textShadow: "2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000" 
+                                        className={`absolute text-black font-bold text-xl mt-[-10]`}
+                                        style={{
+                                            textShadow: "-1px 0px white, 0px 1px white, 1px 0px white, 0px -1px white",
+                                            marginLeft: ((isMy ? myWaitingHP : enemyWaitingHP)[index]) >= 100 ? "4.2rem" : "3.2rem"
                                         }}
-                                    >{(isMy ? myWaitingEnergy : enemyWaitingEnergy)[index]}</div>
-                                }
-                                
-                                {/* Display HP */}
-                                <div
-                                    className={`absolute text-black font-bold text-xl mt-[-10]`}
-                                    style={{
-                                        textShadow: "-1px 0px white, 0px 1px white, 1px 0px white, 0px -1px white",
-                                        marginLeft: ((isMy ? myWaitingHP : enemyWaitingHP)[index]) >= 100 ? "4.2rem" : "3.2rem"
-                                    }}
-                                >{(isMy ? myWaitingHP : enemyWaitingHP)[index]}</div>
-                                <progress
-                                    className="text-green-300 progress absolute mt-[12] w-8 ml-10 h-[.6rem] border-2 border-black rounded-full"
-                                    id="progress"
-                                    value={(isMy ? myWaitingHP : enemyWaitingHP)[index]}
-                                    max={droppedCards[zoneId] ? data[droppedCards[zoneId]]?.hp || 100 : 100}
-                                    style={{ zIndex: 10 }}
-                                ></progress>
-                                 
-                                <img 
-                                    src={droppedCards[zoneId]} 
-                                    alt={droppedCards[zoneId]}
-                                    className="w-full h-full object-cover"
-                                />
-                            </div>
-                        )}
-                    </div>
-                </Droppable>
-            ))}
+                                    >{(isMy ? myWaitingHP : enemyWaitingHP)[index]}</div>
+                                    <progress
+                                        className="text-green-300 progress absolute mt-[12] w-8 ml-10 h-[.6rem] border-2 border-black rounded-full"
+                                        id="progress"
+                                        value={(isMy ? myWaitingHP : enemyWaitingHP)[index]}
+                                        max={droppedCards[zoneId] ? data[droppedCards[zoneId]]?.hp || 100 : 100}
+                                        style={{ zIndex: 10 }}
+                                    ></progress>
+                                     
+                                    <img 
+                                        src={droppedCards[zoneId]} 
+                                        alt={droppedCards[zoneId]}
+                                        className="w-full h-full object-cover"
+                                    />
+                                </div>
+                            )}
+                        </div>
+                    </Droppable>
+                );
+            })}
         </div>
-    )
-}
+    );
+};

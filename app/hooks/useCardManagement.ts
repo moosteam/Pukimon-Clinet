@@ -11,7 +11,8 @@ import {
   enemyCardListAtom,
   myHandListAtom,
   enemyHandListAtom,
-  droppedCardsAtom
+  droppedCardsAtom,
+  gameTurnCountAtom,
 } from "../atom";
 
 export function useCardManagement() {
@@ -54,11 +55,15 @@ export function useCardManagement() {
   // 대신 외부에서 선언된 atom 값 사용
   const [boardRotateZ, setBoardRotateZ] = useAtom(boardRotateZAtom);
   const [boardRotateX, setBoardRotateX] = useAtom(boardRotateXAtom);
+  const [gameTurnCount, setGameTurnCount] = useAtom(gameTurnCountAtom);
   
   const onEndTurn = () => {
     setBoardRotateZ(boardRotateZ + 180);
     setIsNowTurnGiveEnergy(false);
     setBoardRotateX(boardRotateX * -1);
+    
+    // 턴 카운터 증가
+    setGameTurnCount(prev => prev + 1);
     
     if (!myTurn) {
       if (myHandList.length === 0) {

@@ -38,7 +38,7 @@ export const Hand: React.FC<HandProps> = ({ isMy }) => {
             <AnimatePresence>
                 {isCardZoomed && (
                     <motion.div
-                        className="fixed inset-0 z-[999999999999999999999999999999] flex items-center justify-center"
+                        className="fixed inset-0 z-[999999999999999999999999999999] flex items-center justify-center top-40"
                         onClick={closeZoom}
                         style={{ 
                             transform: 'none',
