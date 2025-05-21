@@ -1,6 +1,7 @@
 import React from 'react';
 import { Droppable } from '../Droppable';
 import { useAtomValue } from 'jotai';
+import { data } from '../../data/cards'; // 카드 데이터 가져오기
 import { 
     myWaitingPokemonEnergyAtom, 
     enemyWaitingPokemonEnergyAtom,
@@ -25,11 +26,9 @@ export const Waiting: React.FC<WaitingProps> = ({ isMy }) => {
     const enemyWaitingEnergy = useAtomValue(enemyWaitingPokemonEnergyAtom);
     const myWaitingHP = useAtomValue(myWaitingPokemonHPAtom);
     const enemyWaitingHP = useAtomValue(enemyWaitingPokemonHPAtom);
-    
-    // Use the appropriate energy and HP arrays
-    const energyArray = isMy ? myWaitingEnergy : enemyWaitingEnergy;
-    const hpArray = isMy ? myWaitingHP : enemyWaitingHP;
 
+
+    
     return (
         <div className="flex flex-row" style={{ position: 'relative', zIndex: 10 }}>
             {waitingZones.map((zoneId, index) => (
@@ -46,7 +45,7 @@ export const Waiting: React.FC<WaitingProps> = ({ isMy }) => {
                         {droppedCards[zoneId] && (
                             <div className="drop-card">
                                 {/* Display energy icons */}
-                                {Array(energyArray[index] >= 5 ? 1 : energyArray[index]).fill(0).map((_, i) => (
+                                {Array((isMy ? myWaitingEnergy : enemyWaitingEnergy)[index] >= 5 ? 1 : (isMy ? myWaitingEnergy : enemyWaitingEnergy)[index]).fill(0).map((_, i) => (
                                     <img 
                                         key={i} 
                                         src="ui/energy.png"
@@ -54,13 +53,13 @@ export const Waiting: React.FC<WaitingProps> = ({ isMy }) => {
                                         style={{paddingLeft: `${i*1.7}rem`}}
                                     />
                                 ))}
-                                {energyArray[index] >= 5 &&
+                                {(isMy ? myWaitingEnergy : enemyWaitingEnergy)[index] >= 5 &&
                                     <div
                                         className="absolute h-[1.5rem] pl-[2rem] text-white font-bold"
                                         style={{ 
                                             textShadow: "2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000" 
                                         }}
-                                    >{energyArray[index]}</div>
+                                    >{(isMy ? myWaitingEnergy : enemyWaitingEnergy)[index]}</div>
                                 }
                                 
                                 {/* Display HP */}
@@ -68,14 +67,14 @@ export const Waiting: React.FC<WaitingProps> = ({ isMy }) => {
                                     className={`absolute text-black font-bold text-xl mt-[-10]`}
                                     style={{
                                         textShadow: "-1px 0px white, 0px 1px white, 1px 0px white, 0px -1px white",
-                                        marginLeft: (hpArray[index]) >= 100 ? "4.2rem" : "3.2rem" // 3자리수면 공간 줄이고, 2자리수면 더 많은 공간 주기
+                                        marginLeft: ((isMy ? myWaitingHP : enemyWaitingHP)[index]) >= 100 ? "4.2rem" : "3.2rem"
                                     }}
-                                >{hpArray[index]}</div>
+                                >{(isMy ? myWaitingHP : enemyWaitingHP)[index]}</div>
                                 <progress
                                     className="text-green-300 progress absolute mt-[12] w-8 ml-10 h-[.6rem] border-2 border-black rounded-full"
                                     id="progress"
-                                    value="100"
-                                    max="100"
+                                    value={(isMy ? myWaitingHP : enemyWaitingHP)[index]}
+                                    max={droppedCards[zoneId] ? data[droppedCards[zoneId]]?.hp || 100 : 100}
                                     style={{ zIndex: 10 }}
                                 ></progress>
                                  

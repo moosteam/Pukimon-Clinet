@@ -205,15 +205,15 @@ export const FieldCards = () => {
             {/* 배틀 필드 */}
             <div>
                 <BattleCard 
-                    id="y_battle"
+                    id="enemy_battle"
                     isMyCard={false}
                     droppedCards={droppedCards}
                     energy={enemyBattlePokemonEnergy}
                     hp={enemyBattlePokemonHP}
                     isAttack={isEnemyAttack}
                     onCardClick={() => {
-                        if (!myTurn && droppedCards['y_battle']) {
-                            setAttackingCard('y_battle');
+                        if (!myTurn && droppedCards['enemy_battle']) {
+                            setAttackingCard('enemy_battle');
                             setIsReadyToAttack(true);
                         }
                     }}

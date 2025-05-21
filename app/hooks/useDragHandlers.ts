@@ -9,32 +9,41 @@ import {
   myBattlePokemonHPAtom,
   enemyBattlePokemonEnergyAtom,
   enemyBattlePokemonHPAtom,
-  myWaitingHPAtom,
-  myWaitingEnergyAtom,
-  enemyWaitingHPAtom,
-  enemyWaitingEnergyAtom,
+  myWaitingPokemonHPAtom,
+  myWaitingPokemonEnergyAtom,
+  enemyWaitingPokemonHPAtom,
+  enemyWaitingPokemonEnergyAtom,
   isNowTurnGiveEnergyAtom,
   droppedCardsAtom,
 } from '../atom';
+import { useEffect } from 'react';
 
+/**
+ * 카드 드래그 앤 드롭 핸들러 훅
+ * 카드 이동, 에너지 추가, 진화 등의 동작을 처리합니다.
+ */
 export function useDragHandlers() {
   const myTurn = useAtomValue(myTurnAtom);
   
-  // useGameState 대신 jotai의 atom 사용
+  // 상태 관리 - jotai atom 사용
   const [myHandList, setMyHandList] = useAtom(myHandListAtom);
   const [enemyHandList, setEnemyHandList] = useAtom(enemyHandListAtom);
   const [myBattlePokemonEnergy, setMyBattlePokemonEnergy] = useAtom(myBattlePokemonEnergyAtom);
   const [myBattlePokemonHP, setMyBattlePokemonHP] = useAtom(myBattlePokemonHPAtom);
   const [enemyBattlePokemonEnergy, setEnemyBattlePokemonEnergy] = useAtom(enemyBattlePokemonEnergyAtom);
   const [enemyBattlePokemonHP, setEnemyBattlePokemonHP] = useAtom(enemyBattlePokemonHPAtom);
-  const [myWaitingHP, setMyWaitingHP] = useAtom(myWaitingHPAtom);
-  const [myWaitingEnergy, setMyWaitingEnergy] = useAtom(myWaitingEnergyAtom);
-  const [enemyWaitingHP, setEnemyWaitingHP] = useAtom(enemyWaitingHPAtom);
-  const [enemyWaitingEnergy, setEnemyWaitingEnergy] = useAtom(enemyWaitingEnergyAtom);
+  const [myWaitingHP, setMyWaitingHP] = useAtom(myWaitingPokemonHPAtom);
+  const [myWaitingEnergy, setMyWaitingEnergy] = useAtom(myWaitingPokemonEnergyAtom);
+  const [enemyWaitingHP, setEnemyWaitingHP] = useAtom(enemyWaitingPokemonHPAtom);
+  const [enemyWaitingEnergy, setEnemyWaitingEnergy] = useAtom(enemyWaitingPokemonEnergyAtom);
   const [isNowTurnGiveEnergy, setIsNowTurnGiveEnergy] = useAtom(isNowTurnGiveEnergyAtom);
   const [droppedCards, setDroppedCards] = useAtom(droppedCardsAtom);
 
-  function handleDragEnd(event: DragEndEvent) {
+  /**
+   * 드래그 종료 시 카드 배치 처리
+   * 카드나 에너지를 드래그하여 필드에 배치할 때 호출됩니다.
+   */
+  function handleCardPlacement(event: DragEndEvent) {
     const { active, over } = event;
     if (!over) return;
 
@@ -44,148 +53,236 @@ export function useDragHandlers() {
     const isMyCard = cardId.startsWith('card-');
     const isEnemyCard = cardId.startsWith('enemycard-');
 
+    // 에너지 카드 처리
     if (cardId === "energy") {
-      setIsNowTurnGiveEnergy(true);
-      if (dropzoneId === 'my_battle') {
-        setMyBattlePokemonEnergy(prev => prev + 1);
-      }
-      else if (dropzoneId === 'y_battle') {
-        setEnemyBattlePokemonEnergy(prev => prev + 1);
-      }
-      // Handle energy for waiting/bench Pokémon
-      // Check enemy first to avoid matching "my" in "enemy"
-      else if (dropzoneId.includes('enemy_waiting_')) {
-        // Extract the waiting position number (1, 2, or 3)
-        const waitingPosition = parseInt(dropzoneId.split('_').pop() || '1') - 1;
-        
-        // Make sure there's a Pokémon in this position
-        if (droppedCards[dropzoneId]) {
-          // Update energy for the specific waiting position
-          const newEnergy = [...enemyWaitingEnergy];
-          newEnergy[waitingPosition] = newEnergy[waitingPosition] + 1;
-          setEnemyWaitingEnergy(newEnergy);
-        }
-      }
-      else if (dropzoneId.includes('my_waiting_')) {
-        // Extract the waiting position number (1, 2, or 3)
-        const waitingPosition = parseInt(dropzoneId.split('_').pop() || '1') - 1;
-        
-        // Make sure there's a Pokémon in this position
-        if (droppedCards[dropzoneId]) {
-          // Update energy for the specific waiting position
-          const newEnergy = [...myWaitingEnergy];
-          newEnergy[waitingPosition] = newEnergy[waitingPosition] + 1;
-          setMyWaitingEnergy(newEnergy);
-        }
-      }
+      handleEnergyPlacement(dropzoneId);
       return;
     }
 
-    // Validate turn and ownership
+    // 턴 및 카드 소유권 검증
     if ((myTurn && !isMyCard) || (!myTurn && !isEnemyCard)) return;
 
-    // Get card index from ID
+    // 카드 인덱스 추출
     const index = parseInt(cardId.split('-')[1]);
 
-    // 이미 카드가 드롭되있으면 
+    // 이미 카드가 있는 위치에 드롭한 경우 (진화 처리)
     if (droppedCards[dropzoneId]) {
-      console.log("이미 카드가 드롭됨 : " + droppedCards[dropzoneId]);
-      // 진화체여야 낼 수 있음
-      if (droppedCards[dropzoneId] !== data[cardName]?.beforeEvo) {
-        console.log("진화체가 아님");
-        return;
-      }
-      
-      // 진화 시에도 애니메이션 적용
-      // 기존 카드를 새 카드로 업데이트하고 애니메이션 효과 적용
-      setDroppedCards({...droppedCards, [dropzoneId]: cardName });
-      
-      // 진화 시 HP 업데이트
-      if (dropzoneId === 'my_battle') {
-        setMyBattlePokemonHP(data[cardName].hp);
-        setMyHandList(prev => prev.filter((_, i) => i !== index));
-      } 
-      else if (dropzoneId === 'y_battle') {
-        setEnemyBattlePokemonHP(data[cardName].hp);
-        setEnemyHandList(prev => prev.filter((_, i) => i !== index));
-      }
-      // 대기 영역 진화 처리
-      else if (dropzoneId.includes('waiting_')) {
-        const waitingPosition = parseInt(dropzoneId.split('_').pop() || '1') - 1;
-        
-        if (dropzoneId.startsWith('enemy_')) {
-          const newHP = [...enemyWaitingHP];
-          newHP[waitingPosition] = data[cardName].hp;
-          setEnemyWaitingHP(newHP);
-          setEnemyHandList(prev => prev.filter((_, i) => i !== index));
-        } else {
-          const newHP = [...myWaitingHP];
-          newHP[waitingPosition] = data[cardName].hp;
-          setMyWaitingHP(newHP);
-          setMyHandList(prev => prev.filter((_, i) => i !== index));
-        }
-      }
-      
+      handlePokemonEvolution(dropzoneId, cardName, index);
       return;
     }
-    // 카드가 없다면
+    // 빈 위치에 드롭한 경우 (기본 포켓몬 배치)
     else {
-      // 진화체가 없는 카드만 낼 수 있음
+      // 진화체가 없는 카드만 배치 가능
       if (data[cardName]?.beforeEvo !== "") {
         return;
       }
-    }
-
-    // Battle area handling
-    if (dropzoneId === 'my_battle' || dropzoneId === 'y_battle') {
-      setDroppedCards(({...droppedCards, [dropzoneId]: cardName }));
-      if (myTurn) {
-        setMyBattlePokemonHP(data[cardName].hp);
-        setMyHandList(prev => prev.filter((_, i) => i !== index));
-      } else {
-        setEnemyBattlePokemonHP(data[cardName].hp);
-        setEnemyHandList(prev => prev.filter((_, i) => i !== index));
+      
+      // 전투 영역 배치
+      if (dropzoneId === 'my_battle' || dropzoneId === 'enemy_battle') {
+        placePokemonInBattleArea(dropzoneId, cardName, index);
       }
-    }
-    // Waiting area handling - Requires battle area card
-    else if (dropzoneId.includes('waiting_')) {
-      // Check if corresponding battle area has a card
-      const battleArea = dropzoneId.startsWith('enemy_') ? 'y_battle' : 'my_battle';
-      if (droppedCards[battleArea]) {
-        setDroppedCards({ ...droppedCards, [dropzoneId]: cardName });
-        
-        // Extract the waiting position number (1, 2, or 3)
-        const waitingPosition = parseInt(dropzoneId.split('_').pop() || '1') - 1;
-        
-        // Check enemy first to avoid matching "my" in "enemy"
-        if (dropzoneId.startsWith('enemy_')) {
-          // Update enemy waiting Pokémon HP atom
-          const newHP = [...enemyWaitingHP];
-          newHP[waitingPosition] = data[cardName].hp;
-          setEnemyWaitingHP(newHP);
-          
-          // Update enemy waiting Pokémon energy atom
-          const newEnergy = [...enemyWaitingEnergy];
-          newEnergy[waitingPosition] = 0; // Start with 0 energy
-          setEnemyWaitingEnergy(newEnergy);
-          
-          setEnemyHandList(prev => prev.filter((_, i) => i !== index));
-        } else {
-          // Update my waiting Pokémon HP atom
-          const newHP = [...myWaitingHP];
-          newHP[waitingPosition] = data[cardName].hp;
-          setMyWaitingHP(newHP);
-          
-          // Update my waiting Pokémon energy atom
-          const newEnergy = [...myWaitingEnergy];
-          newEnergy[waitingPosition] = 0; // Start with 0 energy
-          setMyWaitingEnergy(newEnergy);
-          
-          setMyHandList(prev => prev.filter((_, i) => i !== index));
-        }
+      // 대기 영역 배치
+      else if (dropzoneId.includes('waiting_')) {
+        placePokemonInWaitingArea(dropzoneId, cardName, index);
       }
     }
   }
 
-  return { handleDragEnd };
+  /**
+   * 에너지 카드 배치 처리
+   * 에너지 카드를 포켓몬에게 부여합니다.
+   */
+  function handleEnergyPlacement(dropzoneId: string) {
+    setIsNowTurnGiveEnergy(true);
+    
+    // 전투 영역 에너지 추가
+    if (dropzoneId === 'my_battle') {
+      setMyBattlePokemonEnergy(prev => prev + 1);
+    }
+    else if (dropzoneId === 'enemy_battle') {
+      setEnemyBattlePokemonEnergy(prev => prev + 1);
+    }
+    // 대기 영역 에너지 추가
+    else if (dropzoneId.includes('enemy_waiting_')) {
+      addEnergyToWaitingPokemon(dropzoneId, 'enemy');
+    }
+    else if (dropzoneId.includes('my_waiting_')) {
+      addEnergyToWaitingPokemon(dropzoneId, 'my');
+    }
+  }
+
+  /**
+   * 대기 영역 포켓몬에 에너지 추가
+   * 지정된 대기 위치의 포켓몬에 에너지를 추가합니다.
+   */
+  function addEnergyToWaitingPokemon(dropzoneId: string, owner: 'my' | 'enemy') {
+    // 대기 위치 번호 추출 (1, 2, 3)
+    const waitingPosition = parseInt(dropzoneId.split('_').pop() || '1') - 1;
+    
+    // 해당 위치에 포켓몬이 있는지 확인
+    if (droppedCards[dropzoneId]) {
+      if (owner === 'enemy') {
+        // 적 대기 포켓몬 에너지 업데이트
+        const newEnergy = [...enemyWaitingEnergy];
+        newEnergy[waitingPosition] = newEnergy[waitingPosition] + 1;
+        setEnemyWaitingEnergy(newEnergy);
+      } else {
+        // 내 대기 포켓몬 에너지 업데이트
+        const newEnergy = [...myWaitingEnergy];
+        newEnergy[waitingPosition] = newEnergy[waitingPosition] + 1;
+        setMyWaitingEnergy(newEnergy);
+      }
+    }
+  }
+
+  /**
+   * 포켓몬 진화 처리
+   * 이미 배치된 포켓몬을 진화시킵니다.
+   */
+  function handlePokemonEvolution(dropzoneId: string, cardName: string, index: number) {
+    console.log("이미 카드가 드롭됨 : " + droppedCards[dropzoneId]);
+    
+    // 진화 가능 여부 확인
+    if (droppedCards[dropzoneId] !== data[cardName]?.beforeEvo) {
+      console.log("진화체가 아님");
+      return;
+    }
+    
+    // 카드 업데이트
+    setDroppedCards({...droppedCards, [dropzoneId]: cardName });
+    
+    // 진화 시 HP 업데이트
+    if (dropzoneId === 'my_battle') {
+      // 내 전투 포켓몬 진화
+      setMyBattlePokemonHP(data[cardName].hp);
+      setMyHandList(prev => prev.filter((_, i) => i !== index));
+    } 
+    else if (dropzoneId === 'y_battle') {
+      // 적 전투 포켓몬 진화
+      setEnemyBattlePokemonHP(data[cardName].hp);
+      setEnemyHandList(prev => prev.filter((_, i) => i !== index));
+    }
+    else if (dropzoneId.includes('waiting_')) {
+      // 대기 영역 포켓몬 진화
+      updateWaitingPokemonAfterEvolution(dropzoneId, cardName, index);
+    }
+  }
+
+  /**
+   * 대기 영역 포켓몬 진화 후 상태 업데이트
+   * 진화한 대기 포켓몬의 체력을 업데이트합니다.
+   */
+  function updateWaitingPokemonAfterEvolution(dropzoneId: string, cardName: string, index: number) {
+    const waitingPosition = parseInt(dropzoneId.split('_').pop() || '1') - 1;
+    
+    if (dropzoneId.startsWith('enemy_')) {
+      // 적 대기 포켓몬 진화
+      const newHP = [...enemyWaitingHP];
+      newHP[waitingPosition] = data[cardName].hp;
+      setEnemyWaitingHP(newHP);
+      setEnemyHandList(prev => prev.filter((_, i) => i !== index));
+    } else {
+      // 내 대기 포켓몬 진화
+      const newHP = [...myWaitingHP];
+      newHP[waitingPosition] = data[cardName].hp;
+      setMyWaitingHP(newHP);
+      setMyHandList(prev => prev.filter((_, i) => i !== index));
+    }
+  }
+
+  /**
+   * 전투 영역에 포켓몬 배치
+   * 새 포켓몬을 전투 영역에 배치합니다.
+   */
+  function placePokemonInBattleArea(dropzoneId: string, cardName: string, index: number) {
+    setDroppedCards(({...droppedCards, [dropzoneId]: cardName }));
+    
+    if (myTurn) {
+      // 내 전투 포켓몬 설정
+      setMyBattlePokemonHP(data[cardName].hp);
+      setMyHandList(prev => prev.filter((_, i) => i !== index));
+    } else {
+      // 적 전투 포켓몬 설정
+      setEnemyBattlePokemonHP(data[cardName].hp);
+      setEnemyHandList(prev => prev.filter((_, i) => i !== index));
+    }
+  }
+
+  /**
+   * 대기 영역에 포켓몬 배치
+   * 새 포켓몬을 대기 영역에 배치합니다.
+   */
+  function placePokemonInWaitingArea(dropzoneId: string, cardName: string, index: number) {
+    // 전투 영역에 포켓몬이 있는지 확인
+    const battleArea = dropzoneId.startsWith('enemy_') ? 'enemy_battle' : 'my_battle';
+    if (droppedCards[battleArea]) {
+      setDroppedCards({ ...droppedCards, [dropzoneId]: cardName });
+      
+      // 대기 위치 번호 추출 (1, 2, 3)
+      const waitingPosition = parseInt(dropzoneId.split('_').pop() || '1') - 1;
+      
+      // 카드 데이터에서 최대 체력 가져오기
+      const maxHP = data[cardName].hp; // 기본값 100으로 설정
+      console.log(data[cardName].hp)
+      
+      if (dropzoneId.startsWith('enemy_')) {
+        // 적 대기 포켓몬 설정
+        updateEnemyWaitingPokemon(waitingPosition, maxHP, index);
+      } else {
+        // 내 대기 포켓몬 설정
+        updateMyWaitingPokemon(waitingPosition, maxHP, index);
+      }
+    }
+  }
+
+  /**
+   * 내 대기 포켓몬 상태 업데이트
+   * 새로 배치된 내 대기 포켓몬의 체력과 에너지를 설정합니다.
+   */
+  // 권장 해결책
+  
+  useEffect(() => {
+    console.log("myWaitingHP 업데이트됨:", myWaitingHP);
+  }, [myWaitingHP]);
+  
+  function updateMyWaitingPokemon(waitingPosition: number, maxHP: number, index: number) {
+    // 체력 설정 - 함수형 업데이트 사용
+    setMyWaitingHP(prevHP => {
+      const newHP = [...prevHP];
+      newHP[waitingPosition] = maxHP;
+      console.log("업데이트될 myWaitingHP:", newHP);
+      return newHP;
+    });
+    
+    // 에너지 초기화 - 함수형 업데이트 사용
+    setMyWaitingEnergy(prevEnergy => {
+      const newEnergy = [...prevEnergy];
+      newEnergy[waitingPosition] = 0;
+      return newEnergy;
+    });
+    
+    // 손에서 카드 제거
+    setMyHandList(prev => prev.filter((_, i) => i !== index));
+  }
+
+  /**
+   * 적 대기 포켓몬 상태 업데이트
+   * 새로 배치된 적 대기 포켓몬의 체력과 에너지를 설정합니다.
+   */
+  function updateEnemyWaitingPokemon(waitingPosition: number, maxHP: number, index: number) {
+    // 체력 설정
+    const newHP = [...enemyWaitingHP];
+    newHP[waitingPosition] = maxHP;
+    setEnemyWaitingHP(newHP);
+    
+    // 에너지 초기화
+    const newEnergy = [...enemyWaitingEnergy];
+    newEnergy[waitingPosition] = 0;
+    setEnemyWaitingEnergy(newEnergy);
+    
+    // 손에서 카드 제거
+    setEnemyHandList(prev => prev.filter((_, i) => i !== index));
+  }
+
+  return { handleDragEnd: handleCardPlacement };
 }

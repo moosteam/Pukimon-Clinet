@@ -40,7 +40,7 @@ export default function App() {
     // 10초 후에 실행될 타이머 설정
     const timer = setTimeout(() => {
       addCardToMyHand(4);
-    }, 8000); // 10000ms = 10초
+    }, 0.1*8000); // 10000ms = 10초
 
     // 컴포넌트가 언마운트될 때 타이머 정리
     return () => clearTimeout(timer);

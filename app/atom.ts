@@ -7,6 +7,9 @@ export const isNowTurnGiveEnergyAtom = atom<boolean>(true);
 
 export const myCardListAtom = atom<string[]>([
   "파이리",
+  "파이리",
+  "파이리",
+  "파이리",
   "리자드",
   "리자몽ex",
   "파이리",
@@ -15,6 +18,9 @@ export const myCardListAtom = atom<string[]>([
 ]);
 
 export const enemyCardListAtom = atom<string[]>([
+  "파이리",
+  "파이리",
+  "파이리",
   "파이리",
   "리자드",
   "리자몽ex",
@@ -60,11 +66,6 @@ export const playerCardPositionAtom = atom(-130);
 export const startVideoAtom = atom(false);
 export const coinTextOpacityAtom = atom(0);
 export const boardRotateXAtom = atom(0);
-
-export const myWaitingHPAtom = atom<number[]>([0, 0, 0]);
-export const myWaitingEnergyAtom = atom<number[]>([0, 0, 0]);
-export const enemyWaitingHPAtom = atom<number[]>([0, 0, 0]);
-export const enemyWaitingEnergyAtom = atom<number[]>([0, 0, 0]);
 
 // 드롭된 카드 상태 관리를 위한 atom
 export const droppedCardsAtom = atom<{ [key: string]: string }>({});

@@ -19,9 +19,14 @@ interface UseFieldCardsProps {
     onEndTurn: () => void;
 }
 
+/**
+ * 필드 카드 관리 훅
+ * 전투 및 대기 영역의 포켓몬 상태를 관리하고 공격/후퇴 등의 액션을 처리합니다.
+ */
 export const useFieldCards = ({
     onEndTurn
 }: UseFieldCardsProps) => {
+    // 기본 상태 관리
     const myTurn = useAtomValue(myTurnAtom);
     const [myBattlePokemonEnergy, setMyBattlePokemonEnergy] = useAtom(myBattlePokemonEnergyAtom);
     const [myBattlePokemonHP, setMyBattlePokemonHP] = useAtom(myBattlePokemonHPAtom);
@@ -29,31 +34,39 @@ export const useFieldCards = ({
     const [enemyBattlePokemonHP, setEnemyBattlePokemonHP] = useAtom(enemyBattlePokemonHPAtom);
     const [droppedCards, setDroppedCards] = useAtom(droppedCardsAtom);
 
+    // 대기 영역 포켓몬 상태 관리
     const [myWaitingEnergy, setMyWaitingEnergy] = useAtom(myWaitingPokemonEnergyAtom);
     const [myWaitingHP, setMyWaitingHP] = useAtom(myWaitingPokemonHPAtom);
     const [enemyWaitingEnergy, setEnemyWaitingEnergy] = useAtom(enemyWaitingPokemonEnergyAtom);
     const [enemyWaitingHP, setEnemyWaitingHP] = useAtom(enemyWaitingPokemonHPAtom);
     
+    // 게임 점수 관리
     const [myGameScore, setMyGameScore] = useAtom(myGameScoreAtom);
     const [enemyGameScore, setEnemyGameScore] = useAtom(enemyGameScoreAtom);
     
+    // 공격 관련 상태 관리
     const [isReadyToAttack, setIsReadyToAttack] = useState(false);
     const [attackingCard, setAttackingCard] = useState<string | null>(null);
     const [gameOver, setGameOver] = useState(false);
     const [isMyAttack, setIsMyAttack] = useState(false);
     const [isEnemyAttack, setIsEnemyAttack] = useState(false);
 
-    useEffect(() => {
-        if (myGameScore >= 3) {
-            setGameOver(true);
-            alert("You win! You've defeated 3 Pokémon!");
-        } else if (enemyGameScore >= 3) {
-            setGameOver(true);
-            alert("You lose! Your opponent has defeated 3 of your Pokémon!");
-        }
-    }, [myGameScore, enemyGameScore]);
+    // 게임 종료 체크 (주석 처리됨)
+    // useEffect(() => {
+    //     if (myGameScore >= 3) {
+    //         setGameOver(true);
+    //         alert("You win! You've defeated 3 Pokémon!");
+    //     } else if (enemyGameScore >= 3) {
+    //         setGameOver(true);
+    //         alert("You lose! Your opponent has defeated 3 of your Pokémon!");
+    //     }
+    // }, [myGameScore, enemyGameScore]);
 
-    const findFirstBenchPokemon = (prefix: string): number | null => {
+    /**
+     * 첫 번째 벤치 포켓몬 찾기
+     * 지정된 플레이어의 대기 영역에서 첫 번째로 발견되는 포켓몬의 인덱스를 반환합니다.
+     */
+    const findFirstBenchPokemon = (prefix: 'my' | 'enemy'): number | null => {
         for (let i = 1; i <= 3; i++) {
             if (droppedCards[`${prefix}_waiting_${i}`]) {
                 return i;
@@ -62,7 +75,11 @@ export const useFieldCards = ({
         return null;
     };
 
-    const shiftBenchPokemon = (updatedCards: Record<string, string>, prefix: string, startIndex: number) => {
+    /**
+     * 벤치 포켓몬 위치 이동
+     * 포켓몬이 전투 영역으로 이동한 후 벤치의 포켓몬들을 앞으로 당깁니다.
+     */
+    const shiftBenchPokemon = (updatedCards: Record<string, string>, prefix: 'my' | 'enemy', startIndex: number) => {
         for (let i = startIndex; i < 3; i++) {
             if (updatedCards[`${prefix}_waiting_${i+1}`]) {
                 updatedCards[`${prefix}_waiting_${i}`] = updatedCards[`${prefix}_waiting_${i+1}`];
@@ -75,53 +92,73 @@ export const useFieldCards = ({
         return updatedCards;
     };
 
-    const handleAttack = (skill: any) => {
+    /**
+     * 스킬 사용 처리
+     * 선택한 스킬을 사용하여 상대 포켓몬을 공격합니다.
+     */
+    const useSkill = (skill: any) => {
         const currentEnergy = attackingCard === 'my_battle' 
             ? myBattlePokemonEnergy 
             : enemyBattlePokemonEnergy;
         
+        // 에너지 체크
         if (currentEnergy < skill.energy) {
-            alert("Not enough energy to use this skill!");
+            alert("스킬 사용에 필요한 에너지가 부족합니다!");
             setIsReadyToAttack(false);
             return;
         }
         
+        // 공격 애니메이션 상태 설정
         setIsReadyToAttack(false);
         setIsMyAttack(myTurn);
         setIsEnemyAttack(!myTurn);
         
+        // 공격 로직 처리 (애니메이션 시간 후)
         setTimeout(() => {
-            processAttackLogic(skill);
+            processAttackDamage(skill);
         }, 3000);
     };
 
-    const processAttackLogic = (skill: any) => {
+    /**
+     * 공격 데미지 처리 및 결과 반영
+     * 스킬 데미지를 적용하고 포켓몬 교체, 점수 계산 등을 처리합니다.
+     */
+    const processAttackDamage = (skill: any) => {
+        // 내 포켓몬이 공격하는 경우
         if (attackingCard === 'my_battle') {
+            // 적 포켓몬에 데미지 적용
             const newEnemyHP = enemyBattlePokemonHP - skill.damage;
             setEnemyBattlePokemonHP(newEnemyHP);
             
+            // 적 포켓몬이 쓰러진 경우
             if (newEnemyHP <= 0) {
                 setMyGameScore(prev => prev + 1);
                 const benchIndex = findFirstBenchPokemon('enemy');
                 
+                // 벤치에 교체할 포켓몬이 있는 경우
                 if (benchIndex !== null) {
+                    // 벤치 포켓몬을 전투 영역으로 이동
                     const updatedDroppedCards = {...droppedCards};
                     const benchPokemon = updatedDroppedCards[`enemy_waiting_${benchIndex}`];
                     const benchHP = enemyWaitingHP[benchIndex - 1];
                     const benchEnergy = enemyWaitingEnergy[benchIndex - 1];
                     
-                    updatedDroppedCards['y_battle'] = benchPokemon;
+                    updatedDroppedCards['enemy_battle'] = benchPokemon;
                     delete updatedDroppedCards[`enemy_waiting_${benchIndex}`];
                     
+                    // 벤치 포켓몬 위치 조정
                     const finalCards = shiftBenchPokemon(updatedDroppedCards, 'enemy', benchIndex);
                     setDroppedCards(finalCards);
                     
+                    // 새 전투 포켓몬 상태 설정
                     setEnemyBattlePokemonHP(benchHP);
                     setEnemyBattlePokemonEnergy(benchEnergy);
                     
+                    // 대기 영역 상태 업데이트
                     const newWaitingHP = [...enemyWaitingHP];
                     const newWaitingEnergy = [...enemyWaitingEnergy];
                     
+                    // 대기 영역 포켓몬 위치 조정
                     for (let i = benchIndex - 1; i < 2; i++) {
                         if (i + 1 < 3) {
                             newWaitingHP[i] = newWaitingHP[i + 1];
@@ -134,30 +171,39 @@ export const useFieldCards = ({
                     
                     setEnemyWaitingHP(newWaitingHP);
                     setEnemyWaitingEnergy(newWaitingEnergy);
-                } else {
-                    delete droppedCards['y_battle'];
+                } 
+                // 교체할 포켓몬이 없는 경우
+                else {
+                    delete droppedCards['enemy_battle'];
                     setDroppedCards({...droppedCards});
                     
                     const newScore = myGameScore + 1;
                     setMyGameScore(newScore);
                     
+                    // 게임 종료 체크
                     if (newScore >= 3) {
                         setGameOver(true);
-                        alert("You win! You've defeated 3 Pokémon!");
+                        alert("승리! 3마리의 포켓몬을 물리쳤습니다!");
                     } else {
-                        alert("Enemy has no more Pokémon in this position!");
+                        alert("상대방의 교체할 포켓몬이 없습니다!");
                     }
                 }
             }
-        } else {
+        } 
+        // 적 포켓몬이 공격하는 경우
+        else {
+            // 내 포켓몬에 데미지 적용
             const newMyHP = myBattlePokemonHP - skill.damage;
             setMyBattlePokemonHP(newMyHP);
             
+            // 내 포켓몬이 쓰러진 경우
             if (newMyHP <= 0) {
                 setEnemyGameScore(prev => prev + 1);
                 const benchIndex = findFirstBenchPokemon('my');
                 
+                // 벤치에 교체할 포켓몬이 있는 경우
                 if (benchIndex !== null) {
+                    // 벤치 포켓몬을 전투 영역으로 이동
                     const updatedDroppedCards = {...droppedCards};
                     const benchPokemon = updatedDroppedCards[`my_waiting_${benchIndex}`];
                     const benchHP = myWaitingHP[benchIndex - 1];
@@ -166,15 +212,19 @@ export const useFieldCards = ({
                     updatedDroppedCards['my_battle'] = benchPokemon;
                     delete updatedDroppedCards[`my_waiting_${benchIndex}`];
                     
+                    // 벤치 포켓몬 위치 조정
                     const finalCards = shiftBenchPokemon(updatedDroppedCards, 'my', benchIndex);
                     setDroppedCards(finalCards);
                     
+                    // 새 전투 포켓몬 상태 설정
                     setMyBattlePokemonHP(benchHP);
                     setMyBattlePokemonEnergy(benchEnergy);
                     
+                    // 대기 영역 상태 업데이트
                     const newWaitingHP = [...myWaitingHP];
                     const newWaitingEnergy = [...myWaitingEnergy];
                     
+                    // 대기 영역 포켓몬 위치 조정
                     for (let i = benchIndex - 1; i < 2; i++) {
                         if (i + 1 < 3) {
                             newWaitingHP[i] = newWaitingHP[i + 1];
@@ -187,66 +237,83 @@ export const useFieldCards = ({
                     
                     setMyWaitingHP(newWaitingHP);
                     setMyWaitingEnergy(newWaitingEnergy);
-                } else {
+                } 
+                // 교체할 포켓몬이 없는 경우
+                else {
                     delete droppedCards['my_battle'];
                     setDroppedCards({...droppedCards});
                     
                     const newScore = enemyGameScore + 1;
                     setEnemyGameScore(newScore);
                     
+                    // 게임 종료 체크
                     if (newScore >= 3) {
                         setGameOver(true);
-                        alert("You lose! Your opponent has defeated 3 of your Pokémon!");
+                        alert("패배! 상대방이 3마리의 포켓몬을 물리쳤습니다!");
                     } else {
-                        alert("You have no more Pokémon in this position!");
+                        alert("교체할 포켓몬이 없습니다!");
                     }
                 }
             }
         }
         
+        // 공격 상태 초기화 및 턴 종료
         setIsMyAttack(false);
         setIsEnemyAttack(false);
         setAttackingCard(null);
         onEndTurn();
     };
 
-    const handleRetreat = () => {
+    /**
+     * 포켓몬 후퇴 처리
+     * 현재 전투 중인 포켓몬을 벤치의 포켓몬과 교체합니다.
+     */
+    const swapWithBenchPokemon = () => {
         const currentEnergy = attackingCard === 'my_battle' 
             ? myBattlePokemonEnergy 
             : enemyBattlePokemonEnergy;
         
+        // 에너지 체크
         if (currentEnergy < 1) {
-            alert("Not enough energy to retreat! You need at least 1 energy.");
+            alert("후퇴에 필요한 에너지가 부족합니다! 최소 1 에너지가 필요합니다.");
             setIsReadyToAttack(false);
             return;
         }
         
+        // 교체할 벤치 포켓몬 찾기
         const prefix = attackingCard === 'my_battle' ? 'my' : 'enemy';
         const benchIndex = findFirstBenchPokemon(prefix);
         
+        // 교체할 포켓몬이 없는 경우
         if (benchIndex === null) {
-            alert("No Pokémon on bench to swap with!");
+            alert("벤치에 교체할 포켓몬이 없습니다!");
             setIsReadyToAttack(false);
             return;
         }
         
         const updatedDroppedCards = {...droppedCards};
         
+        // 내 포켓몬 교체
         if (attackingCard === 'my_battle') {
+            // 현재 전투 포켓몬 정보 저장
             const battlePokemon = updatedDroppedCards['my_battle'];
             const battleHP = myBattlePokemonHP;
-            const battleEnergy = myBattlePokemonEnergy - 1;
+            const battleEnergy = myBattlePokemonEnergy - 1; // 후퇴 비용 차감
             
+            // 벤치 포켓몬 정보 저장
             const benchPokemon = updatedDroppedCards[`my_waiting_${benchIndex}`];
             const benchHP = myWaitingHP[benchIndex - 1];
             const benchEnergy = myWaitingEnergy[benchIndex - 1];
             
+            // 포켓몬 위치 교체
             updatedDroppedCards['my_battle'] = benchPokemon;
             updatedDroppedCards[`my_waiting_${benchIndex}`] = battlePokemon;
             
+            // 전투 영역 상태 업데이트
             setMyBattlePokemonHP(benchHP);
             setMyBattlePokemonEnergy(benchEnergy);
             
+            // 대기 영역 상태 업데이트
             const newWaitingHP = [...myWaitingHP];
             newWaitingHP[benchIndex - 1] = battleHP;
             setMyWaitingHP(newWaitingHP);
@@ -254,21 +321,28 @@ export const useFieldCards = ({
             const newWaitingEnergy = [...myWaitingEnergy];
             newWaitingEnergy[benchIndex - 1] = battleEnergy;
             setMyWaitingEnergy(newWaitingEnergy);
-        } else {
-            const battlePokemon = updatedDroppedCards['y_battle'];
+        } 
+        // 적 포켓몬 교체
+        else {
+            // 현재 전투 포켓몬 정보 저장
+            const battlePokemon = updatedDroppedCards['enemy_battle'];
             const battleHP = enemyBattlePokemonHP;
-            const battleEnergy = enemyBattlePokemonEnergy - 1;
+            const battleEnergy = enemyBattlePokemonEnergy - 1; // 후퇴 비용 차감
             
+            // 벤치 포켓몬 정보 저장
             const benchPokemon = updatedDroppedCards[`enemy_waiting_${benchIndex}`];
             const benchHP = enemyWaitingHP[benchIndex - 1];
             const benchEnergy = enemyWaitingEnergy[benchIndex - 1];
             
-            updatedDroppedCards['y_battle'] = benchPokemon;
+            // 포켓몬 위치 교체
+            updatedDroppedCards['enemy_battle'] = benchPokemon;
             updatedDroppedCards[`enemy_waiting_${benchIndex}`] = battlePokemon;
             
+            // 전투 영역 상태 업데이트
             setEnemyBattlePokemonHP(benchHP);
             setEnemyBattlePokemonEnergy(benchEnergy);
             
+            // 대기 영역 상태 업데이트
             const newWaitingHP = [...enemyWaitingHP];
             newWaitingHP[benchIndex - 1] = battleHP;
             setEnemyWaitingHP(newWaitingHP);
@@ -278,6 +352,7 @@ export const useFieldCards = ({
             setEnemyWaitingEnergy(newWaitingEnergy);
         }
         
+        // 카드 상태 업데이트 및 턴 종료
         setDroppedCards(updatedDroppedCards);
         setIsReadyToAttack(false);
         onEndTurn();
@@ -291,8 +366,8 @@ export const useFieldCards = ({
         gameOver,
         isMyAttack,
         isEnemyAttack,
-        handleAttack,
-        handleRetreat,
+        handleAttack: useSkill,           // 함수명 변경: handleAttack -> useSkill
+        handleRetreat: swapWithBenchPokemon, // 함수명 변경: handleRetreat -> swapWithBenchPokemon
         myBattlePokemonEnergy,
         myBattlePokemonHP,
         enemyBattlePokemonEnergy,
