@@ -51,6 +51,10 @@ export const useFieldCards = ({
     const [isMyAttack, setIsMyAttack] = useState(false);
     const [isEnemyAttack, setIsEnemyAttack] = useState(false);
 
+    // 점수 애니메이션 상태 관리
+    const [showScoreAnimation, setShowScoreAnimation] = useState(false);
+    const [scoreAnimationType, setScoreAnimationType] = useState<'my' | 'enemy' | null>(null);
+
     // 게임 종료 체크 (주석 처리됨)
     // useEffect(() => {
     //     if (myGameScore >= 3) {
@@ -132,62 +136,17 @@ export const useFieldCards = ({
             
             // 적 포켓몬이 쓰러진 경우
             if (newEnemyHP <= 0) {
-                setMyGameScore(prev => prev + 1);
-                const benchIndex = findFirstBenchPokemon('enemy');
+                // 공격 상태 즉시 초기화 (트로피컬 해머가 다시 나타나지 않도록)
+                setIsMyAttack(false);
+                setIsEnemyAttack(false);
+                setAttackingCard(null);
                 
-                // 벤치에 교체할 포켓몬이 있는 경우
-                if (benchIndex !== null) {
-                    // 벤치 포켓몬을 전투 영역으로 이동
-                    const updatedDroppedCards = {...droppedCards};
-                    const benchPokemon = updatedDroppedCards[`enemy_waiting_${benchIndex}`];
-                    const benchHP = enemyWaitingHP[benchIndex - 1];
-                    const benchEnergy = enemyWaitingEnergy[benchIndex - 1];
-                    
-                    updatedDroppedCards['enemy_battle'] = benchPokemon;
-                    delete updatedDroppedCards[`enemy_waiting_${benchIndex}`];
-                    
-                    // 벤치 포켓몬 위치 조정
-                    const finalCards = shiftBenchPokemon(updatedDroppedCards, 'enemy', benchIndex);
-                    setDroppedCards(finalCards);
-                    
-                    // 새 전투 포켓몬 상태 설정
-                    setEnemyBattlePokemonHP(benchHP);
-                    setEnemyBattlePokemonEnergy(benchEnergy);
-                    
-                    // 대기 영역 상태 업데이트
-                    const newWaitingHP = [...enemyWaitingHP];
-                    const newWaitingEnergy = [...enemyWaitingEnergy];
-                    
-                    // 대기 영역 포켓몬 위치 조정
-                    for (let i = benchIndex - 1; i < 2; i++) {
-                        if (i + 1 < 3) {
-                            newWaitingHP[i] = newWaitingHP[i + 1];
-                            newWaitingEnergy[i] = newWaitingEnergy[i + 1];
-                        } else {
-                            newWaitingHP[i] = 0;
-                            newWaitingEnergy[i] = 0;
-                        }
-                    }
-                    
-                    setEnemyWaitingHP(newWaitingHP);
-                    setEnemyWaitingEnergy(newWaitingEnergy);
-                } 
-                // 교체할 포켓몬이 없는 경우
-                else {
-                    delete droppedCards['enemy_battle'];
-                    setDroppedCards({...droppedCards});
-                    
-                    const newScore = myGameScore + 1;
-                    setMyGameScore(newScore);
-                    
-                    // 게임 종료 체크
-                    if (newScore >= 3) {
-                        setGameOver(true);
-                        alert("승리! 3마리의 포켓몬을 물리쳤습니다!");
-                    } else {
-                        alert("상대방의 교체할 포켓몬이 없습니다!");
-                    }
-                }
+                // 점수 애니메이션 시작
+                setScoreAnimationType('my');
+                setShowScoreAnimation(true);
+                
+                // 애니메이션 완료 후 로직 실행을 위해 여기서 종료
+                return;
             }
         } 
         // 적 포켓몬이 공격하는 경우
@@ -198,65 +157,171 @@ export const useFieldCards = ({
             
             // 내 포켓몬이 쓰러진 경우
             if (newMyHP <= 0) {
-                setEnemyGameScore(prev => prev + 1);
-                const benchIndex = findFirstBenchPokemon('my');
+                // 공격 상태 즉시 초기화 (트로피컬 해머가 다시 나타나지 않도록)
+                setIsMyAttack(false);
+                setIsEnemyAttack(false);
+                setAttackingCard(null);
                 
-                // 벤치에 교체할 포켓몬이 있는 경우
-                if (benchIndex !== null) {
-                    // 벤치 포켓몬을 전투 영역으로 이동
-                    const updatedDroppedCards = {...droppedCards};
-                    const benchPokemon = updatedDroppedCards[`my_waiting_${benchIndex}`];
-                    const benchHP = myWaitingHP[benchIndex - 1];
-                    const benchEnergy = myWaitingEnergy[benchIndex - 1];
-                    
-                    updatedDroppedCards['my_battle'] = benchPokemon;
-                    delete updatedDroppedCards[`my_waiting_${benchIndex}`];
-                    
-                    // 벤치 포켓몬 위치 조정
-                    const finalCards = shiftBenchPokemon(updatedDroppedCards, 'my', benchIndex);
-                    setDroppedCards(finalCards);
-                    
-                    // 새 전투 포켓몬 상태 설정
-                    setMyBattlePokemonHP(benchHP);
-                    setMyBattlePokemonEnergy(benchEnergy);
-                    
-                    // 대기 영역 상태 업데이트
-                    const newWaitingHP = [...myWaitingHP];
-                    const newWaitingEnergy = [...myWaitingEnergy];
-                    
-                    // 대기 영역 포켓몬 위치 조정
-                    for (let i = benchIndex - 1; i < 2; i++) {
-                        if (i + 1 < 3) {
-                            newWaitingHP[i] = newWaitingHP[i + 1];
-                            newWaitingEnergy[i] = newWaitingEnergy[i + 1];
-                        } else {
-                            newWaitingHP[i] = 0;
-                            newWaitingEnergy[i] = 0;
-                        }
-                    }
-                    
-                    setMyWaitingHP(newWaitingHP);
-                    setMyWaitingEnergy(newWaitingEnergy);
-                } 
-                // 교체할 포켓몬이 없는 경우
-                else {
-                    delete droppedCards['my_battle'];
-                    setDroppedCards({...droppedCards});
-                    
-                    const newScore = enemyGameScore + 1;
-                    setEnemyGameScore(newScore);
-                    
-                    // 게임 종료 체크
-                    if (newScore >= 3) {
-                        setGameOver(true);
-                        alert("패배! 상대방이 3마리의 포켓몬을 물리쳤습니다!");
-                    } else {
-                        alert("교체할 포켓몬이 없습니다!");
-                    }
-                }
+                // 점수 애니메이션 시작
+                setScoreAnimationType('enemy');
+                setShowScoreAnimation(true);
+                
+                // 애니메이션 완료 후 로직 실행을 위해 여기서 종료
+                return;
             }
         }
         
+        // 포켓몬이 죽지 않은 경우에만 턴 종료
+        finishTurn();
+    };
+
+    /**
+     * 점수 애니메이션 완료 후 실행되는 함수
+     */
+    const handleScoreAnimationComplete = () => {
+        setShowScoreAnimation(false);
+        setScoreAnimationType(null);
+        
+        // 포켓몬 사망 처리 로직 실행
+        if (scoreAnimationType === 'my') {
+            handleMyPokemonKill();
+        } else if (scoreAnimationType === 'enemy') {
+            handleEnemyPokemonKill();
+        }
+    };
+
+    /**
+     * 내 포켓몬이 적 포켓몬을 죽였을 때의 처리
+     */
+    const handleMyPokemonKill = () => {
+        setMyGameScore(prev => prev + 1);
+        const benchIndex = findFirstBenchPokemon('enemy');
+        
+        // 벤치에 교체할 포켓몬이 있는 경우
+        if (benchIndex !== null) {
+            // 벤치 포켓몬을 전투 영역으로 이동
+            const updatedDroppedCards = {...droppedCards};
+            const benchPokemon = updatedDroppedCards[`enemy_waiting_${benchIndex}`];
+            const benchHP = enemyWaitingHP[benchIndex - 1];
+            const benchEnergy = enemyWaitingEnergy[benchIndex - 1];
+            
+            updatedDroppedCards['enemy_battle'] = benchPokemon;
+            delete updatedDroppedCards[`enemy_waiting_${benchIndex}`];
+            
+            // 벤치 포켓몬 위치 조정
+            const finalCards = shiftBenchPokemon(updatedDroppedCards, 'enemy', benchIndex);
+            setDroppedCards(finalCards);
+            
+            // 새 전투 포켓몬 상태 설정
+            setEnemyBattlePokemonHP(benchHP);
+            setEnemyBattlePokemonEnergy(benchEnergy);
+            
+            // 대기 영역 상태 업데이트
+            const newWaitingHP = [...enemyWaitingHP];
+            const newWaitingEnergy = [...enemyWaitingEnergy];
+            
+            // 대기 영역 포켓몬 위치 조정
+            for (let i = benchIndex - 1; i < 2; i++) {
+                if (i + 1 < 3) {
+                    newWaitingHP[i] = newWaitingHP[i + 1];
+                    newWaitingEnergy[i] = newWaitingEnergy[i + 1];
+                } else {
+                    newWaitingHP[i] = 0;
+                    newWaitingEnergy[i] = 0;
+                }
+            }
+            
+            setEnemyWaitingHP(newWaitingHP);
+            setEnemyWaitingEnergy(newWaitingEnergy);
+        } 
+        // 교체할 포켓몬이 없는 경우
+        else {
+            delete droppedCards['enemy_battle'];
+            setDroppedCards({...droppedCards});
+            
+            const newScore = myGameScore + 1;
+            setMyGameScore(newScore);
+            
+            // 게임 종료 체크
+            if (newScore >= 3) {
+                setGameOver(true);
+                alert("승리! 3마리의 포켓몬을 물리쳤습니다!");
+            } else {
+                alert("상대방의 교체할 포켓몬이 없습니다!");
+            }
+        }
+        
+        onEndTurn();
+    };
+
+    /**
+     * 적 포켓몬이 내 포켓몬을 죽였을 때의 처리
+     */
+    const handleEnemyPokemonKill = () => {
+        setEnemyGameScore(prev => prev + 1);
+        const benchIndex = findFirstBenchPokemon('my');
+        
+        // 벤치에 교체할 포켓몬이 있는 경우
+        if (benchIndex !== null) {
+            // 벤치 포켓몬을 전투 영역으로 이동
+            const updatedDroppedCards = {...droppedCards};
+            const benchPokemon = updatedDroppedCards[`my_waiting_${benchIndex}`];
+            const benchHP = myWaitingHP[benchIndex - 1];
+            const benchEnergy = myWaitingEnergy[benchIndex - 1];
+            
+            updatedDroppedCards['my_battle'] = benchPokemon;
+            delete updatedDroppedCards[`my_waiting_${benchIndex}`];
+            
+            // 벤치 포켓몬 위치 조정
+            const finalCards = shiftBenchPokemon(updatedDroppedCards, 'my', benchIndex);
+            setDroppedCards(finalCards);
+            
+            // 새 전투 포켓몬 상태 설정
+            setMyBattlePokemonHP(benchHP);
+            setMyBattlePokemonEnergy(benchEnergy);
+            
+            // 대기 영역 상태 업데이트
+            const newWaitingHP = [...myWaitingHP];
+            const newWaitingEnergy = [...myWaitingEnergy];
+            
+            // 대기 영역 포켓몬 위치 조정
+            for (let i = benchIndex - 1; i < 2; i++) {
+                if (i + 1 < 3) {
+                    newWaitingHP[i] = newWaitingHP[i + 1];
+                    newWaitingEnergy[i] = newWaitingEnergy[i + 1];
+                } else {
+                    newWaitingHP[i] = 0;
+                    newWaitingEnergy[i] = 0;
+                }
+            }
+            
+            setMyWaitingHP(newWaitingHP);
+            setMyWaitingEnergy(newWaitingEnergy);
+        } 
+        // 교체할 포켓몬이 없는 경우
+        else {
+            delete droppedCards['my_battle'];
+            setDroppedCards({...droppedCards});
+            
+            const newScore = enemyGameScore + 1;
+            setEnemyGameScore(newScore);
+            
+            // 게임 종료 체크
+            if (newScore >= 3) {
+                setGameOver(true);
+                alert("패배! 상대방이 3마리의 포켓몬을 물리쳤습니다!");
+            } else {
+                alert("교체할 포켓몬이 없습니다!");
+            }
+        }
+        
+        onEndTurn();
+    };
+
+    /**
+     * 턴 종료 처리
+     */
+    const finishTurn = () => {
         // 공격 상태 초기화 및 턴 종료
         setIsMyAttack(false);
         setIsEnemyAttack(false);
@@ -373,6 +438,10 @@ export const useFieldCards = ({
         enemyBattlePokemonEnergy,
         enemyBattlePokemonHP,
         myGameScore,
-        enemyGameScore
+        enemyGameScore,
+        // 점수 애니메이션 관련 상태 추가
+        showScoreAnimation,
+        scoreAnimationType,
+        handleScoreAnimationComplete
     };
 };

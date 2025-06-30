@@ -10,6 +10,7 @@ import { DeckArea } from "../Area/DeckArea";
 import { useFieldCards } from "../../hooks/useFieldCards";
 import SlidingBanner from "../SlidingBanner";
 import { useCardManagement } from "../../hooks/useCardManagement";
+import { ScoreAnimation } from "../ScoreAnimation";
 
 
 export const FieldCards = () => {
@@ -32,18 +33,24 @@ export const FieldCards = () => {
         enemyBattlePokemonEnergy,
         enemyBattlePokemonHP,
         myGameScore,
-        enemyGameScore
+        enemyGameScore,
+        showScoreAnimation,
+        scoreAnimationType,
+        handleScoreAnimationComplete
     } = useFieldCards({
         onEndTurn
     });
 
     const [showAttackEffect, setShowAttackEffect] = useState(false);
     const [attackPosition, setAttackPosition] = useState<'opponent' | 'player'>('opponent');
+    const [showSlidingBanner, setShowSlidingBanner] = useState(false);
 
     useEffect(() => {
         if (isMyAttack || isEnemyAttack) {
             // 공격 위치 설정 - 내 턴일 때는 상대방 위치에, 상대방 턴일 때는 내 위치에
             setAttackPosition(myTurn ? 'opponent' : 'player');
+            // 슬라이딩 배너 표시
+            setShowSlidingBanner(true);
             // 1.75초 후에 이펙트 표시
             const timer = setTimeout(() => {
                 setShowAttackEffect(true);
@@ -52,10 +59,20 @@ export const FieldCards = () => {
                 clearTimeout(timer);
                 setShowAttackEffect(false);
             };
+        } else {
+            // 공격이 끝나면 슬라이딩 배너 숨기기
+            setShowSlidingBanner(false);
         }
     }, [isMyAttack, isEnemyAttack, myTurn]);
     return (
-        <div className={`z-50 flex flex-row w-full justify-between items-center`}>
+        <div className={`z-50 flex flex-row w-full justify-between items-center ${showScoreAnimation ? 'pointer-events-none' : ''}`}>
+            {/* 점수 애니메이션 */}
+            <ScoreAnimation
+                isVisible={showScoreAnimation}
+                isMyScore={scoreAnimationType === 'my'}
+                onAnimationComplete={handleScoreAnimationComplete}
+            />
+            
             {gameOver && (
                 <div className="absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
                     <div className="bg-white p-8 rounded-lg text-center">
@@ -73,7 +90,7 @@ export const FieldCards = () => {
                 </div>
             )}
             {
-                (isMyAttack || isEnemyAttack) &&       
+                showSlidingBanner &&       
                 <SlidingBanner
                     title="트로피컬 해머"
                     subtitle="알로라 나시"

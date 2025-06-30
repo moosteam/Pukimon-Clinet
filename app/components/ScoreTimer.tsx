@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { FiClock } from 'react-icons/fi';
 import { useAtomValue } from 'jotai';
-import { myTurnAtom } from '../atom';
+import { myTurnAtom, myGameScoreAtom, enemyGameScoreAtom } from '../atom';
 
 interface ScoreTimerProps {
   totalMinutes?: number;
   maxDeaths?: number;
-  /** 현재 사망 포켓몬 수를 부모 컴포넌트에서 전달하세요 */
-  deaths?: number;
   /** true면 오른쪽 상단, false면 왼쪽 하단에 배치 */
   isPrimary?: boolean;
 }
@@ -15,12 +13,15 @@ interface ScoreTimerProps {
 export const ScoreTimer: React.FC<ScoreTimerProps> = ({
   totalMinutes = 20,
   maxDeaths = 3,
-  deaths = 0,
   isPrimary = false,
 }) => {
   // 남은 시간(초)
   const [secondsLeft, setSecondsLeft] = useState(totalMinutes * 60);
   const myTurn = useAtomValue(myTurnAtom);
+  
+  // ATOM에서 점수 가져오기
+  const myGameScore = useAtomValue(myGameScoreAtom);
+  const enemyGameScore = useAtomValue(enemyGameScoreAtom);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -33,8 +34,12 @@ export const ScoreTimer: React.FC<ScoreTimerProps> = ({
   const seconds = secondsLeft % 60;
   const formatted = `${minutes}:${seconds.toString().padStart(2, '0')}`;
 
-  const teamColor = myTurn !== isPrimary;
-  const teamName = myTurn !== isPrimary ? '레드팀' : '블루팀';
+  // 180도 뒤집힐 때 정보가 바뀌도록 수정
+  const teamColor = isPrimary ? myTurn : !myTurn;
+  const teamName = isPrimary ? (myTurn ? '레드팀' : '블루팀') : (!myTurn ? '레드팀' : '블루팀');
+  
+  // 현재 점수 결정 - 180도 뒤집힐 때 정보가 바뀌도록 수정
+  const currentDeaths = isPrimary ? enemyGameScore : myGameScore;
 
   const renderElements = () => {
     const elements = [
@@ -70,12 +75,12 @@ export const ScoreTimer: React.FC<ScoreTimerProps> = ({
           <div
             key={i}
             className={`w-6 h-6 rounded-full border-2 transition-all duration-300 m-1 ${
-              i < deaths
+              i < currentDeaths
                 ? `bg-gradient-to-br ${teamColor ? 'from-red-500 to-red-600 border-red-400' : 'from-blue-500 to-blue-600 border-blue-400'}`
                 : 'bg-gradient-to-br from-gray-800 to-gray-900 border-gray-700'
             }`}
             style={{
-              boxShadow: i < deaths 
+              boxShadow: i < currentDeaths 
                 ? teamColor 
                   ? '0 0 8px rgba(239, 68, 68, 0.5)'
                   : '0 0 8px rgba(59, 130, 246, 0.5)'
