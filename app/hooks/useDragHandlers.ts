@@ -191,6 +191,13 @@ export function useDragHandlers() {
       return;
     }
     
+    // 진화 사운드 이펙트 재생
+    const evolutionSound = new Audio('/soundeffect/evolution.mp3');
+    evolutionSound.volume = 0.5;
+    evolutionSound.play().catch(error => {
+      console.log('진화 사운드 재생 실패:', error);
+    });
+    
     // 카드 업데이트
     setDroppedCards({...droppedCards, [dropzoneId]: cardName });
     
@@ -244,6 +251,13 @@ export function useDragHandlers() {
    * 새 포켓몬을 전투 영역에 배치합니다.
    */
   function placePokemonInBattleArea(dropzoneId: string, cardName: string, index: number) {
+    // Card-Draw 사운드 재생
+    const cardDrawSound = new Audio('/soundeffect/Card-Drow.mp3');
+    cardDrawSound.volume = 1;
+    cardDrawSound.play().catch(error => {
+      console.log('Card-Draw 사운드 재생 실패:', error);
+    });
+    
     setDroppedCards(({...droppedCards, [dropzoneId]: cardName }));
     
     // 포켓몬 배치 턴 기록
@@ -271,6 +285,13 @@ export function useDragHandlers() {
     // 전투 영역에 포켓몬이 있는지 확인
     const battleArea = dropzoneId.startsWith('enemy_') ? 'enemy_battle' : 'my_battle';
     if (droppedCards[battleArea]) {
+      // Card-Draw 사운드 재생
+      const cardDrawSound = new Audio('/soundeffect/Card-Drow.mp3');
+      cardDrawSound.volume = 0.8;
+      cardDrawSound.play().catch(error => {
+        console.log('Card-Draw 사운드 재생 실패:', error);
+      });
+      
       setDroppedCards({ ...droppedCards, [dropzoneId]: cardName });
       
       // 포켓몬 배치 턴 기록

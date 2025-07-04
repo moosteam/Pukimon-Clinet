@@ -352,7 +352,20 @@ img {
   height: 100%;
   pointer-events: none;
   z-index: 1000;
+  top: 12rem;
+  left: 0;
 }
+
+.player {
+  top: 12rem;
+  left: 0;
+}
+
+.opponent {
+  top: 0rem;
+  left: 0;
+}
+
 
 .attack-effect video {
   width: 100%;
@@ -360,15 +373,6 @@ img {
   object-fit: cover;
 }
 
-.attack-effect.opponent {
-  top: 0;
-  left: 0;
-}
-
-.attack-effect.player {
-  bottom: 0;
-  right: 0;
-}
 
 /* 파일 끝에 추가 */
 .banner-reverse {

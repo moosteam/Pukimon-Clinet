@@ -45,6 +45,7 @@ export const FieldCards = () => {
     const [showAttackEffect, setShowAttackEffect] = useState(false);
     const [attackPosition, setAttackPosition] = useState<'opponent' | 'player'>('opponent');
     const [showSlidingBanner, setShowSlidingBanner] = useState(false);
+    const [currentSkill, setCurrentSkill] = useState<{ name: string; damage: number; energy: number } | null>(null);
 
     useEffect(() => {
         if (isMyAttack || isEnemyAttack) {
@@ -52,6 +53,14 @@ export const FieldCards = () => {
             setAttackPosition(myTurn ? 'opponent' : 'player');
             // 슬라이딩 배너 표시
             setShowSlidingBanner(true);
+            
+            // Charging sound 재생
+            const chargingSound = new Audio('/soundeffect/Charging.mp3');
+            chargingSound.volume = 1;
+            chargingSound.play().catch(error => {
+                console.log('Charging 사운드 재생 실패:', error);
+            });
+            
             // 1.75초 후에 이펙트 표시
             const timer = setTimeout(() => {
                 setShowAttackEffect(true);
@@ -63,8 +72,22 @@ export const FieldCards = () => {
         } else {
             // 공격이 끝나면 슬라이딩 배너 숨기기
             setShowSlidingBanner(false);
+            setCurrentSkill(null);
         }
     }, [isMyAttack, isEnemyAttack, myTurn]);
+
+    // 현재 공격하는 포켓몬의 정보 가져오기
+    const getCurrentPokemonInfo = () => {
+        if (!attackingCard || !droppedCards[attackingCard]) return null;
+        return data[droppedCards[attackingCard]];
+    };
+
+    // 스킬 클릭 핸들러 수정
+    const handleSkillClick = (skill: { name: string; damage: number; energy: number }) => {
+        setCurrentSkill(skill);
+        handleAttack(skill);
+    };
+
     return (
         <div className={`z-50 flex flex-row w-full justify-between items-center ${showScoreAnimation ? 'pointer-events-none' : ''}`}>
             {/* 점수 애니메이션 */}
@@ -75,10 +98,10 @@ export const FieldCards = () => {
             />
            
             {
-                showSlidingBanner &&       
+                showSlidingBanner && currentSkill && getCurrentPokemonInfo() &&      
                 <SlidingBanner
-                    title="트로피컬 해머"
-                    subtitle="알로라 나시"
+                    title={currentSkill.name}
+                    subtitle={getCurrentPokemonInfo()!.name}
                     bgColor="bg-green-600"
                     textColor="text-white"
                     tiltAngle="-8deg"
@@ -91,8 +114,16 @@ export const FieldCards = () => {
                 <div className={`attack-effect ${attackPosition}`}>
                     <video
                         autoPlay
-                        muted={false}
+                        muted={true}
                         playsInline
+                        onLoadedMetadata={(e) => {
+                            // 공격 사운드 이펙트 재생
+                            const attackSound = new Audio('/soundeffect/Attack.mp4');
+                            attackSound.volume = 1;
+                            attackSound.play().catch(error => {
+                                console.log('공격 사운드 재생 실패:', error);
+                            });
+                        }}
                         onEnded={(e) => {
                             const video = e.target as HTMLVideoElement;
                             video.remove();
@@ -145,7 +176,7 @@ export const FieldCards = () => {
                                     background: 'linear-gradient(135deg, #ABABAB 0%, #EDEDED 50%, #ABABAB 100%)',
                                     boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3), 0 6px 20px rgba(0, 0, 0, 0.2)',
                                 }}
-                                onClick={() => handleAttack(skill)}
+                                onClick={() => handleSkillClick(skill)}
                             >
                                 <div className="flex flex-row justify-between items-center">
                                     <div className="flex items-center">

@@ -14,6 +14,8 @@ import { ScoreTimer } from "./components/ScoreTimer";
 import { useAnimationSequence } from "./hooks/useAnimationSequence";
 import { useCardManagement } from "./hooks/useCardManagement";
 import { useDragHandlers } from "./hooks/useDragHandlers";
+import { useBGM } from "./hooks/useBGM";
+import { BGMStartPrompt } from "./components/BGMStartPrompt";
 
 export default function App() {
   // Use animation hook
@@ -35,6 +37,9 @@ export default function App() {
   // Use drag handlers hook
   const { handleDragEnd } = useDragHandlers();
 
+  // Use BGM hook
+  const { currentBGM, hasUserInteracted } = useBGM();
+
   // Initial card draw effect
   useEffect(() => {
     // 10초 후에 실행될 타이머 설정
@@ -49,6 +54,8 @@ export default function App() {
   return (
     <DndContext onDragEnd={handleDragEnd}>
       <div className="w-full h-full bg-[#C2DAF6] relative overflow-hidden">
+        {/* BGM 시작 프롬프트 */}
+        <BGMStartPrompt hasUserInteracted={hasUserInteracted} />
         <ScoreTimer isPrimary/>
         <ScoreTimer/>
         {/* 플레이어 카드 */}
