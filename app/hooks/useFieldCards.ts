@@ -55,16 +55,20 @@ export const useFieldCards = ({
     const [showScoreAnimation, setShowScoreAnimation] = useState(false);
     const [scoreAnimationType, setScoreAnimationType] = useState<'my' | 'enemy' | null>(null);
 
-    // 게임 종료 체크 (주석 처리됨)
-    // useEffect(() => {
-    //     if (myGameScore >= 3) {
-    //         setGameOver(true);
-    //         alert("You win! You've defeated 3 Pokémon!");
-    //     } else if (enemyGameScore >= 3) {
-    //         setGameOver(true);
-    //         alert("You lose! Your opponent has defeated 3 of your Pokémon!");
-    //     }
-    // }, [myGameScore, enemyGameScore]);
+    // 게임 엔딩 상태 관리
+    const [showGameEnd, setShowGameEnd] = useState(false);
+
+    // 게임 종료 체크
+    useEffect(() => {
+        if (myGameScore >= 3 || enemyGameScore >= 3) {
+            setShowGameEnd(true);
+        }
+    }, [myGameScore, enemyGameScore]);
+
+    // showGameEnd가 true가 되면 gameOver도 true로 설정
+    useEffect(() => {
+        if (showGameEnd) setGameOver(true);
+    }, [showGameEnd]);
 
     /**
      * 첫 번째 벤치 포켓몬 찾기
@@ -242,13 +246,7 @@ export const useFieldCards = ({
             const newScore = myGameScore + 1;
             setMyGameScore(newScore);
             
-            // 게임 종료 체크
-            if (newScore >= 3) {
-                setGameOver(true);
-                alert("승리! 3마리의 포켓몬을 물리쳤습니다!");
-            } else {
-                alert("상대방의 교체할 포켓몬이 없습니다!");
-            }
+            // 게임 종료는 useEffect에서 처리됨
         }
         
         onEndTurn();
@@ -306,13 +304,7 @@ export const useFieldCards = ({
             const newScore = enemyGameScore + 1;
             setEnemyGameScore(newScore);
             
-            // 게임 종료 체크
-            if (newScore >= 3) {
-                setGameOver(true);
-                alert("패배! 상대방이 3마리의 포켓몬을 물리쳤습니다!");
-            } else {
-                alert("교체할 포켓몬이 없습니다!");
-            }
+            // 게임 종료는 useEffect에서 처리됨
         }
         
         onEndTurn();
@@ -442,6 +434,7 @@ export const useFieldCards = ({
         // 점수 애니메이션 관련 상태 추가
         showScoreAnimation,
         scoreAnimationType,
-        handleScoreAnimationComplete
+        handleScoreAnimationComplete,
+        showGameEnd
     };
 };

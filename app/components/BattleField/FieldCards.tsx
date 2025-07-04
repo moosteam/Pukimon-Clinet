@@ -11,6 +11,7 @@ import { useFieldCards } from "../../hooks/useFieldCards";
 import SlidingBanner from "../SlidingBanner";
 import { useCardManagement } from "../../hooks/useCardManagement";
 import { ScoreAnimation } from "../ScoreAnimation";
+import { GameEndOverlay } from "../GameEndOverlay";
 
 
 export const FieldCards = () => {
@@ -72,23 +73,7 @@ export const FieldCards = () => {
                 isMyScore={scoreAnimationType === 'my'}
                 onAnimationComplete={handleScoreAnimationComplete}
             />
-            
-            {gameOver && (
-                <div className="absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
-                    <div className="bg-white p-8 rounded-lg text-center">
-                        <h2 className="text-2xl font-bold mb-4">
-                            {myGameScore >= 3 ? "You Win!" : "You Lose!"}
-                        </h2>
-                        <p className="mb-4">Final Score: {myGameScore} - {enemyGameScore}</p>
-                        <button 
-                            className="bg-blue-500 text-white px-4 py-2 rounded"
-                            onClick={() => window.location.reload()}
-                        >
-                            Play Again
-                        </button>
-                    </div>
-                </div>
-            )}
+           
             {
                 showSlidingBanner &&       
                 <SlidingBanner
@@ -254,6 +239,13 @@ export const FieldCards = () => {
             
             {/* 나의 효과칸과 덱 */}
             <DeckArea isMyDeck={true} onEndTurn={onEndTurn} />
+            {/* GameEndOverlay: 게임 종료 시 오버레이 */}
+            {gameOver && (
+                <GameEndOverlay
+                    isVisible={true}
+                    onPlayAgain={() => window.location.reload()}
+                />
+            )}
         </div>
     );
 };
