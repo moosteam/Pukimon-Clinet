@@ -23,7 +23,7 @@ export const EnergyCard: React.FC<EnergyCardProps> = ({
                 <img
                     src={`ui/energy.png`}
                     alt="Energy Card"
-                    className="w-18 transition-all duration-500 cursor-grab hover:scale-110"
+                    className="z-[9999999999999999999999999999999999999999999999] w-18 transition-all duration-500 cursor-grab hover:scale-110"
                 />
             </div>
         </Draggable>

@@ -67,7 +67,12 @@ export function useDragHandlers() {
     if ((myTurn && !isMyCard) || (!myTurn && !isEnemyCard)) return;
 
     // 내 턴일 때는 상대방 영역에 카드를 배치할 수 없음
-    if (myTurn && (dropzoneId === 'enemy_battle' || dropzoneId.includes('enemy_waiting_'))) {
+    if (myTurn && (dropzoneId === 'enemy_battle' || dropzoneId.startsWith('enemy_waiting_'))) {
+      alert("내 턴에는 상대방 영역에 카드를 배치할 수 없습니다!");
+      return;
+    }
+
+    if (!myTurn && (dropzoneId === 'my_battle' || dropzoneId.startsWith('my_waiting_'))) {
       alert("내 턴에는 상대방 영역에 카드를 배치할 수 없습니다!");
       return;
     }

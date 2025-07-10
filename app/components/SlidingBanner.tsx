@@ -20,16 +20,16 @@ const SlidingBanner: React.FC<SlidingBannerProps> = ({
   isReverse = false
 }) => {
   return (
-    <div className={`absolute ${isReverse ? 'right-0' : 'left-0'} ${bottomOffset} w-[600px] overflow-hidden pointer-events-none z-100000000`}>
+    <div className={`absolute ${isReverse ? 'right-0' : 'left-0'} ${bottomOffset} w-[500px] overflow-hidden pointer-events-none z-100000000`}>
       <div
-        className={`bg-neutral-200 inline-block ${textColor} font-bold text-3xl transform w-[600px] ${isReverse ? 'banner-slide-reverse' : 'banner-slide'}`}
+        className={`bg-neutral-200 inline-block ${textColor} font-bold text-3xl transform w-[500px] ${isReverse ? 'banner-slide-reverse' : 'banner-slide'}`}
         style={{ '--tilt-angle': isReverse ? (tiltAngle.startsWith('-') ? tiltAngle.substring(1) : `-${tiltAngle}`) : tiltAngle } as React.CSSProperties}
       >
-        <span className={`inline-block transform w-[600px] ${bgColor} [skew-x:var(--tilt-angle)] p-2`}>
+        <span className={`inline-block transform w-[500px] ${bgColor} [skew-x:var(--tilt-angle)] p-2`}>
           {title}
         </span>
         {subtitle && (
-          <span className={` block text-xl mt-1 transform w-[600px] bg-neutral-700 [skew-x:var(--tilt-angle)] p-2`}>
+          <span className={` block text-xl mt-1 transform w-[500px] bg-neutral-700 [skew-x:var(--tilt-angle)] p-2`}>
             {subtitle}
           </span>
         )}
