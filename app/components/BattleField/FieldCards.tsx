@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { useAtomValue } from "jotai";
+import { useAtomValue, useAtom } from "jotai";
 import { data } from "../../data/cards";
 import { 
     myTurnAtom,
     droppedCardsAtom,
+    attackScaleAtom,
 } from "../../atom";
 import { BattleCard } from "./BattleCard";
 import { DeckArea } from "../Area/DeckArea";
@@ -46,6 +47,7 @@ export const FieldCards = () => {
     const [attackPosition, setAttackPosition] = useState<'opponent' | 'player'>('opponent');
     const [showSlidingBanner, setShowSlidingBanner] = useState(false);
     const [currentSkill, setCurrentSkill] = useState<{ name: string; damage: number; energy: number } | null>(null);
+    const [attackScale, setAttackScale] = useAtom(attackScaleAtom);
 
     useEffect(() => {
         if (isMyAttack || isEnemyAttack) {
@@ -54,12 +56,18 @@ export const FieldCards = () => {
             // 슬라이딩 배너 표시
             setShowSlidingBanner(true);
             
-            // Charging sound 재생
+                        // Charging sound 재생
             const chargingSound = new Audio('/soundeffect/Charging.mp3');
             chargingSound.volume = 1;
             chargingSound.play().catch(error => {
                 console.log('Charging 사운드 재생 실패:', error);
             });
+            
+            // 공격 애니메이션 시작
+            setAttackScale(1.3);
+            setTimeout(() => {
+                setAttackScale(1);
+            }, 1400);
             
             // 1.75초 후에 이펙트 표시
             const timer = setTimeout(() => {
@@ -102,7 +110,7 @@ export const FieldCards = () => {
                 <SlidingBanner
                     title={currentSkill.name}
                     subtitle={getCurrentPokemonInfo()!.name}
-                    bgColor="bg-green-600"
+                    bgColor="bg-red-600"
                     textColor="text-white"
                     tiltAngle="-8deg"
                     bottomOffset="bottom-10"

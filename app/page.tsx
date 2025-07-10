@@ -15,19 +15,23 @@ import { useAnimationSequence } from "./hooks/useAnimationSequence";
 import { useCardManagement } from "./hooks/useCardManagement";
 import { useDragHandlers } from "./hooks/useDragHandlers";
 import { useBGM } from "./hooks/useBGM";
+
 import { BGMStartPrompt } from "./components/BGMStartPrompt";
 
 export default function App() {
   // Use animation hook
   const {
     boardRotateZ, 
-    boardScale,
     boardOpacity,
     playerCardRotate,
     playerCardPosition,
     startVideo,
     coinTextOpacity,
-    boardRotateX,
+  } = useAnimationSequence();
+
+  // Use attack animation hook
+  const {
+    boardScale,
   } = useAnimationSequence();
 
   const {
@@ -68,7 +72,7 @@ export default function App() {
         {/* 오프닝 애니메이션 오버레이 */}
         <OpeningOverlay boardOpacity={boardOpacity} />
         {/* 게임 필드 */}
-        <GameBoard boardRotateZ={boardRotateZ} boardScale={boardScale} boardRotateX={boardRotateX}>
+        <GameBoard boardRotateZ={boardRotateZ} boardScale={boardScale}>
           {/* 적 카드 영역 */}
           <Hand isMy={false}/>
           {/* 필드 카드 영역 */}

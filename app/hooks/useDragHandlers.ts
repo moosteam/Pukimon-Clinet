@@ -66,6 +66,12 @@ export function useDragHandlers() {
     // 턴 및 카드 소유권 검증
     if ((myTurn && !isMyCard) || (!myTurn && !isEnemyCard)) return;
 
+    // 내 턴일 때는 상대방 영역에 카드를 배치할 수 없음
+    if (myTurn && (dropzoneId === 'enemy_battle' || dropzoneId.includes('enemy_waiting_'))) {
+      alert("내 턴에는 상대방 영역에 카드를 배치할 수 없습니다!");
+      return;
+    }
+
     // 카드 인덱스 추출
     const index = parseInt(cardId.split('-')[1]);
 

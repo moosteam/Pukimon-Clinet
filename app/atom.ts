@@ -66,6 +66,7 @@ export const playerCardPositionAtom = atom(-130);
 export const startVideoAtom = atom(false);
 export const coinTextOpacityAtom = atom(0);
 export const boardRotateXAtom = atom(0);
+export const attackScaleAtom = atom(1);
 
 // 드롭된 카드 상태 관리를 위한 atom
 export const droppedCardsAtom = atom<{ [key: string]: string }>({});
