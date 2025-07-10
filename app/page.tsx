@@ -15,6 +15,8 @@ import { useAnimationSequence } from "./hooks/useAnimationSequence";
 import { useCardManagement } from "./hooks/useCardManagement";
 import { useDragHandlers } from "./hooks/useDragHandlers";
 import { useBGM } from "./hooks/useBGM";
+import { showFullScreenEffectAtom } from "./atom";
+import { useAtom } from "jotai";
 
 import { BGMStartPrompt } from "./components/BGMStartPrompt";
 
@@ -44,6 +46,8 @@ export default function App() {
   // Use BGM hook
   const { currentBGM, hasUserInteracted } = useBGM();
 
+  const [showFullScreenEffect, setShowFullScreenEffect] = useAtom(showFullScreenEffectAtom);
+
   // Initial card draw effect
   useEffect(() => {
     // 10초 후에 실행될 타이머 설정
@@ -57,6 +61,20 @@ export default function App() {
   
   return (
     <DndContext onDragEnd={handleDragEnd}>
+      {/* 전체 화면 이펙트 */}
+      {showFullScreenEffect && (
+        <div className="fixed inset-0 z-[99999] pointer-events-none">
+          <video
+            autoPlay
+            muted={true}
+            playsInline
+            className="w-full h-full object-cover"
+            onEnded={() => setShowFullScreenEffect(false)}
+          >
+            <source src="/fullscreeneffect.webm" type="video/webm" />
+          </video>
+        </div>
+      )}
       <div className="w-full h-full bg-[#C2DAF6] relative overflow-hidden">
         {/* BGM 시작 프롬프트 */}
         <BGMStartPrompt hasUserInteracted={hasUserInteracted} />

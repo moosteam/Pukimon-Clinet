@@ -76,3 +76,5 @@ export const pokemonPlacementTurnAtom = atom<Record<string, number>>({});
 
 // 현재 게임 턴 수를 추적하는 atom
 export const gameTurnCountAtom = atom<number>(1);
+
+export const showFullScreenEffectAtom = atom(false);
