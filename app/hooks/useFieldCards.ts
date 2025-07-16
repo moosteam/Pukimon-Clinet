@@ -201,6 +201,9 @@ export const useFieldCards = ({
         setMyGameScore(prev => prev + 1);
         const benchIndex = findFirstBenchPokemon('enemy');
         
+        // 죽은 포켓몬의 에너지 저장
+        const deadPokemonEnergy = enemyBattlePokemonEnergy;
+        
         // 벤치에 교체할 포켓몬이 있는 경우
         if (benchIndex !== null) {
             // 벤치 포켓몬을 전투 영역으로 이동
@@ -216,9 +219,9 @@ export const useFieldCards = ({
             const finalCards = shiftBenchPokemon(updatedDroppedCards, 'enemy', benchIndex);
             setDroppedCards(finalCards);
             
-            // 새 전투 포켓몬 상태 설정
+            // 새 전투 포켓몬 상태 설정 (죽은 포켓몬의 에너지를 벤치 포켓몬에게 이전)
             setEnemyBattlePokemonHP(benchHP);
-            setEnemyBattlePokemonEnergy(benchEnergy);
+            setEnemyBattlePokemonEnergy(benchEnergy + deadPokemonEnergy);
             
             // 대기 영역 상태 업데이트
             const newWaitingHP = [...enemyWaitingHP];
@@ -252,12 +255,15 @@ export const useFieldCards = ({
         onEndTurn();
     };
 
-    /**
+        /**
      * 적 포켓몬이 내 포켓몬을 죽였을 때의 처리
      */
     const handleEnemyPokemonKill = () => {
         setEnemyGameScore(prev => prev + 1);
         const benchIndex = findFirstBenchPokemon('my');
+        
+        // 죽은 포켓몬의 에너지 저장
+        const deadPokemonEnergy = myBattlePokemonEnergy;
         
         // 벤치에 교체할 포켓몬이 있는 경우
         if (benchIndex !== null) {
@@ -274,9 +280,9 @@ export const useFieldCards = ({
             const finalCards = shiftBenchPokemon(updatedDroppedCards, 'my', benchIndex);
             setDroppedCards(finalCards);
             
-            // 새 전투 포켓몬 상태 설정
+            // 새 전투 포켓몬 상태 설정 (죽은 포켓몬의 에너지를 벤치 포켓몬에게 이전)
             setMyBattlePokemonHP(benchHP);
-            setMyBattlePokemonEnergy(benchEnergy);
+            setMyBattlePokemonEnergy(benchEnergy + deadPokemonEnergy);
             
             // 대기 영역 상태 업데이트
             const newWaitingHP = [...myWaitingHP];
@@ -295,7 +301,7 @@ export const useFieldCards = ({
             
             setMyWaitingHP(newWaitingHP);
             setMyWaitingEnergy(newWaitingEnergy);
-        } 
+        }
         // 교체할 포켓몬이 없는 경우
         else {
             delete droppedCards['my_battle'];

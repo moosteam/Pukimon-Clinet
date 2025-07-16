@@ -4,50 +4,45 @@ import { myGameScoreAtom, enemyGameScoreAtom } from '../atom';
 
 interface ScoreAnimationProps {
   isVisible: boolean;
-  isMyScore: boolean; // true면 내 점수, false면 적 점수
+  isMyScore: boolean;
   onAnimationComplete: () => void;
+  profileImg?: string;
+  nickname?: string;
 }
 
 export const ScoreAnimation: React.FC<ScoreAnimationProps> = ({
   isVisible,
   isMyScore,
-  onAnimationComplete
+  onAnimationComplete,
+  profileImg = "/ui/player1.png",
+  nickname = "포켓마스터"
 }) => {
-  const [showProfile, setShowProfile] = useState(false);
-  const [showPoint, setShowPoint] = useState(false);
-  const [showGlow, setShowGlow] = useState(false);
+  const [showAnimation, setShowAnimation] = useState(false);
+  const [showScoreGlow, setShowScoreGlow] = useState(false);
 
-  // ATOM에서 현재 점수 가져오기
   const myGameScore = useAtomValue(myGameScoreAtom);
   const enemyGameScore = useAtomValue(enemyGameScoreAtom);
 
-  // 현재 점수에 따라 애니메이션할 포인트 인덱스 결정
   const currentScore = isMyScore ? myGameScore : enemyGameScore;
-  const targetPointIndex = currentScore - 1; // 0부터 시작하므로 -1
 
   useEffect(() => {
     if (isVisible) {
-      // 글로우 효과 시작
-      setShowGlow(true);
+      setShowAnimation(true);
       
-      // 프로필 애니메이션 시작
-      setShowProfile(true);
+      // 0.8초 후 점수 글로우 효과
+      const glowTimer = setTimeout(() => {
+        setShowScoreGlow(true);
+      }, 800);
       
-      // 1초 후 포인트 애니메이션 시작
-      const pointTimer = setTimeout(() => {
-        setShowPoint(true);
-      }, 1000);
-      
-      // 3초 후 애니메이션 완료
+      // 2.5초 후 애니메이션 완료
       const completeTimer = setTimeout(() => {
-        setShowProfile(false);
-        setShowPoint(false);
-        setShowGlow(false);
+        setShowAnimation(false);
+        setShowScoreGlow(false);
         onAnimationComplete();
-      }, 3000);
+      }, 2500);
       
       return () => {
-        clearTimeout(pointTimer);
+        clearTimeout(glowTimer);
         clearTimeout(completeTimer);
       };
     }
@@ -56,77 +51,147 @@ export const ScoreAnimation: React.FC<ScoreAnimationProps> = ({
   if (!isVisible) return null;
 
   return (
-    <div className="fixed inset-0 z-[9999] pointer-events-none" style={{
-        transform: isMyScore ? 'rotateZ(0deg)' : 'rotateZ(180deg)'
-    }}>
-      {/* 글로우 효과 */}
-      {showGlow && (
-        <div className="absolute inset-0 animate-pulse" />
-      )}
-      
-      {/* 메인 애니메이션 컨테이너 - GameBoard 기울기 고려 */}
-      <div className="absolute inset-0 flex items-center justify-center" style={{
-        transform: 'perspective(800px) rotateX(-15deg) translateY(-2rem)'
-      }}>
-        {/* 가로 띠 형태의 애니메이션 */}
-        <div className={`relative ${showProfile ? 'score-profile-animation' : ''}`}>
-          <div className="flex items-center space-x-6">
-            {/* 프로필 이미지 */}
-            <div className="relative w-20 h-20 rounded-full bg-blue-600 border-4 border-white shadow-2xl flex items-center justify-center overflow-hidden">
-              {/* 내부 글로우 효과 */}
-              <div className={`absolute inset-0 bg-white/30 transition-all duration-1500 ${
-                showGlow ? 'opacity-100' : 'opacity-0'
-              }`} />
+    <>
+      {/* 전체 화면 오버레이 - GameBoard transform 완전 무시 */}
+      <div 
+        className="fixed inset-0 z-[999999] flex items-center justify-center pointer-events-none"
+        style={{ 
+          transform: 'none !important',
+          perspective: 'none !important',
+          transformStyle: 'flat',
+          isolation: 'isolate'
+        }}
+      >
+        {/* 배경 어두운 오버레이 (블러 제거) */}
+        <div 
+          className="absolute inset-0 " 
+          style={{ transform: 'none' }}
+        />
+        
+        {/* 메인 컨테이너 */}
+        <div 
+          className={`
+            relative transition-all duration-700 ease-out
+            ${showAnimation ? 'scale-100 opacity-100 translate-y-0' : 'scale-75 opacity-0 translate-y-8'}
+          `}
+          style={{ 
+            transform: showAnimation 
+              ? 'scale(1) translateY(0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg)' 
+              : 'scale(0.75) translateY(8px) rotateX(0deg) rotateY(0deg) rotateZ(0deg)',
+            transformStyle: 'flat',
+            perspective: 'none'
+          }}
+        >
+          
+          {/* 글로우 배경 효과 */}
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-400/30 via-sky-300/40 to-blue-500/30 rounded-3xl blur-2xl scale-110" />
+          
+          {/* 프로필 이미지 */}
+          <div className="relative -mb-16 z-20 flex justify-center">
+            <div className="relative">
+              {/* 프로필 외곽 글로우 */}
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-sky-300 rounded-full blur-lg scale-110 opacity-60" />
               
-              {/* 프로필 아이콘 */}
-              <div className="relative z-10">
-                <span className="text-white text-2xl font-bold drop-shadow-lg">
-                  {isMyScore ? '⚔️' : '💀'}
-                </span>
+              {/* 프로필 컨테이너 */}
+              <div className="relative w-36 h-36 rounded-full bg-gradient-to-br from-white via-blue-50 to-blue-100 p-1 shadow-2xl">
+                <div className="w-full h-full rounded-full overflow-hidden bg-gradient-to-br from-blue-100 to-white flex items-center justify-center">
+                  <img
+                    src={profileImg}
+                    alt="profile"
+                    className="w-32 h-32 rounded-full object-cover shadow-lg"
+                  />
+                </div>
               </div>
               
-              {/* 회전하는 테두리 */}
-              <div className={`absolute inset-0 rounded-full border-4 border-transparent border-t-white/50 transition-all duration-3000 ${
-                showGlow ? 'animate-spin' : ''
-              }`} />
+              {/* 프로필 테두리 애니메이션 */}
+              <div className="absolute inset-0 rounded-full border-4 border-white/50 animate-pulse" />
+            </div>
+          </div>
+          
+          {/* 메인 카드 */}
+          <div className="relative bg-gradient-to-br from-sky-400 via-blue-500 to-blue-600 rounded-3xl shadow-2xl p-8 pt-20 min-w-[480px]">
+            
+            {/* 카드 내부 글로우 */}
+            <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent rounded-3xl" />
+            
+            {/* 닉네임 */}
+            <div className="text-center mb-8">
+              <h2 className="text-white text-3xl font-black tracking-wide drop-shadow-lg">
+                {nickname}
+              </h2>
             </div>
             
-            {/* 포인트 표시 */}
-            <div className="flex space-x-2">
-              {[0, 1, 2].map((index) => {
-                // 현재 채워진 포인트 수 계산
-                const filledPoints = isMyScore ? myGameScore : enemyGameScore;
+            {/* 점수 표시 */}
+            <div className="flex justify-center items-center gap-8">
+              {[1, 2, 3].map((num) => {
+                const isActive = num <= currentScore;
+                const isCurrent = num === currentScore;
                 
                 return (
-                  <div key={index} className="relative">
+                  <div key={num} className="relative">
+                    
+                    {/* 점수 글로우 배경 */}
+                    {isCurrent && showScoreGlow && (
+                      <div className="absolute inset-0 bg-yellow-400 rounded-full blur-xl scale-150 opacity-60 animate-pulse" />
+                    )}
+                    
+                    {/* 점수 원 */}
                     <div
-                      className={`relative w-8 h-8 rounded-full border-2 border-white transition-all duration-800 ${
-                        showPoint && index === targetPointIndex
-                          ? 'bg-red-500 scale-110 point-fill-animation shadow-lg' 
-                          : index <= filledPoints
-                          ? 'bg-red-500' // 이미 채워진 포인트
-                          : 'bg-gray-800' // 아직 안 채워진 포인트
-                      }`}
+                      className={`
+                        relative w-20 h-20 rounded-full flex items-center justify-center
+                        font-black text-4xl border-4 transition-all duration-500
+                        ${isActive 
+                          ? 'bg-gradient-to-br from-yellow-300 to-yellow-500 border-yellow-200 text-blue-900 shadow-2xl' 
+                          : 'bg-gradient-to-br from-blue-200 to-blue-300 border-blue-100 text-blue-600 opacity-60'
+                        }
+                        ${isCurrent && showScoreGlow ? 'scale-110 animate-bounce' : ''}
+                      `}
                       style={{
-                        boxShadow: showPoint && index === targetPointIndex
-                          ? '0 0 15px rgba(239, 68, 68, 0.8)' 
-                          : index <= filledPoints
-                          ? '0 0 8px rgba(239, 68, 68, 0.5)' // 이미 채워진 포인트의 글로우
-                          : 'none'
+                        boxShadow: isActive 
+                          ? '0 0 30px rgba(255, 235, 59, 0.6), 0 8px 25px rgba(0, 0, 0, 0.3)' 
+                          : '0 4px 15px rgba(0, 0, 0, 0.2)'
                       }}
                     >
-                      {/* 포인트 내부 글로우 */}
-                      {showPoint && index === targetPointIndex && (
-                        <div className="absolute inset-0 rounded-full bg-white/30 animate-pulse" />
+                      {num}
+                      
+                      {/* 활성 점수 내부 글로우 */}
+                      {isActive && (
+                        <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent rounded-full" />
                       )}
                     </div>
+                    
+                    {/* 점수 하이라이트 링 */}
+                    {isCurrent && showScoreGlow && (
+                      <div className="absolute inset-0 border-4 border-yellow-300 rounded-full animate-ping opacity-75" />
+                    )}
                   </div>
                 );
               })}
             </div>
+            
+            {/* 하단 장식 */}
+            <div className="absolute bottom-0 left-0 right-0 h-2 bg-gradient-to-r from-transparent via-white/20 to-transparent rounded-b-3xl" />
           </div>
+          
+          {/* 카드 하단 그림자 */}
+          <div className="absolute -bottom-4 left-4 right-4 h-8 bg-black/20 rounded-full blur-xl" />
         </div>
       </div>
-    </div>
+
+      <style jsx>{`
+        @keyframes bounce {
+          0%, 20%, 53%, 80%, 100% {
+            transform: scale(1.1) rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+          }
+          40%, 43% {
+            transform: scale(1.15) rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+          }
+        }
+        
+        .animate-bounce {
+          animation: bounce 1s ease-in-out;
+        }
+      `}</style>
+    </>
   );
 }; 

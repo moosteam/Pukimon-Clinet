@@ -76,3 +76,30 @@ export const pokemonPlacementTurnAtom = atom<Record<string, number>>({});
 
 // 현재 게임 턴 수를 추적하는 atom
 export const gameTurnCountAtom = atom<number>(1);
+
+export const showFullScreenEffectAtom = atom(false);
+export const showScoreAnimationAtom = atom(false);
+export const scoreAnimationPropsAtom = atom({
+  isVisible: false,
+  isMyScore: true,
+  onAnimationComplete: () => {},
+  profileImg: "/ui/player1.png",
+  nickname: "포켓마스터"
+});
+
+// Tutorial system atoms
+export const tutorialActiveAtom = atom(false);
+export const tutorialStepAtom = atom<string | null>(null);
+export const tutorialMessageAtom = atom<string>("");
+export const hasSeenTutorialAtom = atom(false);
+
+// Start page atoms
+export const showStartPageAtom = atom(true);
+export const gameOptionsAtom = atom({
+  useWebOnly: true,
+  useCamera: false
+});
+export const userProfileAtom = atom({
+  profileImage: "/ui/player1.png",
+  nickname: "포켓마스터"
+});

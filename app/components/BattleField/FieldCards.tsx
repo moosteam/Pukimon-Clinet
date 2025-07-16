@@ -4,7 +4,7 @@ import { data } from "../../data/cards";
 import { 
     myTurnAtom,
     droppedCardsAtom,
-    attackScaleAtom,
+    showFullScreenEffectAtom,
 } from "../../atom";
 import { BattleCard } from "./BattleCard";
 import { DeckArea } from "../Area/DeckArea";
@@ -34,8 +34,6 @@ export const FieldCards = () => {
         myBattlePokemonHP,
         enemyBattlePokemonEnergy,
         enemyBattlePokemonHP,
-        myGameScore,
-        enemyGameScore,
         showScoreAnimation,
         scoreAnimationType,
         handleScoreAnimationComplete
@@ -47,7 +45,7 @@ export const FieldCards = () => {
     const [attackPosition, setAttackPosition] = useState<'opponent' | 'player'>('opponent');
     const [showSlidingBanner, setShowSlidingBanner] = useState(false);
     const [currentSkill, setCurrentSkill] = useState<{ name: string; damage: number; energy: number } | null>(null);
-    const [attackScale, setAttackScale] = useAtom(attackScaleAtom);
+    const [, setShowFullScreenEffect] = useAtom(showFullScreenEffectAtom);
 
     useEffect(() => {
         if (isMyAttack || isEnemyAttack) {
@@ -55,6 +53,7 @@ export const FieldCards = () => {
             setAttackPosition(myTurn ? 'opponent' : 'player');
             // 슬라이딩 배너 표시
             setShowSlidingBanner(true);
+            setShowFullScreenEffect(true); // 전체 이펙트도 시작
             
                         // Charging sound 재생
             const chargingSound = new Audio('/soundeffect/Charging.mp3');
@@ -64,9 +63,8 @@ export const FieldCards = () => {
             });
             
             // 공격 애니메이션 시작
-            setAttackScale(1.3);
             setTimeout(() => {
-                setAttackScale(1);
+                // 공격 애니메이션 완료 후 처리
             }, 1400);
             
             // 1.75초 후에 이펙트 표시
@@ -81,6 +79,7 @@ export const FieldCards = () => {
             // 공격이 끝나면 슬라이딩 배너 숨기기
             setShowSlidingBanner(false);
             setCurrentSkill(null);
+            setShowFullScreenEffect(false);
         }
     }, [isMyAttack, isEnemyAttack, myTurn]);
 
@@ -98,6 +97,8 @@ export const FieldCards = () => {
 
     return (
         <div className={`z-50 flex flex-row w-full justify-between items-center ${showScoreAnimation ? 'pointer-events-none' : ''}`}>
+            {/* 전체 화면 이펙트 */}
+            {/* 전체 화면 이펙트 렌더링 부분은 삭제 (app/page.tsx에서 렌더링 예정) */}
             {/* 점수 애니메이션 */}
             <ScoreAnimation
                 isVisible={showScoreAnimation}
@@ -113,7 +114,6 @@ export const FieldCards = () => {
                     bgColor="bg-red-600"
                     textColor="text-white"
                     tiltAngle="-8deg"
-                    bottomOffset="bottom-10"
                     isReverse={isEnemyAttack}
                 />
             }

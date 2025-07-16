@@ -16,7 +16,7 @@ const SlidingBanner: React.FC<SlidingBannerProps> = ({
   bgColor = 'bg-black',
   textColor = 'text-white',
   tiltAngle = '-8deg',
-  bottomOffset = 'bottom-10',
+  bottomOffset = 'bottom-20',
   isReverse = false
 }) => {
   return (
